@@ -1,10 +1,18 @@
 package com.juny.spacestory.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString(exclude = {"user", "space", "review"})
 public class SpaceReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,12 +29,25 @@ public class SpaceReservation {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user; // user_id category
 
     @ManyToOne
     @JoinColumn(name = "space_id")
     private Space space;
 
-    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "spaceReservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private Review review;
+
+    public SpaceReservation(LocalDateTime reservationStart, LocalDateTime reservationEnd, Boolean isReserved, User user, Space space, Review review) {
+        this.reservationStart = reservationStart;
+        this.reservationEnd = reservationEnd;
+        this.isReserved = isReserved;
+        this.user = user;
+        this.space = space;
+        this.review = review;
+    }
+
+    public void setReview(Review review) {
+        this.review = review;
+    }
 }

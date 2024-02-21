@@ -1,9 +1,17 @@
 package com.juny.spacestory.domain;
 
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Embeddable
-public class Addresss {
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString
+public class Address {
     private String roadAddress;
     private String jibunAddress;
     private String sido;
