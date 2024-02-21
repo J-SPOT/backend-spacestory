@@ -6,22 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-public class Review {
+public class DetailedType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String content;
+    @Column(nullable = false, unique = true)
+    private String details;
 
-    @Column(nullable = false)
-    private Integer rating;
-
-    public Review(String content, Integer rating) {
-        this.content = content;
-        this.rating = rating;
+    public DetailedType(String details) {
+        this.details = details;
     }
 }
