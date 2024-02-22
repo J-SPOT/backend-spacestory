@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.util.Set;
+import lombok.ToString;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ToString
 public class User {
 
     @Id
@@ -26,12 +27,20 @@ public class User {
     private String nickName;
 
     @Column(nullable = false)
-    private Integer point;
+    private Long point;
 
-    public User(String userName, String email, String nickName, Integer point, Set<SpaceReservation> spaceReservations) {
+    public User(String userName, String email, String nickName, Long point) {
         this.userName = userName;
         this.email = email;
         this.nickName = nickName;
         this.point = point;
+    }
+
+    public void payFee(long usageFee, Host host) {
+        if (this.point < usageFee) {
+            throw new IllegalArgumentException("사용자의 포인트가 부족합니다.");
+        }
+        this.point -= usageFee;
+        host.receivedFee(usageFee);
     }
 }

@@ -19,6 +19,12 @@ public class Space {
     @Enumerated(EnumType.STRING)
     private SpaceType spaceType;
 
+    @Column(nullable = false)
+    private String spaceName;
+
+    @Column(nullable = false)
+    private Integer hourlyRate;
+
     private Integer spaceSize;
 
     @Column(nullable = false)
@@ -32,8 +38,10 @@ public class Space {
     @JoinColumn(name = "space_id")
     private Set<DetailedType> detailedTypes = new HashSet<>();
 
-    public Space(SpaceType spaceType, Integer spaceSize, Integer maxCapacity, RealEstate realEstate, Set<DetailedType> detailedTypes) {
+    public Space(SpaceType spaceType, String spaceName, Integer hourlyRate, Integer spaceSize, Integer maxCapacity, RealEstate realEstate, Set<DetailedType> detailedTypes) {
         this.spaceType = spaceType;
+        this.spaceName = spaceName;
+        this.hourlyRate = hourlyRate;
         this.spaceSize = spaceSize;
         this.maxCapacity = maxCapacity;
         this.realEstate = realEstate;

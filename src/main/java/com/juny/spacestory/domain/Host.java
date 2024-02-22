@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ToString
 public class Host {
 
     @Id
@@ -17,10 +18,14 @@ public class Host {
     private String userName;
 
     @Column(nullable = false)
-    private Integer point;
+    private Long point;
 
-    public Host(String userName, Integer point) {
+    public Host(String userName, Long point) {
         this.userName = userName;
         this.point = point;
+    }
+
+    public void receivedFee(long usageFee) {
+        point += usageFee;
     }
 }

@@ -1,10 +1,56 @@
 package com.juny.spacestory.service;
 
+import com.juny.spacestory.domain.Space;
+import com.juny.spacestory.domain.SpaceReservation;
 import com.juny.spacestory.domain.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.juny.spacestory.repository.HostRepository;
+import com.juny.spacestory.repository.ReservationRepository;
+import com.juny.spacestory.repository.SpaceRepository;
+import com.juny.spacestory.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ReservationService {
 
+    private final UserRepository userRepository;
+
+    private final HostRepository hostRepository;
+
+    private final SpaceRepository spaceRepository;
+    private final ReservationRepository reservationRepository;
+
+    public ReservationService(UserRepository userRepository, HostRepository hostRepository, SpaceRepository spaceRepository, ReservationRepository reservationRepository) {
+        this.userRepository = userRepository;
+        this.hostRepository = hostRepository;
+        this.spaceRepository = spaceRepository;
+        this.reservationRepository = reservationRepository;
+    }
+    public SpaceReservation reserveSpace(Long userId, Long spaceId, LocalDateTime start, LocalDateTime end) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유효하지 않는 유저입니다."));
+        Space space = spaceRepository.findById(spaceId).orElseThrow(() -> new IllegalArgumentException("유효하지 않는 공간입니다."));
+        long usageTime = Duration.between(start, end).toHours();
+        if (usageTime < 1)
+            throw new IllegalArgumentException("공간 예약은 최소 1시간입니다.");
+        if (!isReservationAvailable(spaceId, start, end))
+            throw new IllegalArgumentException("이미 예약된 공간입니다.");
+        long usageFee = space.getHourlyRate() * usageTime;
+        user.payFee(usageFee, space.getRealEstate().getHost());
+        userRepository.save(user);
+        hostRepository.save(space.getRealEstate().getHost());
+        return reservationRepository.save(new SpaceReservation(start, end, usageFee, true, space));
+    }
+
+    private boolean isReservationAvailable(Long spaceId, LocalDateTime reqStart, LocalDateTime reqEnd) {
+        List<SpaceReservation> validReservations = reservationRepository.findBySpaceIdAndEndTimeAfter(spaceId, LocalDateTime.now());
+        for (var e : validReservations) {
+            if (reqStart.isBefore(e.getEndTime()) && reqEnd.isAfter(e.getStartTime())) { // req start ~ req end 사이에 예약이 있다면 안된다.
+                return false;
+            }
+        }
+        return true;
+    }
 }
