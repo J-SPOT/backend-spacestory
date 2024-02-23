@@ -9,7 +9,6 @@ import lombok.*;
 @Getter
 @ToString
 public class Host {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

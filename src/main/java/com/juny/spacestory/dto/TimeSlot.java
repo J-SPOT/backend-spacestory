@@ -1,6 +1,15 @@
 package com.juny.spacestory.dto;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalTime;
 
-public record TimeSlot(LocalTime startTime, LocalTime endTime) {
+public record TimeSlot(
+        @NotNull(message = "startTime cannot be null.")
+        @Future
+        LocalTime startTime,
+        @Future
+        @NotNull(message = "endTime cannot be null.")
+        LocalTime endTime) {
 }

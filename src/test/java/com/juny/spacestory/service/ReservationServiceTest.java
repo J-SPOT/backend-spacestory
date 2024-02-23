@@ -12,15 +12,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith; import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
-
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ReservationServiceTest {
@@ -80,10 +78,10 @@ public class ReservationServiceTest {
         long usageFee = space1.getHourlyRate() * usageTime;
         SpaceReservation expected = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space1);
 
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
-        Mockito.when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
-        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(Mockito.eq(spaceId), Mockito.any(LocalDate.class))).thenReturn(Collections.emptyList());
-        Mockito.when(reservationRepository.save(Mockito.any(SpaceReservation.class))).thenReturn(expected);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
+        when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
+        when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(eq(spaceId), any(LocalDate.class))).thenReturn(Collections.emptyList());
+        when(reservationRepository.save(any(SpaceReservation.class))).thenReturn(expected);
 
         //when
         SpaceReservation spaceReservation = reservationService.reserve(userId, spaceId, reservationDate, start, end);
@@ -91,7 +89,7 @@ public class ReservationServiceTest {
         //then
         assertThat(spaceReservation).isNotNull();
         assertThat(spaceReservation).isEqualTo(expected);
-        Mockito.verify(reservationRepository).save(Mockito.any(SpaceReservation.class));
+        verify(reservationRepository).save(any(SpaceReservation.class));
         assertThat(user1.getPoint()).isEqualTo(40_000L);
         assertThat(host1.getPoint()).isEqualTo(60_000L);
     }
@@ -106,15 +104,15 @@ public class ReservationServiceTest {
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(9, 0);
 
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
-        Mockito.when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
+        when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
 
         //when
 
         //then
         assertThatThrownBy(() -> {
             reservationService.reserve(userId, spaceId, reservationDate, start, end);
-        }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("공간 예약은 최소 1시간입니다.");
+        }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("space reservations require a minimum of 1 hour.");
     }
 
     @DisplayName("[실패] 공간 예약 시 이미 예약된 공간은 예약할 수 없다. 9~12시 예약이 있을 경우 7~10시 예약은 실패한다.")
@@ -136,16 +134,16 @@ public class ReservationServiceTest {
         LocalTime reqStart = LocalTime.of( 7, 0);
         LocalTime reqEnd = LocalTime.of(10, 0);
 
-        Mockito.when(userRepository.findById(reqUserId)).thenReturn(Optional.of(user2));
-        Mockito.when(spaceRepository.findById(reqSpaceId)).thenReturn(Optional.of(space1));
-        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(Mockito.eq(reqSpaceId), Mockito.any(LocalDate.class))).thenReturn(validReservations);
+        when(userRepository.findById(reqUserId)).thenReturn(Optional.of(user2));
+        when(spaceRepository.findById(reqSpaceId)).thenReturn(Optional.of(space1));
+        when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(eq(reqSpaceId), any(LocalDate.class))).thenReturn(validReservations);
 
         //when
 
         //then
         assertThatThrownBy(() -> {
             reservationService.reserve(reqUserId, reqSpaceId, reservationDate, reqStart, reqEnd);
-        }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("이미 예약된 공간입니다.");
+        }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("space is already reserved.");
     }
 
     @DisplayName("[실패] 공간 예약 시 이미 예약된 공간은 예약할 수 없다. 9~12시 예약이 있을 경우 11~14시 예약은 실패한다.")
@@ -167,15 +165,15 @@ public class ReservationServiceTest {
         LocalTime reqStart = LocalTime.of(11, 0);
         LocalTime reqEnd = LocalTime.of(14, 0);
 
-        Mockito.when(userRepository.findById(reqUserId)).thenReturn(Optional.of(user2));
-        Mockito.when(spaceRepository.findById(reqSpaceId)).thenReturn(Optional.of(space1));
-        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(Mockito.eq(reqSpaceId), Mockito.any(LocalDate.class))).thenReturn(validReservations);
+        when(userRepository.findById(reqUserId)).thenReturn(Optional.of(user2));
+        when(spaceRepository.findById(reqSpaceId)).thenReturn(Optional.of(space1));
+        when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(eq(reqSpaceId), any(LocalDate.class))).thenReturn(validReservations);
 
         //when
 
         //then
         assertThatThrownBy(() -> { reservationService.reserve(reqUserId, reqSpaceId, reservationDate, reqStart, reqEnd);
-        }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("이미 예약된 공간입니다.");
+        }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("space is already reserved.");
     }
 
     @DisplayName("[실패] 공간 예약 시 포인트가 부족하면 예약할 수 없다.")
@@ -191,15 +189,15 @@ public class ReservationServiceTest {
         long usageFee = space1.getHourlyRate() * usageTime;
         SpaceReservation expected = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space1);
 
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user2));
-        Mockito.when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user2));
+        when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
 
         //when
 
         //then
         assertThatThrownBy(() -> {
             reservationService.reserve(userId, spaceId, reservationDate, start, end);
-        }).isInstanceOf(RuntimeException.class).hasMessageContaining("사용자의 포인트가 부족합니다.");
+        }).isInstanceOf(RuntimeException.class).hasMessageContaining("user's points are insufficient");
     }
 
     @DisplayName("사용자가 특정 날짜에 예약할 수 있는 시간을 조회하다. 운영시간은 9~22시, 예약은 9~12시, 14~15시에 있다.")
@@ -224,8 +222,8 @@ public class ReservationServiceTest {
         validReservations.add(reservation);
         validReservations.add(reservation2);
 
-        Mockito.when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
-        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(validReservations);
+        when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
+        when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(validReservations);
 
         //when
         List<TimeSlot> availableReservation = reservationService.getAvailableReservation(spaceId, reservationDate);
@@ -267,8 +265,8 @@ public class ReservationServiceTest {
         List<SpaceReservation> expected = new ArrayList<>();
         expected.add(reservation);
         expected.add(reservation2);
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
-        Mockito.when(reservationRepository.findByUserId(userId)).thenReturn(expected);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
+        when(reservationRepository.findByUserId(userId)).thenReturn(expected);
 
         //when
         List<SpaceReservation> userReservation = reservationService.getReservationsByUserId(userId);
@@ -292,6 +290,7 @@ public class ReservationServiceTest {
         SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space1);
         List<SpaceReservation> reservations = new ArrayList<>();
         reservations.add(reservation);
+
         Long reservationId = reservation.getId();
         RequestUpdateReservation requestUpdateReservation = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), true);
         LocalTime start2 = LocalTime.of(9, 0);
@@ -300,11 +299,11 @@ public class ReservationServiceTest {
         long usageFee2 = space1.getHourlyRate() * usageTime2;
         SpaceReservation expected = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, space1);
 
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
-        Mockito.when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
-        Mockito.when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
-        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(reservations);
-        Mockito.when(reservationRepository.save(Mockito.any(SpaceReservation.class))).thenReturn(expected);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
+        when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
+        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
+        when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(reservations);
+        when(reservationRepository.save(any(SpaceReservation.class))).thenReturn(expected);
 
         //when
         SpaceReservation update = reservationService.update(userId, spaceId, reservationId, requestUpdateReservation);
@@ -326,12 +325,12 @@ public class ReservationServiceTest {
         long usageFee = space1.getHourlyRate() * usageTime;
         SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space1);
         Long reservationId = reservation.getId();
-        Mockito.when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
 
         //when
         reservationService.delete(reservationId);
 
         //then
-        Mockito.verify(reservationRepository).delete(reservation);
+        verify(reservationRepository).delete(reservation);
     }
 }

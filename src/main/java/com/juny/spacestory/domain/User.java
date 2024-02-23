@@ -12,7 +12,6 @@ import lombok.ToString;
 @Getter
 @ToString
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,7 +37,7 @@ public class User {
 
     public void payFee(long usageFee, Host host) {
         if (this.point < usageFee) {
-            throw new IllegalArgumentException("사용자의 포인트가 부족합니다.");
+            throw new IllegalArgumentException("user's points are insufficient.");
         }
         this.point -= usageFee;
         host.receivedFee(usageFee);
