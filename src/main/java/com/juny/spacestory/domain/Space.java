@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,6 +25,12 @@ public class Space {
     private String spaceName;
 
     @Column(nullable = false)
+    private LocalTime openingTime;
+
+    @Column(nullable = false)
+    private LocalTime closingTime;
+
+    @Column(nullable = false)
     private Integer hourlyRate;
 
     private Integer spaceSize;
@@ -38,9 +46,11 @@ public class Space {
     @JoinColumn(name = "space_id")
     private Set<DetailedType> detailedTypes = new HashSet<>();
 
-    public Space(SpaceType spaceType, String spaceName, Integer hourlyRate, Integer spaceSize, Integer maxCapacity, RealEstate realEstate, Set<DetailedType> detailedTypes) {
+    public Space(SpaceType spaceType, String spaceName, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate, Integer spaceSize, Integer maxCapacity, RealEstate realEstate, Set<DetailedType> detailedTypes) {
         this.spaceType = spaceType;
         this.spaceName = spaceName;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
         this.hourlyRate = hourlyRate;
         this.spaceSize = spaceSize;
         this.maxCapacity = maxCapacity;
