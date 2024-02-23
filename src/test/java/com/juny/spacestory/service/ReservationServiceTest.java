@@ -82,7 +82,7 @@ public class ReservationServiceTest {
 
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
         Mockito.when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
-        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReServedTrue(Mockito.eq(spaceId), Mockito.any(LocalDate.class), Mockito.eq(true))).thenReturn(Collections.emptyList());
+        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(Mockito.eq(spaceId), Mockito.any(LocalDate.class))).thenReturn(Collections.emptyList());
         Mockito.when(reservationRepository.save(Mockito.any(SpaceReservation.class))).thenReturn(expected);
 
         //when
@@ -138,7 +138,7 @@ public class ReservationServiceTest {
 
         Mockito.when(userRepository.findById(reqUserId)).thenReturn(Optional.of(user2));
         Mockito.when(spaceRepository.findById(reqSpaceId)).thenReturn(Optional.of(space1));
-        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReServedTrue(Mockito.eq(reqSpaceId), Mockito.any(LocalDate.class), Mockito.eq(true))).thenReturn(validReservations);
+        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(Mockito.eq(reqSpaceId), Mockito.any(LocalDate.class))).thenReturn(validReservations);
 
         //when
 
@@ -169,7 +169,7 @@ public class ReservationServiceTest {
 
         Mockito.when(userRepository.findById(reqUserId)).thenReturn(Optional.of(user2));
         Mockito.when(spaceRepository.findById(reqSpaceId)).thenReturn(Optional.of(space1));
-        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReServedTrue(Mockito.eq(reqSpaceId), Mockito.any(LocalDate.class), Mockito.eq(true))).thenReturn(validReservations);
+        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(Mockito.eq(reqSpaceId), Mockito.any(LocalDate.class))).thenReturn(validReservations);
 
         //when
 
@@ -225,7 +225,7 @@ public class ReservationServiceTest {
         validReservations.add(reservation2);
 
         Mockito.when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
-        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReServedTrue(spaceId, reservationDate, true)).thenReturn(validReservations);
+        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(validReservations);
 
         //when
         List<TimeSlot> availableReservation = reservationService.getAvailableReservation(spaceId, reservationDate);
@@ -293,7 +293,7 @@ public class ReservationServiceTest {
         List<SpaceReservation> reservations = new ArrayList<>();
         reservations.add(reservation);
         Long reservationId = reservation.getId();
-        RequestUpdateReservation requestUpdateReservation = new RequestUpdateReservation(LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), true);
+        RequestUpdateReservation requestUpdateReservation = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), true);
         LocalTime start2 = LocalTime.of(9, 0);
         LocalTime end2 = LocalTime.of(11, 0);
         long usageTime2 = Duration.between(start2, end2).toHours();
@@ -303,7 +303,7 @@ public class ReservationServiceTest {
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
         Mockito.when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space1));
         Mockito.when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
-        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReServedTrue(spaceId, reservationDate, true)).thenReturn(reservations);
+        Mockito.when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(reservations);
         Mockito.when(reservationRepository.save(Mockito.any(SpaceReservation.class))).thenReturn(expected);
 
         //when

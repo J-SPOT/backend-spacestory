@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<SpaceReservation, Long> {
-    List<SpaceReservation> findBySpaceIdAndReservationDateAndIsReServedTrue(Long spaceId, LocalDate reservationDate, Boolean isReserved);
+    List<SpaceReservation> findBySpaceIdAndReservationDateAndIsReservedTrue(Long spaceId, LocalDate reservationDate);
+
     List<SpaceReservation> findByUserId(Long userId);
 }

@@ -52,7 +52,7 @@ public class ReservationService {
     }
 
     private boolean isReservationAvailable(Long spaceId, LocalDate reservationDate, LocalTime reqStart, LocalTime reqEnd) {
-        List<SpaceReservation> validReservations = reservationRepository.findBySpaceIdAndReservationDateAndIsReServedTrue(spaceId, reservationDate, true);
+        List<SpaceReservation> validReservations = reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate);
         for (var e : validReservations) {
             if (reqStart.isBefore(e.getEndTime()) && reqEnd.isAfter(e.getStartTime())) { // req start ~ req end 사이에 예약이 있다면 안된다.
                 return false;
@@ -63,7 +63,7 @@ public class ReservationService {
 
     public List<TimeSlot> getAvailableReservation(Long spaceId, LocalDate reservationDate) {
         Space space = spaceRepository.findById(spaceId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 공간입니다."));
-        List<SpaceReservation> reservedSpace = reservationRepository.findBySpaceIdAndReservationDateAndIsReServedTrue(spaceId, reservationDate, true);
+        List<SpaceReservation> reservedSpace = reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate);
         LocalTime openingTime = space.getOpeningTime();
         LocalTime closingTime = space.getClosingTime();
         List<TimeSlot> availableSlots = new ArrayList<>();
