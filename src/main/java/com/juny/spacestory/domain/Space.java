@@ -37,15 +37,13 @@ public class Space {
     @Column(nullable = false)
     private Integer maxCapacity;
 
+    private Set<DetailedType> detailedTypes = new HashSet<>();
+
     @ManyToOne
     @JoinColumn(name = "realEstate_id")
     private RealEstate realEstate;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "space_id")
-    private Set<DetailedType> detailedTypes = new HashSet<>();
-
-    public Space(SpaceType spaceType, String spaceName, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate, Integer spaceSize, Integer maxCapacity, RealEstate realEstate, Set<DetailedType> detailedTypes) {
+    public Space(SpaceType spaceType, String spaceName, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate, Integer spaceSize, Integer maxCapacity, Set<DetailedType> detailedTypes, RealEstate realEstate) {
         this.spaceType = spaceType;
         this.spaceName = spaceName;
         this.openingTime = openingTime;
@@ -53,7 +51,7 @@ public class Space {
         this.hourlyRate = hourlyRate;
         this.spaceSize = spaceSize;
         this.maxCapacity = maxCapacity;
-        this.realEstate = realEstate;
         this.detailedTypes = detailedTypes;
+        this.realEstate = realEstate;
     }
 }

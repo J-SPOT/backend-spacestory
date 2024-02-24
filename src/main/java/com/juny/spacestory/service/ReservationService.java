@@ -75,13 +75,11 @@ public class ReservationService {
                         reservation.getEndTime()))
                 .toList();
 
-        for (var e : reservedSpace) {
-            LocalTime reservedStart = e.getStartTime();
-            LocalTime reservedEnd = e.getEndTime();
+        for (var e : reservedSlots) {
             availableSlots.removeIf(slot -> {
                 LocalTime slotStart = slot.startTime();
                 LocalTime slotEnd = slot.endTime();
-                return (slotStart.isBefore(reservedEnd) && slotEnd.isAfter(reservedStart));
+                return (slotStart.isBefore(e.endTime()) && slotEnd.isAfter(e.startTime()));
             });
         }
 
