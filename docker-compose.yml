@@ -1,0 +1,25 @@
+services:
+  juny_db:
+    user: ${USER_ID}
+    image: mysql:8.0.33
+    ports:
+      - 13306:3306
+    container_name: juny
+    volumes:
+      - ${PROJECT_HOME}/Develop:/var/lib/mysql:rw
+      - ${PROJECT_HOME}/my.cnf:/etc/my.cnf:rw
+      - ${PROJECT_HOME}/Script/Develop:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  test_db:
+    user: ${USER_ID}
+    image: mysql:8.0.33
+    ports:
+      - 13307:3306
+    container_name: test
+    volumes:
+      - ${PROJECT_HOME}/Test:/var/lib/mysql:rw
+      - ${PROJECT_HOME}/my.cnf:/etc/my.cnf:rw
+      - ${PROJECT_HOME}/Script/Test:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
