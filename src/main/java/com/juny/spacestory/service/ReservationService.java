@@ -1,5 +1,6 @@
 package com.juny.spacestory.service;
 
+import com.juny.spacestory.domain.Host;
 import com.juny.spacestory.domain.Space;
 import com.juny.spacestory.domain.SpaceReservation;
 import com.juny.spacestory.domain.User;
@@ -30,22 +31,33 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
 
+    private static final String SPACE_MINIMUM_ONE_HOUR_MSG = "space reservations require a minimum of 1 hour.";
+    private static final String SPACE_ALREAY_RESERVED_MSG = "space is already reserved.";
+    private static final String USER_INVALID_MSG = "User is invalid.";
+    private static final String SPACE_INVALID_MSG = "Space is invalid.";
+    private static final String RESERVATION_INVALID_MSG = "Reservation is invalid.";
+    private static final String RESERVATION_REQUEST_INVALID_MSG = "Reservation request is invalid.";
+
     public SpaceReservation reserve(Long userId, Long spaceId, LocalDate reservationDate, LocalTime start, LocalTime end) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("user is invalid."));
-        Space space = spaceRepository.findById(spaceId).orElseThrow(() -> new IllegalArgumentException("space is invalid."));
+        User user = findUserById(userId);
+        Space space = findSpaceById(spaceId);
         long usageTime = Duration.between(start, end).toHours();
 
         if (usageTime < 1)
-            throw new IllegalArgumentException("space reservations require a minimum of 1 hour.");
+            throw new IllegalArgumentException(SPACE_MINIMUM_ONE_HOUR_MSG);
         if (!isReservationAvailable(spaceId, reservationDate, start, end))
-            throw new IllegalArgumentException("space is already reserved.");
+            throw new IllegalArgumentException(SPACE_ALREAY_RESERVED_MSG);
 
         long usageFee = space.getHourlyRate() * usageTime;
-        user.payFee(usageFee, space.getRealEstate().getHost());
-        userRepository.save(user);
-        hostRepository.save(space.getRealEstate().getHost());
+        processPayment(user, space.getRealEstate().getHost(), usageFee);
 
         return reservationRepository.save(new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space));
+    }
+
+    private void processPayment(User user, Host host, long usageFee) {
+        user.payFee(usageFee, host);
+        userRepository.save(user);
+        hostRepository.save(host);
     }
 
     private boolean isReservationAvailable(Long spaceId, LocalDate reservationDate, LocalTime reqStart, LocalTime reqEnd) {
@@ -59,7 +71,7 @@ public class ReservationService {
     }
 
     public List<TimeSlot> getAvailableReservation(Long spaceId, LocalDate reservationDate) {
-        Space space = spaceRepository.findById(spaceId).orElseThrow(() -> new IllegalArgumentException("space is invalid."));
+        Space space = findSpaceById(spaceId);
         List<SpaceReservation> reservedSpace = reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate);
         LocalTime openingTime = space.getOpeningTime();
         LocalTime closingTime = space.getClosingTime();
@@ -87,43 +99,59 @@ public class ReservationService {
     }
 
     public List<SpaceReservation> getReservationsByUserId(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("user is invalid."));
+        findUserById(userId);
 
         return reservationRepository.findByUserId(userId);
     }
 
     public SpaceReservation update(Long userId, Long spaceId, Long reservationId, RequestUpdateReservation req) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("user is invalid."));
-        Space space = spaceRepository.findById(spaceId).orElseThrow(() -> new IllegalArgumentException("space is invalid."));
-        SpaceReservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new IllegalArgumentException("reservation is invalid."));
-        List<TimeSlot> availableSlots = getAvailableReservation(spaceId, req.reservationDate());
+        User user = findUserById(userId);
+        Space space = findSpaceById(spaceId);
+        SpaceReservation reservation = findReservationById(reservationId);
 
+        List<TimeSlot> availableSlots = calculateAvailableSlots(spaceId, req, reservation);
+
+        calculateAvailableSlots(req, availableSlots);
+
+        reservation.updateReservation(req);
+
+        return reservationRepository.save(reservation);
+    }
+
+    private void calculateAvailableSlots(RequestUpdateReservation req, List<TimeSlot> availableSlots) {
+        for (LocalTime time = req.startTime(); time.isBefore(req.endTime()); time = time.plusHours(1)) {
+            TimeSlot reqSlot = new TimeSlot(time, time.plusHours(1));
+            if (!availableSlots.contains(reqSlot)) {
+                throw new IllegalArgumentException(RESERVATION_REQUEST_INVALID_MSG);
+            }
+        }
+    }
+
+    private List<TimeSlot> calculateAvailableSlots(Long spaceId, RequestUpdateReservation req, SpaceReservation reservation) {
+        List<TimeSlot> availableSlots = getAvailableReservation(spaceId, req.reservationDate());
         if (reservation.getReservationDate().equals(req.reservationDate())) {
             for (LocalTime time = reservation.getStartTime(); time.isBefore(reservation.getEndTime()); time = time.plusHours(1)) {
                 availableSlots.add(new TimeSlot(time, time.plusHours(1)));
             }
             availableSlots.sort(Comparator.comparing(TimeSlot::startTime));
         }
+        return availableSlots;
+    }
 
-        boolean isReservationAvailable = true;
-        for (LocalTime time = req.startTime(); time.isBefore(req.endTime()); time = time.plusHours(1)) {
-            TimeSlot reqSlot = new TimeSlot(time, time.plusHours(1));
-            if (!availableSlots.contains(reqSlot)) {
-                isReservationAvailable = false;
-                break;
-            }
-        }
+    private SpaceReservation findReservationById(Long reservationId) {
+        return reservationRepository.findById(reservationId).orElseThrow(() -> new IllegalArgumentException(RESERVATION_INVALID_MSG));
+    }
 
-        if (!isReservationAvailable) {
-            throw new IllegalArgumentException("reservation request is invalid.");
-        }
-        reservation.updateReservation(req);
+    private Space findSpaceById(Long spaceId) {
+        return spaceRepository.findById(spaceId).orElseThrow(() -> new IllegalArgumentException(SPACE_INVALID_MSG));
+    }
 
-        return reservationRepository.save(reservation);
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException(USER_INVALID_MSG));
     }
 
     public void delete(Long reservationId) {
-        SpaceReservation spaceReservation = reservationRepository.findById(reservationId).orElseThrow(() -> new IllegalArgumentException("reservation is invalid."));
+        SpaceReservation spaceReservation = findReservationById(reservationId);
 
         reservationRepository.delete(spaceReservation);
     }
