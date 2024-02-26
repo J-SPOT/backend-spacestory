@@ -6,6 +6,12 @@ import com.juny.spacestory.domain.SpaceReservation;
 import com.juny.spacestory.domain.User;
 import com.juny.spacestory.dto.RequestUpdateReservation;
 import com.juny.spacestory.dto.TimeSlot;
+import com.juny.spacestory.exception.global.ErrorCode;
+import com.juny.spacestory.exception.space.SpaceInvalidIdException;
+import com.juny.spacestory.exception.spaceReservation.ReservationInvalidIdException;
+import com.juny.spacestory.exception.spaceReservation.ReservationMinimumTimeException;
+import com.juny.spacestory.exception.spaceReservation.ReservationOverlappedTimeException;
+import com.juny.spacestory.exception.user.UserInvalidIdException;
 import com.juny.spacestory.repository.HostRepository;
 import com.juny.spacestory.repository.ReservationRepository;
 import com.juny.spacestory.repository.SpaceRepository;
@@ -31,22 +37,17 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
 
-    private static final String SPACE_MINIMUM_ONE_HOUR_MSG = "space reservations require a minimum of 1 hour.";
-    private static final String SPACE_ALREAY_RESERVED_MSG = "space is already reserved.";
-    private static final String USER_INVALID_MSG = "User is invalid.";
-    private static final String SPACE_INVALID_MSG = "Space is invalid.";
-    private static final String RESERVATION_INVALID_MSG = "Reservation is invalid.";
-    private static final String RESERVATION_REQUEST_INVALID_MSG = "Reservation request is invalid.";
-
     public SpaceReservation reserve(Long userId, Long spaceId, LocalDate reservationDate, LocalTime start, LocalTime end) {
         User user = findUserById(userId);
         Space space = findSpaceById(spaceId);
         long usageTime = Duration.between(start, end).toHours();
 
-        if (usageTime < 1)
-            throw new IllegalArgumentException(SPACE_MINIMUM_ONE_HOUR_MSG);
-        if (!isReservationAvailable(spaceId, reservationDate, start, end))
-            throw new IllegalArgumentException(SPACE_ALREAY_RESERVED_MSG);
+        if (usageTime < 1) {
+            throw new ReservationMinimumTimeException(ErrorCode.RESERVATION_MINIMUM_TIME);
+        }
+        if (!isReservationAvailable(spaceId, reservationDate, start, end)) {
+            throw new ReservationOverlappedTimeException(ErrorCode.RESERVATION_OVERLAPPED_TIME);
+        }
 
         long usageFee = space.getHourlyRate() * usageTime;
         processPayment(user, space.getRealEstate().getHost(), usageFee);
@@ -63,7 +64,7 @@ public class ReservationService {
     private boolean isReservationAvailable(Long spaceId, LocalDate reservationDate, LocalTime reqStart, LocalTime reqEnd) {
         List<SpaceReservation> validReservations = reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate);
         for (var e : validReservations) {
-            if (reqStart.isBefore(e.getEndTime()) && reqEnd.isAfter(e.getStartTime())) { // req start ~ req end 사이에 예약이 있다면 안된다.
+            if (reqStart.isBefore(e.getEndTime()) && reqEnd.isAfter(e.getStartTime())) {
                 return false;
             }
         }
@@ -122,7 +123,7 @@ public class ReservationService {
         for (LocalTime time = req.startTime(); time.isBefore(req.endTime()); time = time.plusHours(1)) {
             TimeSlot reqSlot = new TimeSlot(time, time.plusHours(1));
             if (!availableSlots.contains(reqSlot)) {
-                throw new IllegalArgumentException(RESERVATION_REQUEST_INVALID_MSG);
+                throw new ReservationOverlappedTimeException(ErrorCode.RESERVATION_OVERLAPPED_TIME);
             }
         }
     }
@@ -139,15 +140,15 @@ public class ReservationService {
     }
 
     private SpaceReservation findReservationById(Long reservationId) {
-        return reservationRepository.findById(reservationId).orElseThrow(() -> new IllegalArgumentException(RESERVATION_INVALID_MSG));
+        return reservationRepository.findById(reservationId).orElseThrow(() -> new ReservationInvalidIdException(ErrorCode.RESERVATION_INVALID_ID));
     }
 
     private Space findSpaceById(Long spaceId) {
-        return spaceRepository.findById(spaceId).orElseThrow(() -> new IllegalArgumentException(SPACE_INVALID_MSG));
+        return spaceRepository.findById(spaceId).orElseThrow(() -> new SpaceInvalidIdException(ErrorCode.SPACE_INVALID_ID));
     }
 
     private User findUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException(USER_INVALID_MSG));
+        return userRepository.findById(userId).orElseThrow(() -> new UserInvalidIdException(ErrorCode.USER_INVALID_ID));
     }
 
     public void delete(Long reservationId) {
