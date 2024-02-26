@@ -5,19 +5,17 @@ import com.juny.spacestory.dto.RequestUpdateReservation;
 import com.juny.spacestory.dto.TimeSlot;
 import com.juny.spacestory.repository.*;
 import com.juny.spacestory.service.ReservationService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -67,8 +65,8 @@ class SpacestoryApplicationTests {
 		RealEstate realEstate = realEstateRepository.save(res);
 
 		HashSet<DetailedType> details = new HashSet<>();
-		details.add(DetailedType.partyRoom);
-		details.add(DetailedType.residence);
+		details.add(DetailedType.PARTY_ROOM);
+		details.add(DetailedType.RESIDENCE);
 		Space sp = new Space(SpaceType.FRIENDSHIP, "space1", LocalTime.of(9, 0), LocalTime.of(22, 0), 10000, 17, 5, details, realEstate);
 		spaceRepository.save(sp);
 		Space space = spaceRepository.save(sp);

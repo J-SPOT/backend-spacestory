@@ -52,9 +52,9 @@ public class ReservationServiceTest {
         realEstate = new RealEstate(address1, 2, false, true, host);
 
         HashSet<DetailedType> detailedTypes = new HashSet<>();
-        detailedTypes.add(DetailedType.lectureRoom);
-        detailedTypes.add(DetailedType.meetingRoom);
-        space = new Space(SpaceType.EVENT, "소규모 회의, 업무 공간", LocalTime.of(9, 0), LocalTime.of(22, 0), 30000, 55, 10, detailedTypes, realEstate);
+        detailedTypes.add(DetailedType.LECTURE_ROOM);
+        detailedTypes.add(DetailedType.MEETING_ROOM);
+        space = new Space(SpaceType.EVENT, "소규모 회의, 업무 공간", LocalTime.of(9, 0), LocalTime.of(22, 0), 20000, 55, 10, detailedTypes, realEstate);
     }
 
     @DisplayName("사용자가 공간을 예약 시 예약된 공간을 반환한다")
@@ -83,8 +83,8 @@ public class ReservationServiceTest {
         assertThat(spaceReservation).isNotNull();
         assertThat(spaceReservation).isEqualTo(expected);
         verify(reservationRepository).save(any(SpaceReservation.class));
-        assertThat(user1.getPoint()).isEqualTo(40_000L);
-        assertThat(host.getPoint()).isEqualTo(60_000L);
+        assertThat(user1.getPoint()).isEqualTo(60_000);
+        assertThat(host.getPoint()).isEqualTo(40_000);
     }
 
     @DisplayName("[실패] 공간 예약 시 최소 시간은 1시간 이상이어야 한다.")
@@ -265,15 +265,16 @@ public class ReservationServiceTest {
         assertThat(userReservation).usingRecursiveComparison().isEqualTo(expected);
     }
 
-    @DisplayName("사용자가 예약정보를 같은 날 다른 시간으로 변경한다. 9~12시 예약 -> 9~11시 예약으로 변경한다.")
+    @DisplayName("사용자가 예약정보를 같은 날 다른 시간으로 변경한다. 9~12시 예약 -> 9~14시 예약으로 변경한다.")
     @Test
-    void UpdateReservation() {
+    void UpdateReservation_2() {
         //given
         Long userId = user1.getId();
         Long spaceId = space.getId();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(12, 0);
+        user1.payFee(60000, host);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
         SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
@@ -299,6 +300,50 @@ public class ReservationServiceTest {
 
         //then
         assertThat(update).isNotNull();
+        assertThat(expected.getFee()).isEqualTo(40_000);
+        assertThat(user1.getPoint()).isEqualTo(60_000);
+        assertThat(host.getPoint()).isEqualTo(40_000);
+        assertThat(update).usingRecursiveComparison().isEqualTo(expected);
+    }
+
+    @DisplayName("사용자가 예약정보를 같은 날 다른 시간으로 변경한다. 9~12시 예약 -> 9~14시 예약으로 변경한다.")
+    @Test
+    void UpdateReservation() {
+        //given
+        Long userId = user1.getId();
+        Long spaceId = space.getId();
+        LocalDate reservationDate = LocalDate.of(2024, 3, 3);
+        LocalTime start = LocalTime.of(9, 0);
+        LocalTime end = LocalTime.of(12, 0);
+        user1.payFee(60000, host);
+        long usageTime = Duration.between(start, end).toHours();
+        long usageFee = space.getHourlyRate() * usageTime;
+        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
+        List<SpaceReservation> reservations = new ArrayList<>();
+        reservations.add(reservation);
+
+        Long reservationId = reservation.getId();
+        RequestUpdateReservation requestUpdateReservation = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(14, 0), true);
+        LocalTime start2 = LocalTime.of(9, 0);
+        LocalTime end2 = LocalTime.of(14, 0);
+        long usageTime2 = Duration.between(start2, end2).toHours();
+        long usageFee2 = space.getHourlyRate() * usageTime2;
+        SpaceReservation expected = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, space);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
+        when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
+        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
+        when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(reservations);
+        when(reservationRepository.save(any(SpaceReservation.class))).thenReturn(expected);
+
+        //when
+        SpaceReservation update = reservationService.update(userId, spaceId, reservationId, requestUpdateReservation);
+
+        //then
+        assertThat(update).isNotNull();
+        assertThat(expected.getFee()).isEqualTo(100_000);
+        assertThat(user1.getPoint()).isEqualTo(0);
+        assertThat(host.getPoint()).isEqualTo(100_000);
         assertThat(update).usingRecursiveComparison().isEqualTo(expected);
     }
 

@@ -113,7 +113,7 @@ public class ReservationService {
 
         calculateAvailableSlots(req, availableSlots);
 
-        reservation.updateReservation(req);
+        reservation.updateReservation(req, user, space.getRealEstate().getHost());
 
         return reservationRepository.save(reservation);
     }

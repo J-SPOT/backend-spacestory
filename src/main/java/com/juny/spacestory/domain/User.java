@@ -19,7 +19,7 @@ public class User {
     @Column(nullable = false)
     private String userName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false, unique = true)
@@ -41,5 +41,10 @@ public class User {
         }
         this.point -= usageFee;
         host.receivedFee(usageFee);
+    }
+
+    public void getRefund(long differenceAmount, Host host) {
+        this.point += differenceAmount;
+        host.receivedFee(-differenceAmount);
     }
 }

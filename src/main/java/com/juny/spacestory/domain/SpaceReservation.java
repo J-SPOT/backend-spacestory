@@ -52,11 +52,18 @@ public class SpaceReservation {
         this.space = space;
     }
 
-    public void updateReservation(RequestUpdateReservation req) {
+    public void updateReservation(RequestUpdateReservation req, User user, Host host) {
         this.reservationDate = req.reservationDate();
         this.startTime = req.startTime();
         this.endTime = req.endTime();
-        this.fee = Duration.between(startTime, endTime).toHours() * this.space.getHourlyRate();
+        long differenceAmount = getFee() - Duration.between(startTime, endTime).toHours() * this.space.getHourlyRate();
+        if (differenceAmount < 0)
+            user.payFee(-differenceAmount, host);
+        if (differenceAmount > 0)
+            user.getRefund(differenceAmount, host);
+        this.fee -= differenceAmount;
         this.isReserved = req.isReserved();
+        if (!isReserved)
+            user.getRefund(getFee(), host);
     }
 }

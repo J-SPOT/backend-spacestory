@@ -32,11 +32,16 @@ public class Space {
     @Column(nullable = false)
     private Integer hourlyRate;
 
+    @Column(nullable = false)
     private Integer spaceSize;
 
     @Column(nullable = false)
     private Integer maxCapacity;
 
+    @ElementCollection(fetch = FetchType.LAZY, targetClass = DetailedType.class)
+    @CollectionTable(name = "space_detailed_type", joinColumns = @JoinColumn(name = "space_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Set<DetailedType> detailedTypes = new HashSet<>();
 
     @ManyToOne
