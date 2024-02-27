@@ -2,10 +2,12 @@ package com.juny.spacestory.service;
 
 import com.juny.spacestory.domain.*;
 import com.juny.spacestory.dto.RequestUpdateReservation;
+import com.juny.spacestory.dto.ResponseReservation;
 import com.juny.spacestory.dto.TimeSlot;
 import com.juny.spacestory.exception.spaceReservation.ReservationMinimumTimeException;
 import com.juny.spacestory.exception.spaceReservation.ReservationOverlappedTimeException;
 import com.juny.spacestory.exception.user.UserExceededPointException;
+import com.juny.spacestory.mapper.ReservationMapper;
 import com.juny.spacestory.repository.HostRepository;
 import com.juny.spacestory.repository.ReservationRepository;
 import com.juny.spacestory.repository.SpaceRepository;
@@ -13,9 +15,13 @@ import com.juny.spacestory.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith; import org.mockito.InjectMocks;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -41,6 +47,8 @@ public class ReservationServiceTest {
     @Mock
     private HostRepository hostRepository;
 
+    private ReservationMapper mapper = Mappers.getMapper(ReservationMapper.class);
+
     private User user1, user2;
     private Host host;
     private RealEstate realEstate;
@@ -48,6 +56,7 @@ public class ReservationServiceTest {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(reservationService, "mapper", mapper);
         user1 = new User("user1", "user1@gmail.com", "nickname1", 100_000L);
         user2 = new User("user1", "user1@gmail.com", "nickname1", 0L);
         host = new Host("host1", 0L);
@@ -71,20 +80,21 @@ public class ReservationServiceTest {
         LocalTime end = LocalTime.of( 11, 0);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation expected = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
+        SpaceReservation expectedReservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
         when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
         when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(eq(spaceId), any(LocalDate.class))).thenReturn(Collections.emptyList());
-        when(reservationRepository.save(any(SpaceReservation.class))).thenReturn(expected);
+        when(reservationRepository.save(any(SpaceReservation.class))).thenReturn(expectedReservation);
         when(hostRepository.save(space.getRealEstate().getHost())).thenReturn(host);
 
         //when
-        SpaceReservation spaceReservation = reservationService.reserve(userId, spaceId, reservationDate, start, end);
+        ResponseReservation reservation = reservationService.reserve(userId, spaceId, reservationDate, start, end);
+        ResponseReservation expected = mapper.ReservationToResponseCreateReservation(expectedReservation);
 
         //then
-        assertThat(spaceReservation).isNotNull();
-        assertThat(spaceReservation).isEqualTo(expected);
+        assertThat(reservation).isNotNull();
+        assertThat(reservation).isEqualTo(expected);
         verify(reservationRepository).save(any(SpaceReservation.class));
         assertThat(user1.getPoint()).isEqualTo(60_000);
         assertThat(host.getPoint()).isEqualTo(40_000);
@@ -254,18 +264,19 @@ public class ReservationServiceTest {
         long usageFee2 = space.getHourlyRate() * usageTime2;
         SpaceReservation reservation2 = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, space);
 
-        List<SpaceReservation> expected = new ArrayList<>();
-        expected.add(reservation);
-        expected.add(reservation2);
+        List<SpaceReservation> expectedReservations = new ArrayList<>();
+        expectedReservations.add(reservation);
+        expectedReservations.add(reservation2);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
-        when(reservationRepository.findByUserId(userId)).thenReturn(expected);
+        when(reservationRepository.findByUserId(userId)).thenReturn(expectedReservations);
+        List<ResponseReservation> expected = mapper.ReservationsToResponseCreateReservations(expectedReservations);
 
         //when
-        List<SpaceReservation> userReservation = reservationService.getReservationsByUserId(userId);
+        List<ResponseReservation> reservations = reservationService.getReservationsByUserId(userId);
 
         //then
-        assertThat(userReservation).isNotNull();
-        assertThat(userReservation).usingRecursiveComparison().isEqualTo(expected);
+        assertThat(reservations).isNotNull();
+        assertThat(reservations).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @DisplayName("사용자가 예약정보를 같은 날 다른 시간으로 변경한다. 9~12시 예약 -> 9~14시 예약으로 변경한다.")
@@ -290,23 +301,24 @@ public class ReservationServiceTest {
         LocalTime end2 = LocalTime.of(11, 0);
         long usageTime2 = Duration.between(start2, end2).toHours();
         long usageFee2 = space.getHourlyRate() * usageTime2;
-        SpaceReservation expected = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, space);
+        SpaceReservation expectedReservation = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, space);
+        ResponseReservation expected = mapper.ReservationToResponseCreateReservation(expectedReservation);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
         when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
         when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
         when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(reservations);
-        when(reservationRepository.save(any(SpaceReservation.class))).thenReturn(expected);
+        when(reservationRepository.save(any(SpaceReservation.class))).thenReturn(expectedReservation);
 
         //when
-        SpaceReservation update = reservationService.update(userId, spaceId, reservationId, requestUpdateReservation);
+        ResponseReservation updatedReservation = reservationService.update(reservationId, requestUpdateReservation);
 
         //then
-        assertThat(update).isNotNull();
-        assertThat(expected.getFee()).isEqualTo(40_000);
+        assertThat(updatedReservation).isNotNull();
+        assertThat(updatedReservation.fee()).isEqualTo(40_000);
         assertThat(user1.getPoint()).isEqualTo(60_000);
         assertThat(host.getPoint()).isEqualTo(40_000);
-        assertThat(update).usingRecursiveComparison().isEqualTo(expected);
+        assertThat(updatedReservation).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @DisplayName("사용자가 예약정보를 같은 날 다른 시간으로 변경한다. 9~12시 예약 -> 9~14시 예약으로 변경한다.")
@@ -331,23 +343,24 @@ public class ReservationServiceTest {
         LocalTime end2 = LocalTime.of(14, 0);
         long usageTime2 = Duration.between(start2, end2).toHours();
         long usageFee2 = space.getHourlyRate() * usageTime2;
-        SpaceReservation expected = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, space);
+        SpaceReservation expectedReservation = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, space);
+        ResponseReservation expected = mapper.ReservationToResponseCreateReservation(expectedReservation);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
         when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
         when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
         when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(reservations);
-        when(reservationRepository.save(any(SpaceReservation.class))).thenReturn(expected);
+        when(reservationRepository.save(any(SpaceReservation.class))).thenReturn(expectedReservation);
 
         //when
-        SpaceReservation update = reservationService.update(userId, spaceId, reservationId, requestUpdateReservation);
+        ResponseReservation updatedReservation = reservationService.update(reservationId, requestUpdateReservation);
 
         //then
-        assertThat(update).isNotNull();
-        assertThat(expected.getFee()).isEqualTo(100_000);
+        assertThat(updatedReservation).isNotNull();
+        assertThat(updatedReservation.fee()).isEqualTo(100_000);
         assertThat(user1.getPoint()).isEqualTo(0);
         assertThat(host.getPoint()).isEqualTo(100_000);
-        assertThat(update).usingRecursiveComparison().isEqualTo(expected);
+        assertThat(updatedReservation).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @DisplayName("예약 정보를 삭제를 삭제한다.")
@@ -368,6 +381,8 @@ public class ReservationServiceTest {
         reservationService.delete(reservationId);
 
         //then
-        verify(reservationRepository).delete(reservation);
+        verify(reservationRepository).findById(reservationId);
+        assertThat(reservation.getIsReserved()).isEqualTo(false);
+
     }
 }

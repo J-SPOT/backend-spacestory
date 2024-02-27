@@ -2,6 +2,7 @@ package com.juny.spacestory;
 
 import com.juny.spacestory.domain.*;
 import com.juny.spacestory.dto.RequestUpdateReservation;
+import com.juny.spacestory.dto.ResponseReservation;
 import com.juny.spacestory.dto.TimeSlot;
 import com.juny.spacestory.repository.*;
 import com.juny.spacestory.service.ReservationService;
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -41,7 +41,6 @@ class SpacestoryApplicationTests {
 	@Autowired
 	ReservationService reservationService;
 
-
 	@DisplayName("유저가 3월 3일 공간 예약하고 수정하고 취소하고 이용 가능한 시간을 확인한다")
 	@Transactional
 	@Test
@@ -70,15 +69,15 @@ class SpacestoryApplicationTests {
 		Space sp = new Space(SpaceType.FRIENDSHIP, "space1", LocalTime.of(9, 0), LocalTime.of(22, 0), 10000, 17, 5, details, realEstate);
 		spaceRepository.save(sp);
 		Space space = spaceRepository.save(sp);
-		SpaceReservation reservation1 = reservationService.reserve(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(12, 0));
-		SpaceReservation reservation2 = reservationService.reserve(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(17, 0), LocalTime.of(19, 0));
+		ResponseReservation reservation1 = reservationService.reserve(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(12, 0));
+		ResponseReservation reservation2 = reservationService.reserve(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(17, 0), LocalTime.of(19, 0));
 
 		// 3월 3일 9~12시 예약을 9~11시 예약으로 바꾼다.
 		RequestUpdateReservation req = new RequestUpdateReservation(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), true);
-		reservationService.update(user1.getId(), space.getId(), reservation1.getId(), req);
+		reservationService.update(reservation1.reservationId(), req);
 
 		// 3월 3일 5시에서 7시 예약을 삭제한다.
-		reservationService.delete(reservation2.getId());
+		reservationService.delete(reservation2.reservationId());
 
 		// 3월 3일 예약 가능한 시간은 11시부터 영업시간 종료시간인 22시까지임.
 		List<TimeSlot> availableReservation = reservationService.getAvailableReservation(space.getId(), LocalDate.of(2024, 3, 3));

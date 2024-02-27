@@ -1,8 +1,8 @@
 package com.juny.spacestory.controller;
 
-import com.juny.spacestory.domain.SpaceReservation;
 import com.juny.spacestory.dto.RequestCreateReservation;
 import com.juny.spacestory.dto.RequestUpdateReservation;
+import com.juny.spacestory.dto.ResponseReservation;
 import com.juny.spacestory.dto.TimeSlot;
 import com.juny.spacestory.service.ReservationService;
 import org.springframework.http.HttpStatus;
@@ -28,22 +28,22 @@ public class ReservationController {
     }
 
     @GetMapping("/v1/users/{userId}/reservations")
-    public ResponseEntity<List<SpaceReservation>> getUserReservations(@PathVariable Long userId) {
-        List<SpaceReservation> reservationsByUserId = reservationService.getReservationsByUserId(userId);
+    public ResponseEntity<List<ResponseReservation>> getUserReservations(@PathVariable Long userId) {
+        List<ResponseReservation> reservations = reservationService.getReservationsByUserId(userId);
 
-        return new ResponseEntity<>(reservationsByUserId, HttpStatus.OK);
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 
     @PostMapping("/v1/spaces/{spaceId}/reservations")
-    public ResponseEntity<SpaceReservation> reserve(@PathVariable Long spaceId, @RequestBody RequestCreateReservation req) {
-        SpaceReservation reservation = reservationService.reserve(req.userId(), spaceId, req.reservationDate(), req.startTime(), req.endTime());
+    public ResponseEntity<ResponseReservation> reserve(@PathVariable Long spaceId, @RequestBody RequestCreateReservation req) {
+        ResponseReservation reservation = reservationService.reserve(req.userId(), spaceId, req.reservationDate(), req.startTime(), req.endTime());
 
         return new ResponseEntity<>(reservation, HttpStatus.CREATED);
     }
 
     @PatchMapping("/v1/reservations/{reservationId}")
-    public ResponseEntity<SpaceReservation> update(@PathVariable Long reservationId, @RequestBody RequestUpdateReservation req) {
-        SpaceReservation updatedReservation = reservationService.update(req.userId(), req.spaceId(), reservationId, req);
+    public ResponseEntity<ResponseReservation> update(@PathVariable Long reservationId, @RequestBody RequestUpdateReservation req) {
+        ResponseReservation updatedReservation = reservationService.update(reservationId, req);
 
         return new ResponseEntity<>(updatedReservation, HttpStatus.OK);
     }

@@ -66,4 +66,8 @@ public class SpaceReservation {
         if (!isReserved)
             user.getRefund(getFee(), host);
     }
+
+    public void softDelete(SpaceReservation reservation) {
+        this.isReserved = false;
+    }
 }

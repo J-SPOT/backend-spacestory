@@ -5,6 +5,7 @@ import com.juny.spacestory.domain.Space;
 import com.juny.spacestory.domain.SpaceReservation;
 import com.juny.spacestory.domain.User;
 import com.juny.spacestory.dto.RequestUpdateReservation;
+import com.juny.spacestory.dto.ResponseReservation;
 import com.juny.spacestory.dto.TimeSlot;
 import com.juny.spacestory.exception.global.ErrorCode;
 import com.juny.spacestory.exception.space.SpaceInvalidIdException;
@@ -12,6 +13,7 @@ import com.juny.spacestory.exception.spaceReservation.ReservationInvalidIdExcept
 import com.juny.spacestory.exception.spaceReservation.ReservationMinimumTimeException;
 import com.juny.spacestory.exception.spaceReservation.ReservationOverlappedTimeException;
 import com.juny.spacestory.exception.user.UserInvalidIdException;
+import com.juny.spacestory.mapper.ReservationMapper;
 import com.juny.spacestory.repository.HostRepository;
 import com.juny.spacestory.repository.ReservationRepository;
 import com.juny.spacestory.repository.SpaceRepository;
@@ -37,7 +39,9 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
 
-    public SpaceReservation reserve(Long userId, Long spaceId, LocalDate reservationDate, LocalTime start, LocalTime end) {
+    private final ReservationMapper mapper;
+
+    public ResponseReservation reserve(Long userId, Long spaceId, LocalDate reservationDate, LocalTime start, LocalTime end) {
         User user = findUserById(userId);
         Space space = findSpaceById(spaceId);
         long usageTime = Duration.between(start, end).toHours();
@@ -52,7 +56,8 @@ public class ReservationService {
         long usageFee = space.getHourlyRate() * usageTime;
         processPayment(user, space.getRealEstate().getHost(), usageFee);
 
-        return reservationRepository.save(new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space));
+        SpaceReservation savedReservation = reservationRepository.save(new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space));
+        return mapper.ReservationToResponseCreateReservation(savedReservation);
     }
 
     private void processPayment(User user, Host host, long usageFee) {
@@ -99,24 +104,27 @@ public class ReservationService {
         return availableSlots;
     }
 
-    public List<SpaceReservation> getReservationsByUserId(Long userId) {
+    public List<ResponseReservation> getReservationsByUserId(Long userId) {
         findUserById(userId);
 
-        return reservationRepository.findByUserId(userId);
+        List<SpaceReservation> byUserId = reservationRepository.findByUserId(userId);
+
+        return mapper.ReservationsToResponseCreateReservations(byUserId);
     }
 
-    public SpaceReservation update(Long userId, Long spaceId, Long reservationId, RequestUpdateReservation req) {
-        User user = findUserById(userId);
-        Space space = findSpaceById(spaceId);
+    public ResponseReservation update(Long reservationId, RequestUpdateReservation req) {
+        User user = findUserById(req.userId());
+        Space space = findSpaceById(req.spaceId());
         SpaceReservation reservation = findReservationById(reservationId);
 
-        List<TimeSlot> availableSlots = calculateAvailableSlots(spaceId, req, reservation);
+        List<TimeSlot> availableSlots = calculateAvailableSlots(req.spaceId(), req, reservation);
 
         calculateAvailableSlots(req, availableSlots);
 
         reservation.updateReservation(req, user, space.getRealEstate().getHost());
 
-        return reservationRepository.save(reservation);
+        SpaceReservation savedReservation = reservationRepository.save(reservation);
+        return mapper.ReservationToResponseCreateReservation(savedReservation);
     }
 
     private void calculateAvailableSlots(RequestUpdateReservation req, List<TimeSlot> availableSlots) {
@@ -152,8 +160,7 @@ public class ReservationService {
     }
 
     public void delete(Long reservationId) {
-        SpaceReservation spaceReservation = findReservationById(reservationId);
-
-        reservationRepository.delete(spaceReservation);
+        SpaceReservation reservation = findReservationById(reservationId);
+        reservation.softDelete(reservation);
     }
 }
