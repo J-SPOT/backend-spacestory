@@ -1,11 +1,13 @@
 package com.juny.spacestory.service;
 
 import com.juny.spacestory.domain.*;
+import com.juny.spacestory.dto.RequestCreateReservation;
 import com.juny.spacestory.dto.RequestUpdateReservation;
 import com.juny.spacestory.dto.ResponseReservation;
 import com.juny.spacestory.dto.TimeSlot;
 import com.juny.spacestory.exception.spaceReservation.ReservationMinimumTimeException;
 import com.juny.spacestory.exception.spaceReservation.ReservationOverlappedTimeException;
+import com.juny.spacestory.exception.user.UserUnAuthorizedModifyException;
 import com.juny.spacestory.exception.user.UserExceededPointException;
 import com.juny.spacestory.mapper.ReservationMapper;
 import com.juny.spacestory.repository.HostRepository;
@@ -57,11 +59,11 @@ public class ReservationServiceTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(reservationService, "mapper", mapper);
-        user1 = new User("user1", "user1@gmail.com", "nickname1", 100_000L);
-        user2 = new User("user1", "user1@gmail.com", "nickname1", 0L);
-        host = new Host("host1", 0L);
+        user1 = new User(1L, "user1", "user1@gmail.com", "nickname1", 100_000L);
+        user2 = new User(2L, "user1", "user1@gmail.com", "nickname1", 0L);
+        host = new Host(1L, "host1", 0L);
         Address address1 = new Address("서울특별시 성동구 아차산로 17길 48", "서울특별시 성동구 성수동2가 280 성수 SK V1 CENTER 1", "서울특별시", "성동구", "성수동");
-        realEstate = new RealEstate(address1, 2, false, true, host);
+        realEstate = new RealEstate(1L, address1, 2, false, true, host);
 
         HashSet<DetailedType> detailedTypes = new HashSet<>();
         detailedTypes.add(DetailedType.LECTURE_ROOM);
@@ -80,7 +82,8 @@ public class ReservationServiceTest {
         LocalTime end = LocalTime.of( 11, 0);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation expectedReservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
+        RequestCreateReservation req = new RequestCreateReservation(userId, reservationDate, start, end, true);
+        SpaceReservation expectedReservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, true, space);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
         when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
@@ -89,7 +92,7 @@ public class ReservationServiceTest {
         when(hostRepository.save(space.getRealEstate().getHost())).thenReturn(host);
 
         //when
-        ResponseReservation reservation = reservationService.reserve(userId, spaceId, reservationDate, start, end);
+        ResponseReservation reservation = reservationService.reserve(spaceId, req);
         ResponseReservation expected = mapper.ReservationToResponseCreateReservation(expectedReservation);
 
         //then
@@ -109,6 +112,7 @@ public class ReservationServiceTest {
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(9, 0);
+        RequestCreateReservation req = new RequestCreateReservation(userId, reservationDate, start, end, true);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
         when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
@@ -116,7 +120,7 @@ public class ReservationServiceTest {
         //when
 
         //then
-        assertThatThrownBy(() -> reservationService.reserve(userId, spaceId, reservationDate, start, end))
+        assertThatThrownBy(() -> reservationService.reserve(spaceId, req))
                 .isInstanceOf(ReservationMinimumTimeException.class)
                 .hasMessageContaining("The minimum booking duration must be at least 1 hour. Please confirm the reservation time.");
     }
@@ -130,7 +134,8 @@ public class ReservationServiceTest {
         LocalTime end = LocalTime.of( 12, 0);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
+        RequestCreateReservation req = new RequestCreateReservation(userId, reservationDate, start, end, true);
+        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, true, space);
         List<SpaceReservation> validReservations = new ArrayList<>();
         validReservations.add(reservation);
 
@@ -139,14 +144,14 @@ public class ReservationServiceTest {
         LocalTime reqStart = LocalTime.of( 7, 0);
         LocalTime reqEnd = LocalTime.of(10, 0);
 
-        when(userRepository.findById(reqUserId)).thenReturn(Optional.of(user2));
         when(spaceRepository.findById(reqSpaceId)).thenReturn(Optional.of(space));
         when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(eq(reqSpaceId), any(LocalDate.class))).thenReturn(validReservations);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
 
         //when
 
         //then
-        assertThatThrownBy(() -> reservationService.reserve(reqUserId, reqSpaceId, reservationDate, reqStart, reqEnd))
+        assertThatThrownBy(() -> reservationService.reserve(space.getId(), req))
                 .isInstanceOf(ReservationOverlappedTimeException.class)
                 .hasMessageContaining("There is a scheduling conflict. Please verify the reservation time.");
     }
@@ -160,7 +165,8 @@ public class ReservationServiceTest {
         LocalTime end = LocalTime.of(12, 0);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
+        RequestCreateReservation req = new RequestCreateReservation(userId, reservationDate, start, end, true);
+        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, true, space);
         List<SpaceReservation> validReservations = new ArrayList<>();
         validReservations.add(reservation);
 
@@ -169,14 +175,14 @@ public class ReservationServiceTest {
         LocalTime reqStart = LocalTime.of(11, 0);
         LocalTime reqEnd = LocalTime.of(14, 0);
 
-        when(userRepository.findById(reqUserId)).thenReturn(Optional.of(user2));
         when(spaceRepository.findById(reqSpaceId)).thenReturn(Optional.of(space));
         when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(eq(reqSpaceId), any(LocalDate.class))).thenReturn(validReservations);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
 
         //when
 
         //then
-        assertThatThrownBy(() -> reservationService.reserve(reqUserId, reqSpaceId, reservationDate, reqStart, reqEnd))
+        assertThatThrownBy(() -> reservationService.reserve(space.getId(), req))
                 .isInstanceOf(ReservationOverlappedTimeException.class)
                 .hasMessageContaining("There is a scheduling conflict. Please verify the reservation time.");
     }
@@ -190,6 +196,7 @@ public class ReservationServiceTest {
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(11, 0);
+        RequestCreateReservation req = new RequestCreateReservation(userId, reservationDate, start, end, true);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user2));
         when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
@@ -197,7 +204,7 @@ public class ReservationServiceTest {
         //when
 
         //then
-        assertThatThrownBy(() -> reservationService.reserve(userId, spaceId, reservationDate, start, end))
+        assertThatThrownBy(() -> reservationService.reserve(spaceId, req))
                 .isInstanceOf(UserExceededPointException.class)
                 .hasMessageContaining("The User's point exceeded limit. Please check your point.");
     }
@@ -212,13 +219,13 @@ public class ReservationServiceTest {
         LocalTime end = LocalTime.of(12, 0);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation reservation = new SpaceReservation(user1.getId(), reservationDate, start, end, usageFee, true, space);
+        SpaceReservation reservation = new SpaceReservation(user1.getId(), reservationDate, start, end, usageFee, true, true, space);
 
         LocalTime start2 = LocalTime.of(14, 0);
         LocalTime end2 = LocalTime.of(15, 0);
         long usageTime2 = Duration.between(start2, end2).toHours();
         long usageFee2 = space.getHourlyRate() * usageTime2;
-        SpaceReservation reservation2 = new SpaceReservation(user1.getId(), reservationDate, start2, end2, usageFee2, true, space);
+        SpaceReservation reservation2 = new SpaceReservation(user1.getId(), reservationDate, start2, end2, usageFee2, true, true, space);
 
         List<SpaceReservation> validReservations = new ArrayList<>();
         validReservations.add(reservation);
@@ -256,13 +263,13 @@ public class ReservationServiceTest {
         LocalTime end = LocalTime.of(12, 0);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
+        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, true, space);
 
         LocalTime start2 = LocalTime.of(14, 0);
         LocalTime end2 = LocalTime.of(15, 0);
         long usageTime2 = Duration.between(start2, end2).toHours();
         long usageFee2 = space.getHourlyRate() * usageTime2;
-        SpaceReservation reservation2 = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, space);
+        SpaceReservation reservation2 = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, true, space);
 
         List<SpaceReservation> expectedReservations = new ArrayList<>();
         expectedReservations.add(reservation);
@@ -291,17 +298,17 @@ public class ReservationServiceTest {
         user1.payFee(60000, host);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
+        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, true, space);
         List<SpaceReservation> reservations = new ArrayList<>();
         reservations.add(reservation);
 
         Long reservationId = reservation.getId();
-        RequestUpdateReservation requestUpdateReservation = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), true);
+        RequestUpdateReservation requestUpdateReservation = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), true, true);
         LocalTime start2 = LocalTime.of(9, 0);
         LocalTime end2 = LocalTime.of(11, 0);
         long usageTime2 = Duration.between(start2, end2).toHours();
         long usageFee2 = space.getHourlyRate() * usageTime2;
-        SpaceReservation expectedReservation = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, space);
+        SpaceReservation expectedReservation = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, true, space);
         ResponseReservation expected = mapper.ReservationToResponseCreateReservation(expectedReservation);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
@@ -333,17 +340,17 @@ public class ReservationServiceTest {
         user1.payFee(60000, host);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
+        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, true, space);
         List<SpaceReservation> reservations = new ArrayList<>();
         reservations.add(reservation);
 
         Long reservationId = reservation.getId();
-        RequestUpdateReservation requestUpdateReservation = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(14, 0), true);
+        RequestUpdateReservation req = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(14, 0), true, true);
         LocalTime start2 = LocalTime.of(9, 0);
         LocalTime end2 = LocalTime.of(14, 0);
         long usageTime2 = Duration.between(start2, end2).toHours();
         long usageFee2 = space.getHourlyRate() * usageTime2;
-        SpaceReservation expectedReservation = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, space);
+        SpaceReservation expectedReservation = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true,  true, space);
         ResponseReservation expected = mapper.ReservationToResponseCreateReservation(expectedReservation);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
@@ -353,7 +360,7 @@ public class ReservationServiceTest {
         when(reservationRepository.save(any(SpaceReservation.class))).thenReturn(expectedReservation);
 
         //when
-        ResponseReservation updatedReservation = reservationService.update(reservationId, requestUpdateReservation);
+        ResponseReservation updatedReservation = reservationService.update(reservationId, req);
 
         //then
         assertThat(updatedReservation).isNotNull();
@@ -361,6 +368,33 @@ public class ReservationServiceTest {
         assertThat(user1.getPoint()).isEqualTo(0);
         assertThat(host.getPoint()).isEqualTo(100_000);
         assertThat(updatedReservation).usingRecursiveComparison().isEqualTo(expected);
+    }
+    @DisplayName("[실패] 사용자가 다른 사용자의 예약 정보를 수정한다.")
+    @Test
+    void UpdateReservation_WithInvalidUserId() {
+        //given
+        Long userId = user1.getId();
+        Long spaceId = space.getId();
+        Long invalidUserId = Long.MAX_VALUE;
+        LocalDate reservationDate = LocalDate.of(2024, 3, 3);
+        LocalTime start = LocalTime.of(9, 0);
+        LocalTime end = LocalTime.of(12, 0);
+        long usageTime = Duration.between(start, end).toHours();
+        long usageFee = space.getHourlyRate() * usageTime;
+        user1.payFee(usageFee, host);
+        RequestUpdateReservation req = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(14, 0), true, true);
+
+        SpaceReservation reservation = new SpaceReservation(invalidUserId, reservationDate, start, end, usageFee, true, true, space);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
+        when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
+        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
+
+        //when
+
+        //then
+        assertThatThrownBy(() -> reservationService.update(reservation.getId(), req))
+                .isInstanceOf(UserUnAuthorizedModifyException.class)
+                .hasMessageContaining("The user does not have permission to modify. Please verify permissions.");
     }
 
     @DisplayName("예약 정보를 삭제를 삭제한다.")
@@ -373,7 +407,7 @@ public class ReservationServiceTest {
         LocalTime end = LocalTime.of(12, 0);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space);
+        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, true, space);
         Long reservationId = reservation.getId();
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
 
@@ -383,6 +417,5 @@ public class ReservationServiceTest {
         //then
         verify(reservationRepository).findById(reservationId);
         assertThat(reservation.getIsReserved()).isEqualTo(false);
-
     }
 }

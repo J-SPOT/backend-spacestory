@@ -1,6 +1,7 @@
 package com.juny.spacestory;
 
 import com.juny.spacestory.domain.*;
+import com.juny.spacestory.dto.RequestCreateReservation;
 import com.juny.spacestory.dto.RequestUpdateReservation;
 import com.juny.spacestory.dto.ResponseReservation;
 import com.juny.spacestory.dto.TimeSlot;
@@ -69,11 +70,13 @@ class SpacestoryApplicationTests {
 		Space sp = new Space(SpaceType.FRIENDSHIP, "space1", LocalTime.of(9, 0), LocalTime.of(22, 0), 10000, 17, 5, details, realEstate);
 		spaceRepository.save(sp);
 		Space space = spaceRepository.save(sp);
-		ResponseReservation reservation1 = reservationService.reserve(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(12, 0));
-		ResponseReservation reservation2 = reservationService.reserve(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(17, 0), LocalTime.of(19, 0));
+		RequestCreateReservation req1 = new RequestCreateReservation(user1.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(12, 0), false);
+		RequestCreateReservation req2 = new RequestCreateReservation(user1.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(17, 0), LocalTime.of(19, 0), false);
+		ResponseReservation reservation1 = reservationService.reserve(space.getId(), req1);
+		ResponseReservation reservation2 = reservationService.reserve(space.getId(), req2);
 
 		// 3월 3일 9~12시 예약을 9~11시 예약으로 바꾼다.
-		RequestUpdateReservation req = new RequestUpdateReservation(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), true);
+		RequestUpdateReservation req = new RequestUpdateReservation(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), false, true);
 		reservationService.update(reservation1.reservationId(), req);
 
 		// 3월 3일 5시에서 7시 예약을 삭제한다.

@@ -15,5 +15,7 @@ public record RequestCreateReservation(
         @NotNull(message = "startTime cannot be null.")
         LocalTime startTime,
         @NotNull(message = "endTime cannot be null.")
-        LocalTime endTime) {
+        LocalTime endTime,
+        @NotNull(message = "isSelf cannot be null.")
+        Boolean isUser) {
 }

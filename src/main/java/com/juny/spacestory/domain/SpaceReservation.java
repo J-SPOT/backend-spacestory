@@ -36,18 +36,22 @@ public class SpaceReservation {
     private Long fee;
 
     @Column(nullable = false)
+    private Boolean isUser;
+
+    @Column(nullable = false)
     private Boolean isReserved;
 
     @ManyToOne
     @JoinColumn(name = "space_id")
     private Space space;
 
-    public SpaceReservation(Long userId, LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Long fee, Boolean isReserved, Space space) {
+    public SpaceReservation(Long userId, LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Long fee, Boolean isUser, Boolean isReserved, Space space) {
         this.userId = userId;
         this.reservationDate = reservationDate;
         this.startTime = startTime;
         this.endTime = endTime;
         this.fee = fee;
+        this.isUser = isUser;
         this.isReserved = isReserved;
         this.space = space;
     }
@@ -57,13 +61,15 @@ public class SpaceReservation {
         this.startTime = req.startTime();
         this.endTime = req.endTime();
         long differenceAmount = getFee() - Duration.between(startTime, endTime).toHours() * this.space.getHourlyRate();
-        if (differenceAmount < 0)
-            user.payFee(-differenceAmount, host);
-        if (differenceAmount > 0)
-            user.getRefund(differenceAmount, host);
+        if (req.isUser()) {
+            if (differenceAmount < 0)
+                user.payFee(-differenceAmount, host);
+            if (differenceAmount > 0)
+                user.getRefund(differenceAmount, host);
+        }
         this.fee -= differenceAmount;
         this.isReserved = req.isReserved();
-        if (!isReserved)
+        if (req.isUser() && !isReserved)
             user.getRefund(getFee(), host);
     }
 

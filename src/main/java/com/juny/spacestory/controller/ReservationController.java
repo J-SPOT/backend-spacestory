@@ -36,7 +36,7 @@ public class ReservationController {
 
     @PostMapping("/v1/spaces/{spaceId}/reservations")
     public ResponseEntity<ResponseReservation> reserve(@PathVariable Long spaceId, @RequestBody RequestCreateReservation req) {
-        ResponseReservation reservation = reservationService.reserve(req.userId(), spaceId, req.reservationDate(), req.startTime(), req.endTime());
+        ResponseReservation reservation = reservationService.reserve(spaceId, req);
 
         return new ResponseEntity<>(reservation, HttpStatus.CREATED);
     }

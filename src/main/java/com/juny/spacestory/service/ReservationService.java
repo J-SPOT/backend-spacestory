@@ -4,6 +4,7 @@ import com.juny.spacestory.domain.Host;
 import com.juny.spacestory.domain.Space;
 import com.juny.spacestory.domain.SpaceReservation;
 import com.juny.spacestory.domain.User;
+import com.juny.spacestory.dto.RequestCreateReservation;
 import com.juny.spacestory.dto.RequestUpdateReservation;
 import com.juny.spacestory.dto.ResponseReservation;
 import com.juny.spacestory.dto.TimeSlot;
@@ -12,6 +13,7 @@ import com.juny.spacestory.exception.space.SpaceInvalidIdException;
 import com.juny.spacestory.exception.spaceReservation.ReservationInvalidIdException;
 import com.juny.spacestory.exception.spaceReservation.ReservationMinimumTimeException;
 import com.juny.spacestory.exception.spaceReservation.ReservationOverlappedTimeException;
+import com.juny.spacestory.exception.user.UserUnAuthorizedModifyException;
 import com.juny.spacestory.exception.user.UserInvalidIdException;
 import com.juny.spacestory.mapper.ReservationMapper;
 import com.juny.spacestory.repository.HostRepository;
@@ -41,22 +43,23 @@ public class ReservationService {
 
     private final ReservationMapper mapper;
 
-    public ResponseReservation reserve(Long userId, Long spaceId, LocalDate reservationDate, LocalTime start, LocalTime end) {
-        User user = findUserById(userId);
+    public ResponseReservation reserve(Long spaceId, RequestCreateReservation req) {
+        User user = findUserById(req.userId());
         Space space = findSpaceById(spaceId);
-        long usageTime = Duration.between(start, end).toHours();
+        long usageTime = Duration.between(req.startTime(), req.endTime()).toHours();
 
         if (usageTime < 1) {
             throw new ReservationMinimumTimeException(ErrorCode.RESERVATION_MINIMUM_TIME);
         }
-        if (!isReservationAvailable(spaceId, reservationDate, start, end)) {
+        if (!isReservationAvailable(spaceId, req.reservationDate(), req.startTime(), req.endTime())) {
             throw new ReservationOverlappedTimeException(ErrorCode.RESERVATION_OVERLAPPED_TIME);
         }
 
         long usageFee = space.getHourlyRate() * usageTime;
-        processPayment(user, space.getRealEstate().getHost(), usageFee);
-
-        SpaceReservation savedReservation = reservationRepository.save(new SpaceReservation(userId, reservationDate, start, end, usageFee, true, space));
+        if (req.isUser()) {
+            processPayment(user, space.getRealEstate().getHost(), usageFee);
+        }
+        SpaceReservation savedReservation = reservationRepository.save(new SpaceReservation(req.userId(), req.reservationDate(), req.startTime(), req.endTime(), usageFee, true, true, space));
         return mapper.ReservationToResponseCreateReservation(savedReservation);
     }
 
@@ -116,7 +119,9 @@ public class ReservationService {
         User user = findUserById(req.userId());
         Space space = findSpaceById(req.spaceId());
         SpaceReservation reservation = findReservationById(reservationId);
-
+        if (!reservation.getUserId().equals(req.userId())) {
+            throw new UserUnAuthorizedModifyException(ErrorCode.USER_UNAUTHORIZED_TO_MODIFY);
+        }
         List<TimeSlot> availableSlots = calculateAvailableSlots(req.spaceId(), req, reservation);
 
         calculateAvailableSlots(req, availableSlots);
