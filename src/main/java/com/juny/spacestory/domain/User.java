@@ -1,5 +1,7 @@
 package com.juny.spacestory.domain;
 
+import com.juny.spacestory.exception.global.ErrorCode;
+import com.juny.spacestory.exception.user.UserExceededPointException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,7 +39,7 @@ public class User {
 
     public void payFee(long usageFee, Host host) {
         if (this.point < usageFee) {
-            throw new IllegalArgumentException("user's points are insufficient.");
+            throw new UserExceededPointException(ErrorCode.USER_NOT_ENOUGH_POINT);
         }
         this.point -= usageFee;
         host.receivedFee(usageFee);

@@ -3,6 +3,9 @@ package com.juny.spacestory.service;
 import com.juny.spacestory.domain.*;
 import com.juny.spacestory.dto.RequestUpdateReservation;
 import com.juny.spacestory.dto.TimeSlot;
+import com.juny.spacestory.exception.spaceReservation.ReservationMinimumTimeException;
+import com.juny.spacestory.exception.spaceReservation.ReservationOverlappedTimeException;
+import com.juny.spacestory.exception.user.UserExceededPointException;
 import com.juny.spacestory.repository.HostRepository;
 import com.juny.spacestory.repository.ReservationRepository;
 import com.juny.spacestory.repository.SpaceRepository;
@@ -104,8 +107,8 @@ public class ReservationServiceTest {
 
         //then
         assertThatThrownBy(() -> reservationService.reserve(userId, spaceId, reservationDate, start, end))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("space reservations require a minimum of 1 hour.");
+                .isInstanceOf(ReservationMinimumTimeException.class)
+                .hasMessageContaining("The minimum booking duration must be at least 1 hour. Please confirm the reservation time.");
     }
 
     @DisplayName("[실패] 공간 예약 시 이미 예약된 공간은 예약할 수 없다. 9~12시 예약이 있을 경우 7~10시 예약은 실패한다.")
@@ -134,8 +137,8 @@ public class ReservationServiceTest {
 
         //then
         assertThatThrownBy(() -> reservationService.reserve(reqUserId, reqSpaceId, reservationDate, reqStart, reqEnd))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("space is already reserved.");
+                .isInstanceOf(ReservationOverlappedTimeException.class)
+                .hasMessageContaining("There is a scheduling conflict. Please verify the reservation time.");
     }
 
     @DisplayName("[실패] 공간 예약 시 이미 예약된 공간은 예약할 수 없다. 9~12시 예약이 있을 경우 11~14시 예약은 실패한다.")
@@ -164,8 +167,8 @@ public class ReservationServiceTest {
 
         //then
         assertThatThrownBy(() -> reservationService.reserve(reqUserId, reqSpaceId, reservationDate, reqStart, reqEnd))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("space is already reserved.");
+                .isInstanceOf(ReservationOverlappedTimeException.class)
+                .hasMessageContaining("There is a scheduling conflict. Please verify the reservation time.");
     }
 
     @DisplayName("[실패] 공간 예약 시 포인트가 부족하면 예약할 수 없다.")
@@ -185,8 +188,8 @@ public class ReservationServiceTest {
 
         //then
         assertThatThrownBy(() -> reservationService.reserve(userId, spaceId, reservationDate, start, end))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("user's points are insufficient");
+                .isInstanceOf(UserExceededPointException.class)
+                .hasMessageContaining("The User's point exceeded limit. Please check your point.");
     }
 
     @DisplayName("사용자가 특정 날짜에 예약할 수 있는 시간을 조회하다. 운영시간은 9~22시, 예약은 9~12시, 14~15시에 있다.")

@@ -17,7 +17,8 @@ public enum ErrorCode {
 
     SPACE_INVALID_ID(HttpStatus.BAD_REQUEST, "S1", "The space requested is invalid. Please review your request."),
 
-    USER_INVALID_ID(HttpStatus.BAD_REQUEST, "U1", "The user requested is invalid. Please review your request.");
+    USER_INVALID_ID(HttpStatus.BAD_REQUEST, "U1", "The user requested is invalid. Please review your request."),
+    USER_NOT_ENOUGH_POINT(HttpStatus.BAD_REQUEST, "U2", "The User's point exceeded limit. Please check your point.");
 
 
     private final HttpStatus status;
