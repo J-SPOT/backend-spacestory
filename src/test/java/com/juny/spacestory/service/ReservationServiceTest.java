@@ -23,7 +23,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -69,6 +68,83 @@ public class ReservationServiceTest {
         detailedTypes.add(DetailedType.LECTURE_ROOM);
         detailedTypes.add(DetailedType.MEETING_ROOM);
         space = new Space(SpaceType.EVENT, "소규모 회의, 업무 공간", LocalTime.of(9, 0), LocalTime.of(22, 0), 20000, 55, 10, "상세설명", false, detailedTypes, realEstate);
+    }
+
+    @DisplayName("사용자가 특정 날짜에 예약할 수 있는 시간을 조회한다. 운영시간은 9~22시, 예약은 9~12시, 14~15시에 있다.")
+    @Test
+    void GetAvaliableReservation() {
+        //given
+        Long spaceId = space.getId();
+        LocalDate reservationDate = LocalDate.of(2024, 3, 3);
+        LocalTime start = LocalTime.of(9, 0);
+        LocalTime end = LocalTime.of(12, 0);
+        long usageTime = Duration.between(start, end).toHours();
+        long usageFee = space.getHourlyRate() * usageTime;
+        SpaceReservation reservation = new SpaceReservation(user1.getId(), reservationDate, start, end, usageFee, true, true, space);
+
+        LocalTime start2 = LocalTime.of(14, 0);
+        LocalTime end2 = LocalTime.of(15, 0);
+        long usageTime2 = Duration.between(start2, end2).toHours();
+        long usageFee2 = space.getHourlyRate() * usageTime2;
+        SpaceReservation reservation2 = new SpaceReservation(user1.getId(), reservationDate, start2, end2, usageFee2, true, true, space);
+
+        List<SpaceReservation> validReservations = new ArrayList<>();
+        validReservations.add(reservation);
+        validReservations.add(reservation2);
+
+        when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
+        when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(validReservations);
+
+        //when
+        List<TimeSlot> availableReservation = reservationService.getAvailableReservation(spaceId, reservationDate);
+
+        //then
+        List<TimeSlot> expected = List.of(
+                new TimeSlot(LocalTime.of(12, 0), LocalTime.of(13, 0)),
+                new TimeSlot(LocalTime.of(13, 0), LocalTime.of(14, 0)),
+                new TimeSlot(LocalTime.of(15, 0), LocalTime.of(16, 0)),
+                new TimeSlot(LocalTime.of(16, 0), LocalTime.of(17, 0)),
+                new TimeSlot(LocalTime.of(17, 0), LocalTime.of(18, 0)),
+                new TimeSlot(LocalTime.of(18, 0), LocalTime.of(19, 0)),
+                new TimeSlot(LocalTime.of(19, 0), LocalTime.of(20, 0)),
+                new TimeSlot(LocalTime.of(20, 0), LocalTime.of(21, 0)),
+                new TimeSlot(LocalTime.of(21, 0), LocalTime.of(22, 0))
+        );
+        assertThat(availableReservation).isNotNull();
+        assertThat(availableReservation).usingRecursiveComparison().isEqualTo(expected);
+    }
+
+    @DisplayName("사용자가 자신의 예약 목록을 조회한다.")
+    @Test
+    void GetUserReservation() {
+        //given
+        Long userId = user1.getId();
+        LocalDate reservationDate = LocalDate.of(2024, 3, 3);
+        LocalTime start = LocalTime.of(9, 0);
+        LocalTime end = LocalTime.of(12, 0);
+        long usageTime = Duration.between(start, end).toHours();
+        long usageFee = space.getHourlyRate() * usageTime;
+        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, true, space);
+
+        LocalTime start2 = LocalTime.of(14, 0);
+        LocalTime end2 = LocalTime.of(15, 0);
+        long usageTime2 = Duration.between(start2, end2).toHours();
+        long usageFee2 = space.getHourlyRate() * usageTime2;
+        SpaceReservation reservation2 = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, true, space);
+
+        List<SpaceReservation> expectedReservations = new ArrayList<>();
+        expectedReservations.add(reservation);
+        expectedReservations.add(reservation2);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
+        when(reservationRepository.findByUserId(userId)).thenReturn(expectedReservations);
+        List<ResponseReservation> expected = mapper.ReservationsToResponseCreateReservations(expectedReservations);
+
+        //when
+        List<ResponseReservation> reservations = reservationService.getReservationsByUserId(userId);
+
+        //then
+        assertThat(reservations).isNotNull();
+        assertThat(reservations).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @DisplayName("사용자가 공간을 예약 시 예약된 공간을 반환한다")
@@ -207,83 +283,6 @@ public class ReservationServiceTest {
         assertThatThrownBy(() -> reservationService.reserve(spaceId, req))
                 .isInstanceOf(UserExceededPointException.class)
                 .hasMessageContaining("The User's point exceeded limit. Please check your point.");
-    }
-
-    @DisplayName("사용자가 특정 날짜에 예약할 수 있는 시간을 조회하다. 운영시간은 9~22시, 예약은 9~12시, 14~15시에 있다.")
-    @Test
-    void GetAvaliableReservation() {
-        //given
-        Long spaceId = space.getId();
-        LocalDate reservationDate = LocalDate.of(2024, 3, 3);
-        LocalTime start = LocalTime.of(9, 0);
-        LocalTime end = LocalTime.of(12, 0);
-        long usageTime = Duration.between(start, end).toHours();
-        long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation reservation = new SpaceReservation(user1.getId(), reservationDate, start, end, usageFee, true, true, space);
-
-        LocalTime start2 = LocalTime.of(14, 0);
-        LocalTime end2 = LocalTime.of(15, 0);
-        long usageTime2 = Duration.between(start2, end2).toHours();
-        long usageFee2 = space.getHourlyRate() * usageTime2;
-        SpaceReservation reservation2 = new SpaceReservation(user1.getId(), reservationDate, start2, end2, usageFee2, true, true, space);
-
-        List<SpaceReservation> validReservations = new ArrayList<>();
-        validReservations.add(reservation);
-        validReservations.add(reservation2);
-
-        when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
-        when(reservationRepository.findBySpaceIdAndReservationDateAndIsReservedTrue(spaceId, reservationDate)).thenReturn(validReservations);
-
-        //when
-        List<TimeSlot> availableReservation = reservationService.getAvailableReservation(spaceId, reservationDate);
-
-        //then
-        List<TimeSlot> expected = List.of(
-                new TimeSlot(LocalTime.of(12, 0), LocalTime.of(13, 0)),
-                new TimeSlot(LocalTime.of(13, 0), LocalTime.of(14, 0)),
-                new TimeSlot(LocalTime.of(15, 0), LocalTime.of(16, 0)),
-                new TimeSlot(LocalTime.of(16, 0), LocalTime.of(17, 0)),
-                new TimeSlot(LocalTime.of(17, 0), LocalTime.of(18, 0)),
-                new TimeSlot(LocalTime.of(18, 0), LocalTime.of(19, 0)),
-                new TimeSlot(LocalTime.of(19, 0), LocalTime.of(20, 0)),
-                new TimeSlot(LocalTime.of(20, 0), LocalTime.of(21, 0)),
-                new TimeSlot(LocalTime.of(21, 0), LocalTime.of(22, 0))
-                );
-        assertThat(availableReservation).isNotNull();
-        assertThat(availableReservation).usingRecursiveComparison().isEqualTo(expected);
-    }
-
-    @DisplayName("사용자가 자신의 예약 목록을 조회한다.")
-    @Test
-    void GetUserReservation() {
-        //given
-        Long userId = user1.getId();
-        LocalDate reservationDate = LocalDate.of(2024, 3, 3);
-        LocalTime start = LocalTime.of(9, 0);
-        LocalTime end = LocalTime.of(12, 0);
-        long usageTime = Duration.between(start, end).toHours();
-        long usageFee = space.getHourlyRate() * usageTime;
-        SpaceReservation reservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, true, space);
-
-        LocalTime start2 = LocalTime.of(14, 0);
-        LocalTime end2 = LocalTime.of(15, 0);
-        long usageTime2 = Duration.between(start2, end2).toHours();
-        long usageFee2 = space.getHourlyRate() * usageTime2;
-        SpaceReservation reservation2 = new SpaceReservation(userId, reservationDate, start2, end2, usageFee2, true, true, space);
-
-        List<SpaceReservation> expectedReservations = new ArrayList<>();
-        expectedReservations.add(reservation);
-        expectedReservations.add(reservation2);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
-        when(reservationRepository.findByUserId(userId)).thenReturn(expectedReservations);
-        List<ResponseReservation> expected = mapper.ReservationsToResponseCreateReservations(expectedReservations);
-
-        //when
-        List<ResponseReservation> reservations = reservationService.getReservationsByUserId(userId);
-
-        //then
-        assertThat(reservations).isNotNull();
-        assertThat(reservations).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @DisplayName("사용자가 예약정보를 같은 날 다른 시간으로 변경한다. 9~12시 예약 -> 9~14시 예약으로 변경한다.")

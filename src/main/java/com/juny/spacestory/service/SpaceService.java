@@ -42,7 +42,7 @@ public class SpaceService {
     public List<ResponseSpace> searchByTypeInSeoul(SpaceType spaceType, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        List<Space> spaces = spaceRepository.findBySpaceTypeAndRealEstateAddressSido(spaceType, pageRequest).getContent();
+        List<Space> spaces = spaceRepository.findBySpaceTypeInSeoul(spaceType, pageRequest).getContent();
         return mapper.SpacesToResponseSpaces(spaces);
     }
 
@@ -54,7 +54,7 @@ public class SpaceService {
     }
 
     public ResponseSpace create(RequestCreateSpace req) {
-        if (!isValidDetailedTypes(req.spaceType(), req.detailedTypes())) {
+        if (isInValidDetailedTypes(req.spaceType(), req.detailedTypes())) {
             throw new SpaceInvalidDetailedTypeException(ErrorCode.SPACE_INVALID_DETAILED_TYPE);
         }
 
@@ -70,12 +70,15 @@ public class SpaceService {
         return mapper.SpaceToResponseSpace(savedSpace);
     }
 
-    private boolean isValidDetailedTypes(SpaceType spaceType, Set<DetailedType> detailedTypes) {
+    private boolean isInValidDetailedTypes(SpaceType spaceType, Set<DetailedType> detailedTypes) {
         Set<DetailedType> validDetailedTypes = validDetailedTypesMap.getOrDefault(spaceType, EnumSet.noneOf(DetailedType.class));
-        return validDetailedTypes.containsAll(detailedTypes);
+        return !validDetailedTypes.containsAll(detailedTypes);
     }
 
     public ResponseSpace update(Long spaceId, RequestUpdateSpace req) {
+        if (isInValidDetailedTypes(req.spaceType(), req.detailedTypes())) {
+            throw new SpaceInvalidDetailedTypeException(ErrorCode.SPACE_INVALID_DETAILED_TYPE);
+        }
         Space space = findBySpaceId(spaceId);
         space.updateSpace(req);
         Space updatedSpace = spaceRepository.save(space);

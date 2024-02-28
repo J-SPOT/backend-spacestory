@@ -17,7 +17,7 @@ public interface SpaceRepository extends JpaRepository<Space, Long>{
     Optional<Space> findById(Long spaceId);
 
     @Query("select s from Space s where s.spaceType = :spaceType and s.realEstate.address.sido = '서울특별시'")
-    Page<Space> findBySpaceTypeAndRealEstateAddressSido(@Param("spaceType") SpaceType spaceType, Pageable pageable);
+    Page<Space> findBySpaceTypeInSeoul(@Param("spaceType") SpaceType spaceType, Pageable pageable);
 
     @Query("SELECT s FROM Space s " +
             "WHERE s.spaceType = :spaceType " +
