@@ -155,6 +155,7 @@ public class ReservationService {
     public void delete(Long reservationId) {
         SpaceReservation reservation = findReservationById(reservationId);
         reservation.softDelete(reservation);
+        reservationRepository.save(reservation);
     }
 
     private SpaceReservation findReservationById(Long reservationId) {

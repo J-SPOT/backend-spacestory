@@ -24,8 +24,6 @@ public record RequestUpdateSpace(
         Integer maxCapacity,
         @NotNull(message = "spaceDescription cannot be null.")
         String spaceDescription,
-        @NotNull(message = "isDeleted cannot be null.")
-        Boolean isDeleted,
         @NotNull(message = "detailedTypes cannot be null.")
         Set<DetailedType> detailedTypes) {
 }

@@ -20,6 +20,8 @@ public enum ErrorCode {
 
     HOST_INVALID_ID(HttpStatus.BAD_REQUEST, "H1", "The Host requested is invalid. Please review your request."),
 
+    REVIEW_INVALID_ID(HttpStatus.BAD_REQUEST, "H1", "The review requested is invalid. Please review your request."),
+
     USER_INVALID_ID(HttpStatus.BAD_REQUEST, "U1", "The user requested is invalid. Please review your request."),
     USER_NOT_ENOUGH_POINT(HttpStatus.BAD_REQUEST, "U2", "The User's point exceeded limit. Please check your point."),
     USER_UNAUTHORIZED_TO_MODIFY(HttpStatus.BAD_REQUEST, "U3", "The user does not have permission to modify. Please verify permissions.");

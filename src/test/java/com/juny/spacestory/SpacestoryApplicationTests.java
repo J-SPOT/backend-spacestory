@@ -76,7 +76,7 @@ class SpacestoryApplicationTests {
 		ResponseReservation reservation2 = reservationService.reserve(space.getId(), req2);
 
 		// 3월 3일 9~12시 예약을 9~11시 예약으로 바꾼다.
-		RequestUpdateReservation req = new RequestUpdateReservation(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), false, true);
+		RequestUpdateReservation req = new RequestUpdateReservation(user1.getId(), space.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), false);
 		reservationService.update(reservation1.reservationId(), req);
 
 		// 3월 3일 5시에서 7시 예약을 삭제한다.

@@ -37,9 +37,7 @@ public class SpaceServiceTest {
     @Mock
     RealEstateRepository realEstateRepository;
 
-    private SpaceMapper mapper = Mappers.getMapper(SpaceMapper.class);
-
-    private Host host;
+    private final SpaceMapper mapper = Mappers.getMapper(SpaceMapper.class);
 
     private RealEstate realEstate;
 
@@ -48,7 +46,7 @@ public class SpaceServiceTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(spaceService, "mapper", mapper);
-        host = new Host("host1", 0L);
+        Host host = new Host("host1", 0L);
         realEstate = new RealEstate(new Address("도로명 주소1", "지번 주소1", "서울특별시", "강남구", "서초동"), 2, false, false, host);
     }
     
@@ -107,7 +105,7 @@ public class SpaceServiceTest {
 
         Space expectedSpace = new Space(SpaceType.ART, "Art place", LocalTime.of(10, 0), LocalTime.of(16, 0), 10000, 15, 5, "또 오고 싶은 예술 공간", false, EnumSet.of(DetailedType.DANCE_ROOM, DetailedType.VOCAL_ROOM), realEstate);
         ResponseSpace expected = mapper.SpaceToResponseSpace(expectedSpace);
-        RequestUpdateSpace req = new RequestUpdateSpace(SpaceType.ART, "Art place", LocalTime.of(10, 0), LocalTime.of(16, 0), 10000, 15, 5, "또 오고 싶은 예술 공간", false, EnumSet.of(DetailedType.DANCE_ROOM, DetailedType.VOCAL_ROOM));
+        RequestUpdateSpace req = new RequestUpdateSpace(SpaceType.ART, "Art place", LocalTime.of(10, 0), LocalTime.of(16, 0), 10000, 15, 5, "또 오고 싶은 예술 공간", EnumSet.of(DetailedType.DANCE_ROOM, DetailedType.VOCAL_ROOM));
 
         when(spaceRepository.findById(any())).thenReturn(Optional.of(before));
         when(spaceRepository.save(any(Space.class))).thenReturn(expectedSpace);

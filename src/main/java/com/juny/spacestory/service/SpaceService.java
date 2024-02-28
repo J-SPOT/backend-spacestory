@@ -89,6 +89,7 @@ public class SpaceService {
     public void delete(Long spaceId) {
         Space space = findBySpaceId(spaceId);
         space.softDelete(space);
+        spaceRepository.save(space);
     }
 
     private Space findBySpaceId(Long spaceId) {

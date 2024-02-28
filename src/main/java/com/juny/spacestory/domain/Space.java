@@ -78,7 +78,6 @@ public class Space {
         this.spaceSize = req.spaceSize();
         this.maxCapacity = req.maxCapacity();
         this.spaceDescription = req.spaceDescription();
-        this.isDeleted = req.isDeleted();
         this.detailedTypes = req.detailedTypes();
     }
 

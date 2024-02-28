@@ -68,9 +68,6 @@ public class SpaceReservation {
                 user.getRefund(differenceAmount, host);
         }
         this.fee -= differenceAmount;
-        this.isReserved = req.isReserved();
-        if (req.isUser() && !isReserved)
-            user.getRefund(getFee(), host);
     }
 
     public void softDelete(SpaceReservation reservation) {

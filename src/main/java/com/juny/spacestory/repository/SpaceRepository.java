@@ -14,9 +14,9 @@ import java.util.Optional;
 @Repository
 public interface SpaceRepository extends JpaRepository<Space, Long>{
 
-    Optional<Space> findById(Long spaceId);
+    Optional<Space> findByIdAndIsDeletedFalse(Long spaceId);
 
-    @Query("select s from Space s where s.spaceType = :spaceType and s.realEstate.address.sido = '서울특별시'")
+    @Query("select s from Space s where s.spaceType = :spaceType and s.realEstate.address.sido = '서울특별시' and s.isDeleted = false")
     Page<Space> findBySpaceTypeInSeoul(@Param("spaceType") SpaceType spaceType, Pageable pageable);
 
     @Query("SELECT s FROM Space s " +
@@ -24,7 +24,8 @@ public interface SpaceRepository extends JpaRepository<Space, Long>{
             "AND s.realEstate.address.sido = :sido " +
             "AND s.realEstate.address.sigungu = :sigungu " +
             "AND s.maxCapacity >= :minCapacity " +
-            "AND (:detailedType IS NULL OR :detailedType MEMBER OF s.detailedTypes)")
+            "AND (:detailedType IS NULL OR :detailedType MEMBER OF s.detailedTypes) " +
+            "AND s.isDeleted = false")
     Page<Space> findByCriteria(@Param("spaceType") SpaceType spaceType,
                                @Param("sido") String sido,
                                @Param("sigungu") String sigungu,

@@ -48,11 +48,10 @@ public class ReservationServiceTest {
     @Mock
     private HostRepository hostRepository;
 
-    private ReservationMapper mapper = Mappers.getMapper(ReservationMapper.class);
+    private final ReservationMapper mapper = Mappers.getMapper(ReservationMapper.class);
 
     private User user1, user2;
     private Host host;
-    private RealEstate realEstate;
     private Space space;
 
     @BeforeEach
@@ -62,7 +61,7 @@ public class ReservationServiceTest {
         user2 = new User(2L, "user1", "user1@gmail.com", "nickname1", 0L);
         host = new Host(1L, "host1", 0L);
         Address address1 = new Address("서울특별시 성동구 아차산로 17길 48", "서울특별시 성동구 성수동2가 280 성수 SK V1 CENTER 1", "서울특별시", "성동구", "성수동");
-        realEstate = new RealEstate(1L, address1, 2, false, true, host);
+        RealEstate realEstate = new RealEstate(1L, address1, 2, false, true, host);
 
         HashSet<DetailedType> detailedTypes = new HashSet<>();
         detailedTypes.add(DetailedType.LECTURE_ROOM);
@@ -302,7 +301,7 @@ public class ReservationServiceTest {
         reservations.add(reservation);
 
         Long reservationId = reservation.getId();
-        RequestUpdateReservation requestUpdateReservation = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), true, true);
+        RequestUpdateReservation requestUpdateReservation = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(11, 0), true);
         LocalTime start2 = LocalTime.of(9, 0);
         LocalTime end2 = LocalTime.of(11, 0);
         long usageTime2 = Duration.between(start2, end2).toHours();
@@ -344,7 +343,7 @@ public class ReservationServiceTest {
         reservations.add(reservation);
 
         Long reservationId = reservation.getId();
-        RequestUpdateReservation req = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(14, 0), true, true);
+        RequestUpdateReservation req = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(14, 0), true);
         LocalTime start2 = LocalTime.of(9, 0);
         LocalTime end2 = LocalTime.of(14, 0);
         long usageTime2 = Duration.between(start2, end2).toHours();
@@ -381,7 +380,7 @@ public class ReservationServiceTest {
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
         user1.payFee(usageFee, host);
-        RequestUpdateReservation req = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(14, 0), true, true);
+        RequestUpdateReservation req = new RequestUpdateReservation(userId, spaceId, LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(14, 0), true);
 
         SpaceReservation reservation = new SpaceReservation(invalidUserId, reservationDate, start, end, usageFee, true, true, space);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
