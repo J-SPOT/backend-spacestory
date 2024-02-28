@@ -2,25 +2,12 @@ package com.juny.spacestory.dto;
 
 import com.juny.spacestory.domain.DetailedType;
 import com.juny.spacestory.domain.SpaceType;
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;
 
-public record ResponseReservation(
-        @NotNull(message = "reservationId cannot be null.")
-        Long reservationId,
-        @NotNull(message = "reservationDate cannot be null.")
-        @Future
-        LocalDate reservationDate,
-        @NotNull(message = "startTime cannot be null.")
-        LocalTime startTime,
-        @NotNull(message = "endTime cannot be null.")
-        LocalTime endTime,
-        @NotNull(message = "fee cannot be null.")
-        Long fee,
+public record ResponseSpace(
         @NotNull(message = "spaceType cannot be null.")
         SpaceType spaceType,
         @NotNull(message = "spaceName cannot be null.")
@@ -35,12 +22,22 @@ public record ResponseReservation(
         Integer spaceSize,
         @NotNull(message = "maxCapacity cannot be null.")
         Integer maxCapacity,
+        @NotNull(message = "spaceDescription cannot be null.")
+        String spaceDescription,
+        @NotNull(message = "isDeleted cannot be null.")
+        Boolean isDeleted,
         @NotNull(message = "detailedTypes cannot be null.")
         Set<DetailedType> detailedTypes,
+        @NotNull(message = "sido cannot be null.")
+        String sido,
+        @NotNull(message = "sigungu cannot be null.")
+        String sigungu,
+        @NotNull(message = "dong cannot be null.")
+        String dong,
         @NotNull(message = "floor cannot be null.")
         Integer floor,
         @NotNull(message = "hasParking cannot be null.")
-        boolean hasParking,
+        Boolean hasParking,
         @NotNull(message = "hasElevator cannot be null.")
-        boolean hasElevator) {
+        Boolean hasElevator) {
 }

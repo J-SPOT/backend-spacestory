@@ -16,6 +16,9 @@ public enum ErrorCode {
     RESERVATION_OVERLAPPED_TIME(HttpStatus.BAD_REQUEST, "R3", "There is a scheduling conflict. Please verify the reservation time."),
 
     SPACE_INVALID_ID(HttpStatus.BAD_REQUEST, "S1", "The space requested is invalid. Please review your request."),
+    SPACE_INVALID_DETAILED_TYPE(HttpStatus.BAD_REQUEST, "S2", "The space detailed type is invalid. please review your request."),
+
+    HOST_INVALID_ID(HttpStatus.BAD_REQUEST, "H1", "The Host requested is invalid. Please review your request."),
 
     USER_INVALID_ID(HttpStatus.BAD_REQUEST, "U1", "The user requested is invalid. Please review your request."),
     USER_NOT_ENOUGH_POINT(HttpStatus.BAD_REQUEST, "U2", "The User's point exceeded limit. Please check your point."),

@@ -68,7 +68,7 @@ public class ReservationServiceTest {
         HashSet<DetailedType> detailedTypes = new HashSet<>();
         detailedTypes.add(DetailedType.LECTURE_ROOM);
         detailedTypes.add(DetailedType.MEETING_ROOM);
-        space = new Space(SpaceType.EVENT, "소규모 회의, 업무 공간", LocalTime.of(9, 0), LocalTime.of(22, 0), 20000, 55, 10, detailedTypes, realEstate);
+        space = new Space(SpaceType.EVENT, "소규모 회의, 업무 공간", LocalTime.of(9, 0), LocalTime.of(22, 0), 20000, 55, 10, "상세설명", false, detailedTypes, realEstate);
     }
 
     @DisplayName("사용자가 공간을 예약 시 예약된 공간을 반환한다")

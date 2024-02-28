@@ -74,6 +74,6 @@ public class SpaceReservation {
     }
 
     public void softDelete(SpaceReservation reservation) {
-        this.isReserved = false;
+        reservation.isReserved = false;
     }
 }

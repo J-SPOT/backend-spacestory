@@ -152,6 +152,11 @@ public class ReservationService {
         return availableSlots;
     }
 
+    public void delete(Long reservationId) {
+        SpaceReservation reservation = findReservationById(reservationId);
+        reservation.softDelete(reservation);
+    }
+
     private SpaceReservation findReservationById(Long reservationId) {
         return reservationRepository.findById(reservationId).orElseThrow(() -> new ReservationInvalidIdException(ErrorCode.RESERVATION_INVALID_ID));
     }
@@ -162,10 +167,5 @@ public class ReservationService {
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserInvalidIdException(ErrorCode.USER_INVALID_ID));
-    }
-
-    public void delete(Long reservationId) {
-        SpaceReservation reservation = findReservationById(reservationId);
-        reservation.softDelete(reservation);
     }
 }

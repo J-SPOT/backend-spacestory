@@ -1,5 +1,6 @@
 package com.juny.spacestory.domain;
 
+import com.juny.spacestory.dto.RequestUpdateSpace;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,6 +39,12 @@ public class Space {
     @Column(nullable = false)
     private Integer maxCapacity;
 
+    @Column(nullable = false)
+    private String spaceDescription;
+
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
     @ElementCollection(fetch = FetchType.LAZY, targetClass = DetailedType.class)
     @CollectionTable(name = "space_detailed_type", joinColumns = @JoinColumn(name = "space_id"))
     @Enumerated(EnumType.STRING)
@@ -48,7 +55,7 @@ public class Space {
     @JoinColumn(name = "realEstate_id")
     private RealEstate realEstate;
 
-    public Space(SpaceType spaceType, String spaceName, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate, Integer spaceSize, Integer maxCapacity, Set<DetailedType> detailedTypes, RealEstate realEstate) {
+    public Space(SpaceType spaceType, String spaceName, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate, Integer spaceSize, Integer maxCapacity, String spaceDescription, Boolean isDeleted, Set<DetailedType> detailedTypes, RealEstate realEstate) {
         this.spaceType = spaceType;
         this.spaceName = spaceName;
         this.openingTime = openingTime;
@@ -56,7 +63,26 @@ public class Space {
         this.hourlyRate = hourlyRate;
         this.spaceSize = spaceSize;
         this.maxCapacity = maxCapacity;
+        this.spaceDescription = spaceDescription;
+        this.isDeleted = isDeleted;
         this.detailedTypes = detailedTypes;
         this.realEstate = realEstate;
+    }
+
+    public void updateSpace(RequestUpdateSpace req) {
+        this.spaceType = req.spaceType();
+        this.spaceName = req.spaceName();
+        this.openingTime = req.openingTime();
+        this.closingTime = req.closingTime();
+        this.hourlyRate = req.hourlyRate();
+        this.spaceSize = req.spaceSize();
+        this.maxCapacity = req.maxCapacity();
+        this.spaceDescription = req.spaceDescription();
+        this.isDeleted = req.isDeleted();
+        this.detailedTypes = req.detailedTypes();
+    }
+
+    public void softDelete(Space space) {
+        space.isDeleted = true;
     }
 }

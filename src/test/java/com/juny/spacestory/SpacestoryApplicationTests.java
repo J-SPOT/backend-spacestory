@@ -67,7 +67,7 @@ class SpacestoryApplicationTests {
 		HashSet<DetailedType> details = new HashSet<>();
 		details.add(DetailedType.PARTY_ROOM);
 		details.add(DetailedType.RESIDENCE);
-		Space sp = new Space(SpaceType.FRIENDSHIP, "space1", LocalTime.of(9, 0), LocalTime.of(22, 0), 10000, 17, 5, details, realEstate);
+		Space sp = new Space(SpaceType.FRIENDSHIP, "space1", LocalTime.of(9, 0), LocalTime.of(22, 0), 10000, 17, 5, "상세설명", false, details, realEstate);
 		spaceRepository.save(sp);
 		Space space = spaceRepository.save(sp);
 		RequestCreateReservation req1 = new RequestCreateReservation(user1.getId(), LocalDate.of(2024, 3, 3), LocalTime.of(9, 0), LocalTime.of(12, 0), false);
