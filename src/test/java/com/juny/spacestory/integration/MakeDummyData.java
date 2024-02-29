@@ -1,10 +1,12 @@
-package com.juny.spacestory;
+package com.juny.spacestory.integration;
 
 import com.juny.spacestory.domain.*;
 import com.juny.spacestory.repository.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -64,6 +66,7 @@ public class MakeDummyData {
     }
 
     @Test
+    @Transactional
     void HostAndRealEstateAndSpace() {
         districtsAndDongs.put("강남구", Arrays.asList("역삼동", "개포동", "청담동", "삼성동", "대치동", "신사동", "논현동", "압구정동", "세곡동", "자곡동", "율현동", "일원동", "수서동", "도곡동"));
         districtsAndDongs.put("강동구", Arrays.asList("명일동", "고덕동", "상일동", "길동", "둔춘동", "암사동", "성내동", "천호동", "강일동"));
