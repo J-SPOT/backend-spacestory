@@ -61,7 +61,7 @@ public class SpaceService {
         RealEstate findRealEstate = realEstateRepository.findByAddress_RoadAddress(req.roadAddress()).orElse(null);
         if (findRealEstate == null) {
             Address address = new Address(req.roadAddress(), req.jibunAddress(), req.sido(), req.sigungu(), req.dong());
-            RealEstate realEstate = new RealEstate(address, req.floor(), req.hasParking(), req.hasElevator(),findByHostId(req.hostId()));
+            RealEstate realEstate = new RealEstate(address, req.floor(), req.hasParking(), req.hasElevator(), false, findByHostId(req.hostId()));
             findRealEstate = realEstateRepository.save(realEstate);
         }
 

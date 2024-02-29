@@ -4,7 +4,6 @@ import com.juny.spacestory.domain.SpaceReservation;
 import com.juny.spacestory.dto.ResponseReservation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -20,7 +19,7 @@ public interface ReservationMapper {
     @Mapping(source = "space.realEstate.floor", target = "floor")
     @Mapping(source = "space.realEstate.hasParking", target = "hasParking")
     @Mapping(source = "space.realEstate.hasElevator", target = "hasElevator")
-    ResponseReservation ReservationToResponseCreateReservation(SpaceReservation reservation);
+    ResponseReservation ReservationToResponseReservation(SpaceReservation reservation);
 
-    List<ResponseReservation> ReservationsToResponseCreateReservations(List<SpaceReservation> reservations);
+    List<ResponseReservation> ReservationsToResponseReservations(List<SpaceReservation> reservations);
 }

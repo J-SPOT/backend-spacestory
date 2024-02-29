@@ -11,7 +11,7 @@ import java.util.Set;
 
 public record ResponseReservation(
         @NotNull(message = "reservationId cannot be null.")
-        Long reservationId,
+        Long id,
         @NotNull(message = "reservationDate cannot be null.")
         @Future
         LocalDate reservationDate,

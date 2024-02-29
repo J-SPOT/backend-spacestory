@@ -30,11 +30,15 @@ public class User {
     @Column(nullable = false)
     private Long point;
 
-    public User(String userName, String email, String nickName, Long point) {
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
+    public User(String userName, String email, String nickName, Long point, Boolean isDeleted) {
         this.userName = userName;
         this.email = email;
         this.nickName = nickName;
         this.point = point;
+        this.isDeleted = isDeleted;
     }
 
     public void payFee(long usageFee, Host host) {

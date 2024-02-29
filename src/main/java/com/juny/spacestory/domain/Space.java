@@ -51,7 +51,7 @@ public class Space {
     @Column(nullable = false)
     private Set<DetailedType> detailedTypes = new HashSet<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "realEstate_id")
     private RealEstate realEstate;
 

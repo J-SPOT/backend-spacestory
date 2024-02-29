@@ -24,15 +24,19 @@ public class RealEstate {
     @Column(nullable = false)
     private Boolean hasElevator;
 
-    @ManyToOne
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id")
     private Host host;
 
-    public RealEstate(Address address, Integer floor, Boolean hasParking, Boolean hasElevator, Host host) {
+    public RealEstate(Address address, Integer floor, Boolean hasParking, Boolean hasElevator, Boolean isDeleted, Host host) {
         this.address = address;
         this.floor = floor;
         this.hasParking = hasParking;
         this.hasElevator = hasElevator;
+        this.isDeleted = isDeleted;
         this.host = host;
     }
 }

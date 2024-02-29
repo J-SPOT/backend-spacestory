@@ -19,9 +19,13 @@ public class Host {
     @Column(nullable = false)
     private Long point;
 
-    public Host(String userName, Long point) {
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
+    public Host(String userName, Long point, Boolean isDeleted) {
         this.userName = userName;
         this.point = point;
+        this.isDeleted = isDeleted;
     }
 
     public void receivedFee(long usageFee) {

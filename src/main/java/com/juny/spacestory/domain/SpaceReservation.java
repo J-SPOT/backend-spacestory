@@ -39,20 +39,20 @@ public class SpaceReservation {
     private Boolean isUser;
 
     @Column(nullable = false)
-    private Boolean isReserved;
+    private Boolean isDeleted;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "space_id")
     private Space space;
 
-    public SpaceReservation(Long userId, LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Long fee, Boolean isUser, Boolean isReserved, Space space) {
+    public SpaceReservation(Long userId, LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Long fee, Boolean isUser, Boolean isDeleted, Space space) {
         this.userId = userId;
         this.reservationDate = reservationDate;
         this.startTime = startTime;
         this.endTime = endTime;
         this.fee = fee;
         this.isUser = isUser;
-        this.isReserved = isReserved;
+        this.isDeleted = isDeleted;
         this.space = space;
     }
 
@@ -71,6 +71,6 @@ public class SpaceReservation {
     }
 
     public void softDelete(SpaceReservation reservation) {
-        reservation.isReserved = false;
+        reservation.isDeleted = true;
     }
 }

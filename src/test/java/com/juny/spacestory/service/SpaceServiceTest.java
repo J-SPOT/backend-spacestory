@@ -46,8 +46,8 @@ public class SpaceServiceTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(spaceService, "mapper", mapper);
-        Host host = new Host("host1", 0L);
-        realEstate = new RealEstate(new Address("도로명 주소1", "지번 주소1", "서울특별시", "강남구", "서초동"), 2, false, false, host);
+        Host host = new Host("host1", 0L, false);
+        realEstate = new RealEstate(new Address("도로명 주소1", "지번 주소1", "서울특별시", "강남구", "서초동"), 2, false, false, false, host);
     }
     
     @DisplayName("공간 정보를 등록한다.")

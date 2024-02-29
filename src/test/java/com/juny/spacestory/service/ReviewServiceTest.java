@@ -44,7 +44,7 @@ public class ReviewServiceTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(reviewService, "mapper", mapper);
-        user = new User("user1", "user1@gmail.com", "nickname1", 100_000L);
+        user = new User("user1", "user1@gmail.com", "nickname1", 100_000L, false);
     }
     @DisplayName("리뷰를 등록한다.")
     @Test
