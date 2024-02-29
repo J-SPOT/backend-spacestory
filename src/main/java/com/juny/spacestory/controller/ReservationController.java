@@ -34,6 +34,13 @@ public class ReservationController {
         return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 
+    @GetMapping("/v1/spaces/{spaceId}/reservations")
+    public ResponseEntity<List<ResponseReservation>> getSpaceReservations(@PathVariable Long spaceId, @RequestParam LocalDate reservationDate) {
+        List<ResponseReservation> reservations = reservationService.getSpaceReservations(spaceId, reservationDate);
+
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
+    }
+
     @PostMapping("/v1/spaces/{spaceId}/reservations")
     public ResponseEntity<ResponseReservation> reserve(@PathVariable Long spaceId, @RequestBody RequestCreateReservation req) {
         ResponseReservation reservation = reservationService.reserve(spaceId, req);
