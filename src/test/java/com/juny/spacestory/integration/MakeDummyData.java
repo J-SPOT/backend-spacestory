@@ -95,7 +95,7 @@ public class MakeDummyData {
         districtsAndDongs.put("중랑구", Arrays.asList("면목동", "상봉동", "중화동", "묵동", "망우동", "신내동"));
 
         int st = 1;
-        int n = 1000;
+        int n = 0;
         for (int i = st; i <= n; ++i) {
             String selectedDistrict = getRandomDistrict(districtsAndDongs.keySet());
             List<String> selectedDongs = districtsAndDongs.get(selectedDistrict);

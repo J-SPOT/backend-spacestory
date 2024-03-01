@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class SpaceController {
             @RequestParam(defaultValue = "서울특별시") String sido,
             @RequestParam(defaultValue = "강남구") String sigungu,
             @RequestParam(defaultValue = "1") int minCapacity,
-            @RequestParam(required = false) DetailedType detailedType,
+            @RequestParam(required = false) Set<DetailedType> detailedType,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         List<ResponseSpace> spaces = spaceService.searchSpaces(type, sido, sigungu, minCapacity, detailedType, page, size);

@@ -107,7 +107,7 @@ public class SpaceServiceTest {
         ResponseSpace expected = mapper.SpaceToResponseSpace(expectedSpace);
         RequestUpdateSpace req = new RequestUpdateSpace(SpaceType.ART, "Art place", LocalTime.of(10, 0), LocalTime.of(16, 0), 10000, 15, 5, "또 오고 싶은 예술 공간", EnumSet.of(DetailedType.DANCE_ROOM, DetailedType.VOCAL_ROOM));
 
-        when(spaceRepository.findById(any())).thenReturn(Optional.of(before));
+        when(spaceRepository.findByIdAndIsDeletedFalse(any())).thenReturn(Optional.of(before));
         when(spaceRepository.save(any(Space.class))).thenReturn(expectedSpace);
 
         //when
@@ -124,13 +124,13 @@ public class SpaceServiceTest {
         //given
         Space space = new Space(SpaceType.ART, "Art place", LocalTime.of(10, 0), LocalTime.of(16, 0), 10000, 15, 5, "또 오고 싶은 예술 공간", false, EnumSet.of(DetailedType.DANCE_ROOM, DetailedType.VOCAL_ROOM), realEstate);
 
-        when(spaceRepository.findById(any())).thenReturn(Optional.of(space));
+        when(spaceRepository.findByIdAndIsDeletedFalse(any())).thenReturn(Optional.of(space));
 
         //when
         spaceService.delete(any());
 
         //then
-        verify(spaceRepository).findById(any());
+        verify(spaceRepository).findByIdAndIsDeletedFalse(any());
         assertThat(space.getIsDeleted()).isEqualTo(true);
     }
 }

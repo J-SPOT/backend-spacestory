@@ -42,14 +42,14 @@ public class SpaceService {
     public List<ResponseSpace> searchByTypeInSeoul(SpaceType spaceType, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        List<Space> spaces = spaceRepository.findBySpaceTypeInSeoul(spaceType, pageRequest).getContent();
+        List<Space> spaces = spaceRepository.findBySpaceTypeInSeoulQuerydsl(spaceType, pageRequest).getContent();
         return mapper.SpacesToResponseSpaces(spaces);
     }
 
-    public List<ResponseSpace> searchSpaces(SpaceType spaceType, String sido, String sigungu, int minCapacity, DetailedType detailedType, int page, int size) {
+    public List<ResponseSpace> searchSpaces(SpaceType spaceType, String sido, String sigungu, int minCapacity, Set<DetailedType> detailedType, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        List<Space> spaces = spaceRepository.findByCriteria(spaceType, sido, sigungu, minCapacity, detailedType, pageRequest).getContent();
+        List<Space> spaces = spaceRepository.findByCriteriaQuerydsl(spaceType, sido, sigungu, minCapacity, detailedType, pageRequest).getContent();
         return mapper.SpacesToResponseSpaces(spaces);
     }
 
@@ -93,7 +93,7 @@ public class SpaceService {
     }
 
     private Space findBySpaceId(Long spaceId) {
-        return spaceRepository.findById(spaceId).orElseThrow(() -> new SpaceInvalidIdException(ErrorCode.SPACE_INVALID_ID));
+        return spaceRepository.findByIdAndIsDeletedFalse(spaceId).orElseThrow(() -> new SpaceInvalidIdException(ErrorCode.SPACE_INVALID_ID));
     }
 
     private Host findByHostId(Long hostId) {
