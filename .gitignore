@@ -4,8 +4,8 @@
 
 ### Docker Env
 .env
-
 HELP.md
+gradle/
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
