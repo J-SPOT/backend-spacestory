@@ -66,7 +66,6 @@ public class MakeDummyData {
     }
 
     @Test
-    @Transactional
     void HostAndRealEstateAndSpace() {
         districtsAndDongs.put("강남구", Arrays.asList("역삼동", "개포동", "청담동", "삼성동", "대치동", "신사동", "논현동", "압구정동", "세곡동", "자곡동", "율현동", "일원동", "수서동", "도곡동"));
         districtsAndDongs.put("강동구", Arrays.asList("명일동", "고덕동", "상일동", "길동", "둔춘동", "암사동", "성내동", "천호동", "강일동"));
@@ -96,6 +95,7 @@ public class MakeDummyData {
 
         int st = 1;
         int n = 0;
+        LocalDate reservationDate = LocalDate.of(2024, 5, 25);
         for (int i = st; i <= n; ++i) {
             String selectedDistrict = getRandomDistrict(districtsAndDongs.keySet());
             List<String> selectedDongs = districtsAndDongs.get(selectedDistrict);
@@ -119,7 +119,6 @@ public class MakeDummyData {
 
             User user = new User("user" + i, "user" + i + "@gmail.com", "nickname" + i, 300_000L, false);
             userRepository.save(user);
-            LocalDate reservationDate = LocalDate.of(2024, 3, 3);
             LocalTime startTime = LocalTime.of(random.nextInt(3) + 9, 0);
             LocalTime endTime = LocalTime.of(random.nextInt(2) + 12, 0);
             long usageFee = Duration.between(startTime, endTime).toHours() * space1.getHourlyRate();
