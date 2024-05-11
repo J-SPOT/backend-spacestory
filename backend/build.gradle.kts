@@ -22,13 +22,17 @@ repositories {
 }
 
 dependencies {
+	if (project.hasProperty("env") && project.property("env") == "dev") {
+		dependencies {
+			implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1")
+			implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+		}
+	}
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0") // http://localhost:8080/swagger-ui/index.html
-	implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1")
 	implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("com.mysql:mysql-connector-j")

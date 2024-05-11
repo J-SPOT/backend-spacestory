@@ -1,21 +1,23 @@
 services:
-  juny_db:
+  prod_db:
+    user: "501"
     image: mysql:8.4
     ports:
       - 13306:3306
-    container_name: mysql_db1
+    container_name: mysql_prod
     volumes:
-      - ${PROJECT_HOME}/Develop:/var/lib/mysql:rw
+      - ${PROJECT_HOME}/prod:/var/lib/mysql:rw
       - ${PROJECT_HOME}/my.cnf:/etc/my.cnf:rw
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-  test_db:
+  dev_db:
+    user: "501"
     image: mysql:8.4
     ports:
       - 13307:3306
-    container_name: mysql_db2
+    container_name: mysql_dev
     volumes:
-      - ${PROJECT_HOME}/Test:/var/lib/mysql:rw
+      - ${PROJECT_HOME}/dev:/var/lib/mysql:rw
       - ${PROJECT_HOME}/my.cnf:/etc/my.cnf:rw
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
