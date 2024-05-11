@@ -1,5 +1,5 @@
 ### Docker Env
-out
+nohup.out
 .env
 HELP.md
 gradle/
