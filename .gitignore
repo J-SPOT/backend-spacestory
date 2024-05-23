@@ -1,3 +1,5 @@
+env.yml
+
 ### Docker Env
 nohup.out
 .env

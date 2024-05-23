@@ -52,15 +52,4 @@ wHERE s.space_type = "FRIENDSHIP" and re.sigungu = "강남구" and (sdt.detailed
         Page<Space> bySpaceTypeInSeoulQuerydsl = spaceRepository.findBySpaceTypeInSeoulQuerydsl(SpaceType.FRIENDSHIP, pageRequest);
         System.out.println("bySpaceTypeInSeoulQuerydsl.getTotalElements() = " + bySpaceTypeInSeoulQuerydsl.getTotalElements());
     }
-
-    @DisplayName("N+1문제를 확인한다.")
-    @Test
-    @Transactional
-    void CheckN1() {
-        List<SpaceReservation> reservations1 = reservationRepository.findAll();
-        System.out.println("reservations1.get(0).getSpace().getSpaceName() = " + reservations1.get(0).getSpace().getSpaceName());
-
-        List<SpaceReservation> reservations2 = reservationRepository.findAllReservations();
-        System.out.println("reservations2.size() = " + reservations2.size());
-    }
 }

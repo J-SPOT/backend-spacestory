@@ -22,12 +22,8 @@ repositories {
 }
 
 dependencies {
-	if (project.hasProperty("env") && project.property("env") == "dev") {
-		dependencies {
-			implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1")
-			implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
-		}
-	}
+	implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-web")

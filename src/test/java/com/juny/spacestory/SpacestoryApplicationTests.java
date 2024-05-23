@@ -1,5 +1,6 @@
 package com.juny.spacestory;
 
+import com.juny.spacestory.config.EnvConfig;
 import com.juny.spacestory.domain.*;
 import com.juny.spacestory.dto.RequestCreateReservation;
 import com.juny.spacestory.dto.RequestUpdateReservation;
@@ -10,7 +11,9 @@ import com.juny.spacestory.service.ReservationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -20,6 +23,9 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@PropertySource(value = {
+		"classpath:env.yml",
+}, factory = EnvConfig.class)
 class SpacestoryApplicationTests {
 
 	@Autowired
