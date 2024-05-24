@@ -12,7 +12,7 @@ test:
   before_script: 
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
     - echo $ENV_YML > src/main/resources/env.yml
-    - echo $ENV_YML
+    - echo $ENV_YML > src/test/resources/env.yml
   script:
     - gradle build test -Dspring.profiles.active=dev
   tags:
