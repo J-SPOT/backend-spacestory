@@ -11,10 +11,9 @@ test:
   stage: test
   before_script: 
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
-    - echo $ENV_YML > src/main/resources/env.yml
-    - cat src/main/resources/env.yml
+    - echo $ENV_YML > src/test/resources/env.yml
   script:
-    - ./gradlew build test
+    - gradle build test
   tags:
     - test
 
