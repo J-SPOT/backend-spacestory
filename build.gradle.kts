@@ -31,7 +31,6 @@ dependencies {
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")
 	implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
 	compileOnly("org.projectlombok:lombok")
-	implementation ("com.h2database:h2")
 	runtimeOnly("com.mysql:mysql-connector-j")
 	annotationProcessor("org.projectlombok:lombok")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
