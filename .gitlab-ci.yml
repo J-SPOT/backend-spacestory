@@ -2,9 +2,13 @@ compile:
   before_script: 
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
   script:
-    - ls
-    - echo $ENV_YML > env.yml
-    - ls
+    - ls && echo $ENV_YML > env.yml && ls
+    - echo hello \
+      && echo hello \
+      && echo hello2
+    - echo hello3 \
+      && echo hello4 \
+      && echo hello5
   tags:
     - compile
     
