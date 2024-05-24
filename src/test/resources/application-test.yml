@@ -1,6 +1,0 @@
-spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_DEV_HOST}:${DB_DEV_PORT}/${DB_DEV_NAME}
-    username: ${DB_DEV_USER}
-    password: ${DB_DEV_PW}
