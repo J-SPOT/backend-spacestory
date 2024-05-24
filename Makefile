@@ -13,16 +13,13 @@ down:
 restart:
 	docker restart $$(docker ps -q)
 
-build-dev:
-	./script/build_dev.sh
-
-build-prod:
-	./script/build_prod.sh
+build:
+	./gradlew clean && ./gradlew build
 
 run-dev:
-	./script/run_dev.sh
+	java -jar -Dspring.profiles.active=dev ./build/libs/spacestory-0.0.1-SNAPSHOT.jar
 
 run-prod:
-	./script/run_prod.sh
+	nohup java -jar -Dspring.profiles.active=prod ./build/libs/spacestory-0.0.1-SNAPSHOT.jar
 
-.phony: all up restart build-dev build-prod run-dev run-prod
+.phony: all up restart build run-dev run-prod
