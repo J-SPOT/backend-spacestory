@@ -1,5 +1,4 @@
 compile:
-  stage: compile
   before_script: 
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
   script:
