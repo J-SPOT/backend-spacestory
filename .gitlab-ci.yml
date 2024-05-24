@@ -7,6 +7,16 @@ stages:
   - test
   - build
   - deploy
+  - compile
+
+compile:
+  stage: compile
+  before_script: 
+    - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
+  script:
+    - gradle build --exclude-task test
+  tags:
+    - compile
 
 test:
   stage: test
@@ -41,9 +51,9 @@ deploy:
     - ssh-keyscan -H 13.209.19.192 >> ~/.ssh/known_hosts
   script:
     - ssh -i $SSH_KEY ubuntu@13.209.19.192 "echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin \
-       && docker rm app -f || true \ 
+       && docker rm spring-app -f || true \ 
        && docker rmi $IMAGE_NAME:$IMAGE_TAG || true \
        && docker pull $IMAGE_NAME:$IMAGE_TAG \ 
-       && docker run -d -p 8080:8080 --name app $IMAGE_NAME:$IMAGE_TAG"
+       && docker run -d -p 8080:8080 --name spring-app $IMAGE_NAME:$IMAGE_TAG"
   tags:
     - deploy
