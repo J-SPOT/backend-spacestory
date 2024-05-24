@@ -1,6 +1,7 @@
 variables:
   IMAGE_NAME: jinyhehe/spacestory
   IMAGE_TAG: "1.0"
+  MY_ENV: $SPRING_ENV
 
 stages:
   - test
@@ -10,7 +11,10 @@ stages:
 test:
   stage: test
   before_script: 
-    - echo -e $ENV_YML
+    - echo $SPRING_ENV
+    - cat $SPRING_ENV
+    - echo $MY_ENV
+    - cat $MY_ENV
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
     - echo $ENV_YML > src/main/resources/env.yml
     - echo $ENV_YML > src/test/resources/env.yml
