@@ -14,7 +14,7 @@ test:
     - echo $ENV_YML > src/main/resources/env.yml
     - echo $ENV_YML > src/test/resources/env.yml
   script:
-    - gradle build test -Dspring.profiles.active=dev
+    - gradle build test -Dspring.profiles.active=test
   tags:
     - test
 
