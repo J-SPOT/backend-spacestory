@@ -3,27 +3,18 @@ variables:
   IMAGE_TAG: "1.0"
 
 stages:
-  - compile
   - test
   - build
   - deploy
-
-compile:
-  stage: compile
-  before_script: 
-    - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
-  script:
-    - gradle build --exclude-task test
-  tags:
-    - compile
 
 test:
   stage: test
   before_script: 
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
     - echo $ENV_YML > src/main/resources/env.yml
+    - cat src/main/resources/env.yml
   script:
-    - gradle build test
+    - ./gradlew build test
   tags:
     - test
 
