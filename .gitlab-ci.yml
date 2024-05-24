@@ -11,15 +11,8 @@ stages:
 test:
   stage: test
   before_script: 
-    - echo $SPRING_ENV
-    - cat $SPRING_ENV
-    - echo $MY_ENV
-    - cat $MY_ENV
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
-    - echo $ENV_YML > src/main/resources/env.yml
-    - echo $ENV_YML > src/test/resources/env.yml
-    - cat src/main/resources/env.yml
-    - cat src/test/resources/env.yml
+    - cat $SPRING_ENV > src/main/resources/env.yml
   script:
     - gradle build test
   tags:
