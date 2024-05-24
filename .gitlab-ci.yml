@@ -10,11 +10,12 @@ stages:
 test:
   stage: test
   before_script: 
+    - echo $ENV_YML
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
     - echo $ENV_YML > src/main/resources/env.yml
     - echo $ENV_YML > src/test/resources/env.yml
   script:
-    - gradle build test -Dspring.profiles.active=test
+    - gradle build test
   tags:
     - test
 
@@ -47,4 +48,3 @@ deploy:
        && docker run -d -p 8080:8080 --name app $IMAGE_NAME:$IMAGE_TAG"
   tags:
     - deploy
-
