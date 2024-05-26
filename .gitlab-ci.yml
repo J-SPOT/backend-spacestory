@@ -3,8 +3,29 @@ variables:
   IMAGE_TAG: $CI_COMMIT_SHA
 
 stages:
+  - compile
+  - test
   - build
   - deploy
+
+compile:
+  stage: compile
+  before_script: 
+    - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
+  script:
+    - gradle build --exclude-task test
+  tags:
+    - compile
+
+test:
+  stage: test
+  before_script: 
+    - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
+    - cat $SPRING_ENV > src/main/resources/env.yml
+  script:
+    - gradle build test
+  tags:
+    - test
 
 build:
   stage: build
@@ -31,6 +52,6 @@ deploy:
     - mkdir -p ~/.ssh
     - ssh-keyscan -H 13.125.206.46 >> ~/.ssh/known_hosts
   script:
-    - ssh -i $SSH_KEY ubuntu@13.125.206.46 "echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin && docker rm spring-app -f || true && docker rmi $IMAGE_NAME:latest || true && docker pull $IMAGE_NAME:$IMAGE_TAG && docker run -d -p 8080:8080 --name spring-app $IMAGE_NAME:$IMAGE_TAG"
+    - ssh -i $SSH_KEY ubuntu@13.125.206.46 "echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin && docker rm spring-app -f || true && docker rmi $IMAGE_NAME:latest || true && docker pull $IMAGE_NAME:latest && docker run -d -p 8080:8080 --name spring-app $IMAGE_NAME:latest"
   tags:
     - deploy
