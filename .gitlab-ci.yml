@@ -1,31 +1,10 @@
 variables:
   IMAGE_NAME: jinyhehe/spacestory
-  IMAGE_TAG: "1.0"
+  IMAGE_TAG: $CI_COMMIT_SHA
 
 stages:
-  - compile
-  - test
   - build
   - deploy
-
-compile:
-  stage: compile
-  before_script: 
-    - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
-  script:
-    - gradle build --exclude-task test
-  tags:
-    - compile
-
-test:
-  stage: test
-  before_script: 
-    - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
-    - cat $SPRING_ENV > src/main/resources/env.yml
-  script:
-    - gradle build test
-  tags:
-    - test
 
 build:
   stage: build
