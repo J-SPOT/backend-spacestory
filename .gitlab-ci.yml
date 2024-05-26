@@ -19,6 +19,7 @@ build:
   script:
     - docker build -t $IMAGE_NAME:$IMAGE_TAG .
     - docker push $IMAGE_NAME:$IMAGE_TAG
+    - docker push $IMAGE_NAME:latest
   tags:
     - build
 
@@ -29,6 +30,6 @@ deploy:
     - mkdir -p ~/.ssh
     - ssh-keyscan -H 13.125.206.46 >> ~/.ssh/known_hosts
   script:
-    - ssh -i $SSH_KEY ubuntu@13.125.206.46 "echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin && docker rm spring-app -f || true && docker rmi $IMAGE_NAME:$IMAGE_TAG || true && docker pull $IMAGE_NAME:$IMAGE_TAG && docker run -d -p 8080:8080 --name spring-app $IMAGE_NAME:$IMAGE_TAG"
+    - ssh -i $SSH_KEY ubuntu@13.125.206.46 "echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin && docker rm spring-app -f || true && docker rmi $IMAGE_NAME:latest || true && docker pull $IMAGE_NAME:$IMAGE_TAG && docker run -d -p 8080:8080 --name spring-app $IMAGE_NAME:$IMAGE_TAG"
   tags:
     - deploy
