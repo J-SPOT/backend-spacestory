@@ -19,4 +19,10 @@ public class TestController {
 
     return "Post Hello";
   }
+
+  @GetMapping("/api/v1/test")
+  public String testHello() {
+
+    return "test Hello";
+  }
 }
