@@ -15,19 +15,21 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    http
-        .cors((cors) -> cors
-            .configurationSource(request -> {
-              CorsConfiguration config = new CorsConfiguration();
+  http
+      .cors((cors) -> cors
+          .configurationSource(request -> {
+            CorsConfiguration config = new CorsConfiguration();
 
-              config.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
-              config.setAllowedMethods(Collections.singletonList("*"));
+            config.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
+            config.setAllowedMethods(Collections.singletonList("*"));
 
-              return config;
-            }));
+            return config;
+          }));
 
-    http
-        .authorizeHttpRequests((auth) -> auth.requestMatchers("/api/v1/hello").permitAll());
+    http.authorizeHttpRequests(
+        (auth) -> auth.requestMatchers("/", "/login", "/api/v1/hello").permitAll().anyRequest().authenticated());
+
+    http.csrf(csrf -> csrf.disable());
 
     return http.build();
   }
