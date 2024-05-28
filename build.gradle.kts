@@ -22,6 +22,8 @@ repositories {
 }
 
 dependencies {
+	implementation ("org.springframework.boot:spring-boot-starter-security")
+	testImplementation ("org.springframework.security:spring-security-test")
 	implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
