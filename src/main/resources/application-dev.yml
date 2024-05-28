@@ -9,6 +9,8 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+    hibernate:
+      ddl-auto: update
 
 server:
   port: 8080
