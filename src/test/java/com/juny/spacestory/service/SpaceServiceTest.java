@@ -1,13 +1,20 @@
 package com.juny.spacestory.service;
 
-import com.juny.spacestory.domain.*;
-import com.juny.spacestory.dto.RequestCreateSpace;
-import com.juny.spacestory.dto.RequestUpdateSpace;
-import com.juny.spacestory.dto.ResponseSpace;
-import com.juny.spacestory.exception.space.SpaceInvalidDetailedTypeException;
-import com.juny.spacestory.mapper.SpaceMapper;
-import com.juny.spacestory.repository.RealEstateRepository;
-import com.juny.spacestory.repository.SpaceRepository;
+import com.juny.spacestory.global.exception.ErrorCode;
+import com.juny.spacestory.space.dto.RequestCreateSpace;
+import com.juny.spacestory.space.dto.RequestUpdateSpace;
+import com.juny.spacestory.space.dto.ResponseSpace;
+import com.juny.spacestory.global.exception.hierarchy.space.SpaceInvalidDetailedTypeBusinessException;
+import com.juny.spacestory.host.Host;
+import com.juny.spacestory.space.mapper.SpaceMapper;
+import com.juny.spacestory.realestate.Address;
+import com.juny.spacestory.realestate.RealEstate;
+import com.juny.spacestory.realestate.RealEstateRepository;
+import com.juny.spacestory.space.repository.SpaceRepository;
+import com.juny.spacestory.space.domain.DetailedType;
+import com.juny.spacestory.space.domain.Space;
+import com.juny.spacestory.space.domain.SpaceType;
+import com.juny.spacestory.space.service.SpaceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,17 +35,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class SpaceServiceTest {
 
-    @InjectMocks
-    private SpaceService spaceService;
-
+    private final SpaceMapper mapper = Mappers.getMapper(SpaceMapper.class);
     @Mock
     SpaceRepository spaceRepository;
 
     @Mock
     RealEstateRepository realEstateRepository;
-
-    private final SpaceMapper mapper = Mappers.getMapper(SpaceMapper.class);
-
+    @InjectMocks
+    private SpaceService spaceService;
     private RealEstate realEstate;
 
     private Space space;
@@ -46,7 +50,7 @@ public class SpaceServiceTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(spaceService, "mapper", mapper);
-        Host host = new Host("host1", 0L, false);
+        Host host = new Host("host1", 0L, null);
         realEstate = new RealEstate(new Address("도로명 주소1", "지번 주소1", "서울특별시", "강남구", "서초동"), 2, false, false, false, host);
     }
     
@@ -75,12 +79,12 @@ public class SpaceServiceTest {
         //given
         RequestCreateSpace req = new RequestCreateSpace(SpaceType.ART, "Art place", LocalTime.of(10, 0), LocalTime.of(16, 0), 10000, 15, 5, "또 오고 싶은 예술 공간", false, EnumSet.of(DetailedType.STUDY_ROOM, DetailedType.VOCAL_ROOM), "상세 도로명 주소1", "상세 지번 주소2", "서울특별시", "강남구", "서초동", 2, false, false, 1L);
 
-        //when
+    // when
 
-        //then
-        assertThatThrownBy(() -> spaceService.create(req))
-                .isInstanceOf(SpaceInvalidDetailedTypeException.class)
-                .hasMessageContaining("The space detailed type is invalid. please review your request.");
+    // then
+    assertThatThrownBy(() -> spaceService.create(req))
+        .isInstanceOf(SpaceInvalidDetailedTypeBusinessException.class)
+        .hasMessageContaining(ErrorCode.SPACE_INVALID_DETAILED_TYPE.getMsg());
     }
 
     @DisplayName("[실패] 공간 타입에 맞지 않는 세부 타입 시 공간 생성을 실패한다. FRIENDSHIP 세부 타입으로 DANCE_ROOM")
@@ -89,12 +93,12 @@ public class SpaceServiceTest {
         //given
         RequestCreateSpace req = new RequestCreateSpace(SpaceType.FRIENDSHIP, "Art place", LocalTime.of(10, 0), LocalTime.of(16, 0), 10000, 15, 5, "또 오고 싶은 친목 공간", false, EnumSet.of(DetailedType.CAFE, DetailedType.DANCE_ROOM), "상세 도로명 주소1", "상세 지번 주소2", "서울특별시", "강남구", "서초동", 2, false, false, 1L);
 
-        //when
+    // when
 
-        //then
-        assertThatThrownBy(() -> spaceService.create(req))
-                .isInstanceOf(SpaceInvalidDetailedTypeException.class)
-                .hasMessageContaining("The space detailed type is invalid. please review your request.");
+    // then
+    assertThatThrownBy(() -> spaceService.create(req))
+        .isInstanceOf(SpaceInvalidDetailedTypeBusinessException.class)
+        .hasMessageContaining(ErrorCode.SPACE_INVALID_DETAILED_TYPE.getMsg());
     }
 
     @DisplayName("공간 정보를 수정한다.")
@@ -122,7 +126,8 @@ public class SpaceServiceTest {
     @Test
     void DeleteSpace() {
         //given
-        Space space = new Space(SpaceType.ART, "Art place", LocalTime.of(10, 0), LocalTime.of(16, 0), 10000, 15, 5, "또 오고 싶은 예술 공간", false, EnumSet.of(DetailedType.DANCE_ROOM, DetailedType.VOCAL_ROOM), realEstate);
+        Space space = new Space(SpaceType.ART, "Art place", LocalTime.of(10, 0), LocalTime.of(16, 0), 10000, 15, 5, "또 오고 싶은 예술 공간", false, EnumSet.of(
+          DetailedType.DANCE_ROOM, DetailedType.VOCAL_ROOM), realEstate);
 
         when(spaceRepository.findByIdAndIsDeletedFalse(any())).thenReturn(Optional.of(space));
 

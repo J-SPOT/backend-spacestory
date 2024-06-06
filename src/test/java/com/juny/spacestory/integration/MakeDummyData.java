@@ -1,11 +1,21 @@
 package com.juny.spacestory.integration;
 
-import com.juny.spacestory.domain.*;
-import com.juny.spacestory.repository.*;
+import com.juny.spacestory.host.Host;
+import com.juny.spacestory.host.HostRepository;
+import com.juny.spacestory.realestate.Address;
+import com.juny.spacestory.realestate.RealEstate;
+import com.juny.spacestory.realestate.RealEstateRepository;
+import com.juny.spacestory.reservation.repository.ReservationRepository;
+import com.juny.spacestory.reservation.entity.SpaceReservation;
+import com.juny.spacestory.space.domain.DetailedType;
+import com.juny.spacestory.space.domain.Space;
+import com.juny.spacestory.space.domain.SpaceType;
+import com.juny.spacestory.space.repository.SpaceRepository;
+import com.juny.spacestory.user.domain.User;
+import com.juny.spacestory.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -14,21 +24,6 @@ import java.util.*;
 @SpringBootTest
 public class MakeDummyData {
 
-    @Autowired
-    HostRepository hostRepository;
-
-    @Autowired
-    RealEstateRepository realEstateRepository;
-
-    @Autowired
-    SpaceRepository spaceRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    ReservationRepository reservationRepository;
-
     private static final Map<SpaceType, Set<DetailedType>> validDetailedTypesMap = Map.of(
             SpaceType.FRIENDSHIP, EnumSet.of(DetailedType.PARTY_ROOM, DetailedType.RESIDENCE, DetailedType.CAFE),
             SpaceType.EVENT, EnumSet.of(DetailedType.PERFORMANCE_VENUE, DetailedType.CONFERENCE_HALL, DetailedType.EXHIBITION_HALL),
@@ -36,8 +31,17 @@ public class MakeDummyData {
             SpaceType.ART, EnumSet.of(DetailedType.DANCE_ROOM, DetailedType.VOCAL_ROOM, DetailedType.INSTRUMENT_ROOM, DetailedType.DRAWING_ROOM, DetailedType.CRAFT_ROOM),
             SpaceType.SPORT, EnumSet.of(DetailedType.BADMINTON_COURT, DetailedType.FUTSAL_COURT, DetailedType.TENNIS_COURT),
             SpaceType.PHOTOGRAPHY, EnumSet.of(DetailedType.FILM_STUDIO, DetailedType.BROADCAST_ROOM) );
-
     private static final Map<String, List<String>> districtsAndDongs = new HashMap<>();
+    @Autowired
+    HostRepository hostRepository;
+    @Autowired
+    RealEstateRepository realEstateRepository;
+    @Autowired
+    SpaceRepository spaceRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    ReservationRepository reservationRepository;
 
     private static SpaceType getRandomSpaceType () {
         Random random = new Random();
@@ -105,7 +109,7 @@ public class MakeDummyData {
             DetailedType selectedDetailedType = getRandomDetailedType(detailedTypes);
 
             Random random = new Random();
-			Host host = new Host("host" + i, 0L, false);
+			Host host = new Host("host" + i, 0L, null);
 			hostRepository.save(host);
             Address address = new Address("도로명주소" + i, "저번주소" + i, "서울특별시", selectedDistrict, selectedDong);
             RealEstate realEstate = new RealEstate(address, random.nextInt(20) + 1, random.nextBoolean(), random.nextBoolean(), false, host);
@@ -117,7 +121,7 @@ public class MakeDummyData {
             spaceRepository.save(space2);
             spaceRepository.save(space3);
 
-            User user = new User("user" + i, "user" + i + "@gmail.com", "nickname" + i, 300_000L, false);
+            User user = new User("user" + i, "user email" + i, "1234");
             userRepository.save(user);
             LocalTime startTime = LocalTime.of(random.nextInt(3) + 9, 0);
             LocalTime endTime = LocalTime.of(random.nextInt(2) + 12, 0);

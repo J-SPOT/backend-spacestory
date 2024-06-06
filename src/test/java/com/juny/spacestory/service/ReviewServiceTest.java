@@ -1,15 +1,14 @@
 package com.juny.spacestory.service;
 
-import com.juny.spacestory.domain.Review;
-import com.juny.spacestory.domain.User;
-import com.juny.spacestory.dto.RequestCreateReview;
-import com.juny.spacestory.dto.RequestUpdateReview;
-import com.juny.spacestory.dto.ResponseReview;
-import com.juny.spacestory.mapper.ReviewMapper;
-import com.juny.spacestory.repository.RealEstateRepository;
-import com.juny.spacestory.repository.ReviewRepository;
-import com.juny.spacestory.repository.UserRepository;
-import org.assertj.core.api.Assertions;
+import com.juny.spacestory.review.domain.Review;
+import com.juny.spacestory.review.service.ReviewService;
+import com.juny.spacestory.user.domain.User;
+import com.juny.spacestory.review.dto.RequestCreateReview;
+import com.juny.spacestory.review.dto.RequestUpdateReview;
+import com.juny.spacestory.review.dto.ResponseReview;
+import com.juny.spacestory.review.mapper.ReviewMapper;
+import com.juny.spacestory.review.repository.ReviewRepository;
+import com.juny.spacestory.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -29,22 +27,19 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class ReviewServiceTest {
 
-    @InjectMocks
-    private ReviewService reviewService;
-
+    private final ReviewMapper mapper = Mappers.getMapper(ReviewMapper.class);
     @Mock
     ReviewRepository reviewRepository;
 
     @Mock
     UserRepository userRepository;
-
-    private final ReviewMapper mapper = Mappers.getMapper(ReviewMapper.class);
-
+    @InjectMocks
+    private ReviewService reviewService;
     private User user;
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(reviewService, "mapper", mapper);
-        user = new User("user1", "user1@gmail.com", "nickname1", 100_000L, false);
+        user = new User("user1", "user1@gmail.com", null);
     }
     @DisplayName("리뷰를 등록한다.")
     @Test

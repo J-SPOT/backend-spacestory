@@ -10,7 +10,10 @@ spring:
         show_sql: true
         format_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 
 server:
   port: 8080
+
+jwt:
+  secretKey: ${JWT_SECRET_KEY}

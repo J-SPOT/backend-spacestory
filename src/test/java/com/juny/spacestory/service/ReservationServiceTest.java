@@ -1,19 +1,28 @@
 package com.juny.spacestory.service;
 
-import com.juny.spacestory.domain.*;
-import com.juny.spacestory.dto.RequestCreateReservation;
-import com.juny.spacestory.dto.RequestUpdateReservation;
-import com.juny.spacestory.dto.ResponseReservation;
-import com.juny.spacestory.dto.TimeSlot;
-import com.juny.spacestory.exception.spaceReservation.ReservationMinimumTimeException;
-import com.juny.spacestory.exception.spaceReservation.ReservationOverlappedTimeException;
-import com.juny.spacestory.exception.user.UserUnAuthorizedModifyException;
-import com.juny.spacestory.exception.user.UserExceededPointException;
-import com.juny.spacestory.mapper.ReservationMapper;
-import com.juny.spacestory.repository.HostRepository;
-import com.juny.spacestory.repository.ReservationRepository;
-import com.juny.spacestory.repository.SpaceRepository;
-import com.juny.spacestory.repository.UserRepository;
+import com.juny.spacestory.global.exception.ErrorCode;
+import com.juny.spacestory.host.Host;
+import com.juny.spacestory.realestate.Address;
+import com.juny.spacestory.realestate.RealEstate;
+import com.juny.spacestory.reservation.service.ReservationService;
+import com.juny.spacestory.reservation.entity.SpaceReservation;
+import com.juny.spacestory.space.domain.DetailedType;
+import com.juny.spacestory.space.domain.Space;
+import com.juny.spacestory.space.domain.SpaceType;
+import com.juny.spacestory.user.domain.User;
+import com.juny.spacestory.reservation.dto.RequestCreateReservation;
+import com.juny.spacestory.reservation.dto.RequestUpdateReservation;
+import com.juny.spacestory.reservation.dto.ResponseReservation;
+import com.juny.spacestory.reservation.dto.TimeSlot;
+import com.juny.spacestory.global.exception.hierarchy.spaceReservation.ReservationMinimumTimeBusinessException;
+import com.juny.spacestory.global.exception.hierarchy.spaceReservation.ReservationOverlappedTimeBusinessException;
+import com.juny.spacestory.global.exception.hierarchy.user.UserExceededPointBusinessException;
+import com.juny.spacestory.global.exception.hierarchy.user.UserUnAuthorizedModifyBusinessException;
+import com.juny.spacestory.reservation.mapper.ReservationMapper;
+import com.juny.spacestory.host.HostRepository;
+import com.juny.spacestory.reservation.repository.ReservationRepository;
+import com.juny.spacestory.space.repository.SpaceRepository;
+import com.juny.spacestory.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +32,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -33,33 +44,31 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class ReservationServiceTest {
 
+    private final ReservationMapper mapper = Mappers.getMapper(ReservationMapper.class);
     @InjectMocks
     private ReservationService reservationService;
-
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private SpaceRepository spaceRepository;
-
     @Mock
     private ReservationRepository reservationRepository;
-
     @Mock
     private HostRepository hostRepository;
-
-    private final ReservationMapper mapper = Mappers.getMapper(ReservationMapper.class);
-
     private User user1, user2;
     private Host host;
     private Space space;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IllegalAccessException, NoSuchFieldException {
         ReflectionTestUtils.setField(reservationService, "mapper", mapper);
-        user1 = new User(1L, "user1", "user1@gmail.com", "nickname1", 100_000L, false);
-        user2 = new User(2L, "user1", "user1@gmail.com", "nickname1", 0L, false);
-        host = new Host(1L, "host1", 0L, false);
+        user1 = new User("user1", "email1", "1234");
+        user2 = new User("user2", "email2", "1234");
+        Field idField = User.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(user1, 1L);
+        idField.set(user2, 2L);
+        host = new Host(1L, "host1", 0L, null);
         Address address1 = new Address("서울특별시 성동구 아차산로 17길 48", "서울특별시 성동구 성수동2가 280 성수 SK V1 CENTER 1", "서울특별시", "성동구", "성수동");
         RealEstate realEstate = new RealEstate(1L, address1, 2, false, true, false, host);
 
@@ -157,6 +166,8 @@ public class ReservationServiceTest {
         LocalTime end = LocalTime.of( 11, 0);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
+        user1.rechargePoint(100_000L);
+        user2.rechargePoint(100_000L);
         RequestCreateReservation req = new RequestCreateReservation(userId, reservationDate, start, end, true);
         SpaceReservation expectedReservation = new SpaceReservation(userId, reservationDate, start, end, usageFee, true, false, space);
 
@@ -192,12 +203,12 @@ public class ReservationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
         when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
 
-        //when
+    // when
 
-        //then
-        assertThatThrownBy(() -> reservationService.reserve(spaceId, req))
-                .isInstanceOf(ReservationMinimumTimeException.class)
-                .hasMessageContaining("The minimum booking duration must be at least 1 hour. Please confirm the reservation time.");
+    // then
+    assertThatThrownBy(() -> reservationService.reserve(spaceId, req))
+        .isInstanceOf(ReservationMinimumTimeBusinessException.class)
+        .hasMessageContaining(ErrorCode.RESERVATION_MINIMUM_TIME.getMsg());
     }
 
     @DisplayName("[실패] 공간 예약 시 이미 예약된 공간은 예약할 수 없다. 9~12시 예약이 있을 경우 7~10시 예약은 실패한다.")
@@ -223,12 +234,12 @@ public class ReservationServiceTest {
         when(reservationRepository.findBySpaceIdAndReservationDateAndIsDeletedFalse(eq(reqSpaceId), any(LocalDate.class))).thenReturn(validReservations);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
 
-        //when
+    // when
 
-        //then
-        assertThatThrownBy(() -> reservationService.reserve(space.getId(), req))
-                .isInstanceOf(ReservationOverlappedTimeException.class)
-                .hasMessageContaining("There is a scheduling conflict. Please verify the reservation time.");
+    // then
+    assertThatThrownBy(() -> reservationService.reserve(space.getId(), req))
+        .isInstanceOf(ReservationOverlappedTimeBusinessException.class)
+        .hasMessageContaining(ErrorCode.RESERVATION_OVERLAPPED_TIME.getMsg());
     }
 
     @DisplayName("[실패] 공간 예약 시 이미 예약된 공간은 예약할 수 없다. 9~12시 예약이 있을 경우 11~14시 예약은 실패한다.")
@@ -254,12 +265,12 @@ public class ReservationServiceTest {
         when(reservationRepository.findBySpaceIdAndReservationDateAndIsDeletedFalse(eq(reqSpaceId), any(LocalDate.class))).thenReturn(validReservations);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
 
-        //when
+    // when
 
-        //then
-        assertThatThrownBy(() -> reservationService.reserve(space.getId(), req))
-                .isInstanceOf(ReservationOverlappedTimeException.class)
-                .hasMessageContaining("There is a scheduling conflict. Please verify the reservation time.");
+    // then
+    assertThatThrownBy(() -> reservationService.reserve(space.getId(), req))
+        .isInstanceOf(ReservationOverlappedTimeBusinessException.class)
+        .hasMessageContaining(ErrorCode.RESERVATION_OVERLAPPED_TIME.getMsg());
     }
 
     @DisplayName("[실패] 공간 예약 시 포인트가 부족하면 예약할 수 없다.")
@@ -276,12 +287,12 @@ public class ReservationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user2));
         when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
 
-        //when
+    // when
 
-        //then
-        assertThatThrownBy(() -> reservationService.reserve(spaceId, req))
-                .isInstanceOf(UserExceededPointException.class)
-                .hasMessageContaining("The User's point exceeded limit. Please check your point.");
+    // then
+    assertThatThrownBy(() -> reservationService.reserve(spaceId, req))
+        .isInstanceOf(UserExceededPointBusinessException.class)
+        .hasMessageContaining(ErrorCode.USER_NOT_ENOUGH_POINT.getMsg());
     }
 
     @DisplayName("사용자가 예약정보를 같은 날 다른 시간으로 변경한다. 9~12시 예약 -> 9~14시 예약으로 변경한다.")
@@ -293,6 +304,8 @@ public class ReservationServiceTest {
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(12, 0);
+        user1.rechargePoint(100_000L);
+        user2.rechargePoint(100_000L);
         user1.payFee(60000, host);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
@@ -335,6 +348,8 @@ public class ReservationServiceTest {
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(12, 0);
+        user1.rechargePoint(100_000L);
+        user2.rechargePoint(100_000L);
         user1.payFee(60000, host);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
@@ -377,6 +392,8 @@ public class ReservationServiceTest {
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(12, 0);
+        user1.rechargePoint(100_000L);
+        user2.rechargePoint(100_000L);
         long usageTime = Duration.between(start, end).toHours();
         long usageFee = space.getHourlyRate() * usageTime;
         user1.payFee(usageFee, host);
@@ -387,12 +404,12 @@ public class ReservationServiceTest {
         when(spaceRepository.findById(spaceId)).thenReturn(Optional.of(space));
         when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
 
-        //when
+    // when
 
-        //then
-        assertThatThrownBy(() -> reservationService.update(reservation.getId(), req))
-                .isInstanceOf(UserUnAuthorizedModifyException.class)
-                .hasMessageContaining("The user does not have permission to modify. Please verify permissions.");
+    // then
+    assertThatThrownBy(() -> reservationService.update(reservation.getId(), req))
+        .isInstanceOf(UserUnAuthorizedModifyBusinessException.class)
+        .hasMessageContaining(ErrorCode.USER_UNAUTHORIZED_TO_MODIFY.getMsg());
     }
 
     @DisplayName("예약 정보를 삭제를 삭제한다.")
