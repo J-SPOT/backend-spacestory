@@ -11,6 +11,7 @@ stages:
 compile:
   stage: compile
   before_script: 
+    - echo $whoami
     - echo $PATH
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
     - echo $PATH
