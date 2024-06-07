@@ -1,11 +1,13 @@
 package com.juny.spacestory.global.config;
 
 import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Collections;
 
 import com.juny.spacestory.global.security.filter.JwtFilter;
 import com.juny.spacestory.global.security.filter.LoginFilter;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,8 +29,10 @@ public class SecurityConfig {
   private final JwtUtil jwtUtil;
   private final RefreshRepository refreshRepository;
 
-  public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JwtUtil jwtUtil,
-    RefreshRepository refreshRepository) {
+  public SecurityConfig(
+      AuthenticationConfiguration authenticationConfiguration,
+      JwtUtil jwtUtil,
+      RefreshRepository refreshRepository) {
 
     this.authenticationConfiguration = authenticationConfiguration;
     this.jwtUtil = jwtUtil;
@@ -36,7 +40,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
 
     return configuration.getAuthenticationManager();
   }
@@ -56,7 +61,11 @@ public class SecurityConfig {
                 request -> {
                   CorsConfiguration config = new CorsConfiguration();
 
-                  config.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
+                  config.setAllowedOrigins(List.of(
+                    "http://localhost:5173",
+                    "https://spacestory.duckdns.org"
+                  ));
+
                   config.setAllowedMethods(Collections.singletonList("*"));
 
                   return config;
@@ -64,7 +73,8 @@ public class SecurityConfig {
 
     http.authorizeHttpRequests(
         (auth) ->
-            auth.requestMatchers("/", "/api/v1/auth/register", "/api/v1/hello", "/api/**")
+            auth.requestMatchers(
+                    "/", "/api/v1/auth/login", "/api/**", "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**")
                 .permitAll()
                 .requestMatchers("/admin/**")
                 .hasAuthority("ADMIN")
@@ -75,11 +85,12 @@ public class SecurityConfig {
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable);
 
-    http
-        .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
+    http.addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
 
-    http
-        .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterAt(
+        new LoginFilter(
+            authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository),
+        UsernamePasswordAuthenticationFilter.class);
 
     http.sessionManagement(
         (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

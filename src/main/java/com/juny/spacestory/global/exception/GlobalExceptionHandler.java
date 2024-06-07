@@ -18,9 +18,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handle(Exception e) {
 
-    log.error("global exception {}", e);
+    e.printStackTrace();
+    log.error("global exception {}", e.getMessage());
     return new ResponseEntity<>(
-        new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR),
+        new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR.getCode(), e.getMessage()),
         ErrorCode.INTERNAL_SERVER_ERROR.getStatus());
   }
 }

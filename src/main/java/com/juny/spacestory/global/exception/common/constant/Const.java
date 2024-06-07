@@ -53,8 +53,14 @@ public class Const {
   public static final String USER_PASSWORD_IS_SHORT_CODE = "U6";
   public static final String USER_PASSWORD_IS_SHORT_MSG = "User password is short.";
 
-  public static final String TOKEN_REFRESH_INVALID_CODE = "RE1";
-  public static final String TOKEN_REFRESH_INVALID_MSG = "Refresh token is invalid.";
+  public static final String ACCESS_TOKEN_EXPIRED_CODE = "AT1";
+  public static final String ACCESS_TOKEN_EXPIRED_MSG = "Access token is expired.";
+
+  public static final String ACCESS_TOKEN_INVALID_CODE = "AT2";
+  public static final String ACCESS_TOKEN_INVALID_MSG = "Access token is invalid.";
+
+  public static final String REFRESH_TOKEN_INVALID_CODE = "RT1";
+  public static final String REFRESH_TOKEN_INVALID_MSG = "Refresh token is invalid.";
 
   private Const() {
   }

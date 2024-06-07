@@ -12,6 +12,7 @@ public class RefreshService {
 
   private final JwtUtil jwtUtil;
   private final RefreshRepository refreshRepository;
+  private final String REFRESH_TOKEN_NULL_OR_EMPTY_MSG = "Refresh token is null or empty.";
 
   public RefreshService(JwtUtil jwtUtil, RefreshRepository refreshRepository) {
     this.jwtUtil = jwtUtil;
@@ -34,12 +35,12 @@ public class RefreshService {
 
     if (refreshToken == null || refreshToken.trim().isEmpty()) {
 
-      throw new ParameterIsNullOrEmpty(ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, "Refresh token is null or empty.");
+      throw new ParameterIsNullOrEmpty(ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, REFRESH_TOKEN_NULL_OR_EMPTY_MSG);
     }
 
-    if (!(jwtUtil.isValid(refreshToken) && JwtUtil.REFRESH_TOKEN_PREFIX.equals(jwtUtil.getType(refreshToken)))) {
+    if (jwtUtil.isValid(refreshToken) < 0 || JwtUtil.REFRESH_TOKEN_PREFIX.equals(jwtUtil.getType(refreshToken))) {
 
-      throw new RefreshTokenInvalidException(ErrorCode.TOKEN_REFRESH_INVALID);
+      throw new RefreshTokenInvalidException(ErrorCode.REFRESH_TOKEN_INVALID);
     }
   }
 

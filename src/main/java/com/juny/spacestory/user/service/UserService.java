@@ -60,12 +60,12 @@ public class UserService {
 
     if (userRepository.existsByEmail(req.email())) {
 
-      throw new UserDuplicatedEmailException(ErrorCode.UserDuplicatedEmail);
+      throw new UserDuplicatedEmailException(ErrorCode.USER_DUPLICATED_EMAIL);
     }
 
     if (!req.password().equals(req.passwordCheck())) {
 
-      throw new UserNotMatchPasswordException(ErrorCode.UserNotMatchPassword);
+      throw new UserNotMatchPasswordException(ErrorCode.USER_NOT_MATCH_PASSWORD);
     }
 
     if (req.password().length() < 4) {

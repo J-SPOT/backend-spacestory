@@ -1,9 +1,17 @@
 package com.juny.spacestory.global.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.juny.spacestory.global.exception.ErrorCode;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -30,6 +38,9 @@ public class JwtUtil {
   public static final String JWT_CLAIM_ROLE = "role";
   public static final Long ACCESS_TOKEN_EXPIRED = 60 * 5 * 1000L; // 5분
   public static final Long REFRESH_TOKEN_EXPIRED = 60 * 60 * 24 * 1000L; // 1일
+  public static final String ERROR_CODE = "code";
+  public static final String ERROR_MSG = "msg";
+
 
   private final SecretKey secretKey;
 
@@ -60,18 +71,19 @@ public class JwtUtil {
         .get(JWT_CLAIM_ROLE, String.class);
   }
 
-  public Boolean isValid(String token) {
-
+  public Integer isValid(String token) {
     try {
-
       Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
     } catch (Exception e) {
-
-      log.error("token is invalid: {}", e.getMessage());
-      return false;
+      if (e instanceof ExpiredJwtException) {
+        return 1;
+      } else {
+        e.printStackTrace();
+        return 2;
+      }
     }
 
-    return true;
+    return -1;
   }
 
   public String getType(String token) {
@@ -117,5 +129,20 @@ public class JwtUtil {
     Instant instant = date.toInstant();
     LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     return localDateTime.toString();
+  }
+
+  public void setErrorResponse(
+    HttpServletResponse response, ErrorCode errorCode) throws IOException {
+    response.setContentType(JwtUtil.CONTENT_TYPE);
+    response.setStatus(errorCode.getStatus().value());
+
+    Map<String, Object> data = new HashMap<>();
+    data.put(JwtUtil.ERROR_CODE, errorCode.getCode());
+    data.put(JwtUtil.ERROR_MSG, errorCode.getMsg());
+
+    OutputStream out = response.getOutputStream();
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.writeValue(out, data);
+    out.flush();
   }
 }
