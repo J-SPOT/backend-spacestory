@@ -15,7 +15,7 @@ compile:
     - echo $PATH
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
     - echo $PATH
-    - ls /home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH
+    - /home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -v
   script:
     - gradle build --exclude-task test
   tags:
