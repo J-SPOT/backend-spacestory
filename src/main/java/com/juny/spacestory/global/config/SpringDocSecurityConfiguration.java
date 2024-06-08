@@ -1,4 +1,5 @@
 package com.juny.spacestory.global.config;
+
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Content;
@@ -44,33 +45,32 @@ import org.springframework.security.web.authentication.ui.DefaultLoginPageGenera
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Lazy(false)
-@Configuration(
-  proxyBeanMethods = false
-)
-@ConditionalOnExpression("${springdoc.api-docs.enabled:true} and ${springdoc.enable-spring-security:true}")
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnExpression(
+    "${springdoc.api-docs.enabled:true} and ${springdoc.enable-spring-security:true}")
 @ConditionalOnClass({SecurityFilterChain.class})
 @ConditionalOnWebApplication
-//@ConditionalOnBean({SpringDocConfiguration.class})
+// @ConditionalOnBean({SpringDocConfiguration.class})
 @ImportRuntimeHints({SpringDocSecurityHints.class})
 public class SpringDocSecurityConfiguration {
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-    org.springdoc.core.configuration.SpringDocSecurityConfiguration.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(
+          org.springdoc.core.configuration.SpringDocSecurityConfiguration.class);
 
-  public SpringDocSecurityConfiguration() {
-  }
+  public SpringDocSecurityConfiguration() {}
 
   static {
-    SpringDocUtils.getConfig().addRequestWrapperToIgnore(new Class[]{Authentication.class}).addResponseTypeToIgnore(Authentication.class).addAnnotationsToIgnore(new Class[]{AuthenticationPrincipal.class});
+    SpringDocUtils.getConfig()
+        .addRequestWrapperToIgnore(new Class[] {Authentication.class})
+        .addResponseTypeToIgnore(Authentication.class)
+        .addAnnotationsToIgnore(new Class[] {AuthenticationPrincipal.class});
   }
 
   @Lazy(false)
-  @Configuration(
-    proxyBeanMethods = false
-  )
+  @Configuration(proxyBeanMethods = false)
   @ConditionalOnClass({OAuth2AuthorizationService.class})
   class SpringDocSecurityOAuth2Configuration {
-    SpringDocSecurityOAuth2Configuration() {
-    }
+    SpringDocSecurityOAuth2Configuration() {}
 
     @Bean
     @ConditionalOnProperty({"springdoc.show-oauth2-endpoints"})
@@ -81,18 +81,17 @@ public class SpringDocSecurityConfiguration {
   }
 
   @Lazy(false)
-  @Configuration(
-    proxyBeanMethods = false
-  )
+  @Configuration(proxyBeanMethods = false)
   @ConditionalOnClass({Filter.class})
   class SpringSecurityLoginEndpointConfiguration {
-    SpringSecurityLoginEndpointConfiguration() {
-    }
+    SpringSecurityLoginEndpointConfiguration() {}
 
     @Bean
     @Lazy(false)
     OpenApiCustomizer springSecurityLoginEndpointCustomiser(ApplicationContext applicationContext) {
-      FilterChainProxy filterChainProxy = (FilterChainProxy)applicationContext.getBean("springSecurityFilterChain", FilterChainProxy.class);
+      FilterChainProxy filterChainProxy =
+          (FilterChainProxy)
+              applicationContext.getBean("springSecurityFilterChain", FilterChainProxy.class);
       return (openAPI) -> {
         Iterator var2 = filterChainProxy.getFilterChains().iterator();
 
@@ -154,12 +153,15 @@ public class SpringDocSecurityConfiguration {
                 String.valueOf(HttpStatus.FORBIDDEN.value()),
                 (new ApiResponse()).description(HttpStatus.FORBIDDEN.getReasonPhrase()));
             operation.responses(apiResponses);
-            operation.addTagsItem("유저 인증 API").summary("로그인 요청 API").description("테스트 email: user, password: 1234")
-              .responses(new ApiResponses().addApiResponse("204", new ApiResponse().description("로그인 성공"))
-              .addApiResponse("AT1", new ApiResponse().description("401, 액세스 토큰이 만료된 경우"))
-              .addApiResponse("AT2", new ApiResponse().description("401, 액세스 토큰이 유효하지 않은 경우"))
-              .addApiResponse("RT1", new ApiResponse().description("401, 리프레시 토큰이 유효하지 않은 경우"))
-              .addApiResponse("U5", new ApiResponse().description("401, 패스워드가 일치하지 않은 경우")));
+            operation
+                .addTagsItem("유저 인증 API")
+                .summary("로그인 요청 API")
+                .description("테스트 email: user, password: 1234")
+                .responses(
+                    new ApiResponses()
+                        .addApiResponse("200", new ApiResponse().description("로그인 성공"))
+                        .addApiResponse(
+                            "E3", new ApiResponse().description("401, 인증에 실패한 경우")));
             PathItem pathItem = (new PathItem()).post(operation);
 
             try {

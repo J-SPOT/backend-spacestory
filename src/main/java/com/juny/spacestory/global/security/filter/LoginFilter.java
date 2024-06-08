@@ -1,21 +1,25 @@
 package com.juny.spacestory.global.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.security.jwt.refresh.Refresh;
 import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
 import com.juny.spacestory.global.security.service.CustomUserDetails;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import java.io.IOException;
@@ -40,7 +44,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   private final AuthenticationManager authenticationManager;
   private final JwtUtil jwtUtil;
   private final RefreshRepository refreshRepository;
-  private final String PARAMETER_NULL_OR_EMPTY_MSG = "Parameter is null or empty.";
   private final String SET_USERNAME_PARAMETER = "email";
   private final String SET_LOGIN_ENDPOINT = "/api/v1/auth/login";
   private final String SET_LOGIN_ENDPOINT_METHOD = "POST";
@@ -60,8 +63,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
       HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
     ReqLogin reqLogin = readByJson(request, response);
+    if (reqLogin == null) {
 
-    log.info("attempt authentication, email: {}, password: {}", reqLogin.email(), reqLogin.password());
+      throw new AuthenticationServiceException(ErrorCode.PARAMETER_IS_NULL_OR_EMPTY.getMsg());
+    }
 
     UsernamePasswordAuthenticationToken authToken =
         new UsernamePasswordAuthenticationToken(reqLogin.email(), reqLogin.password(), null);
@@ -71,24 +76,19 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
   private ReqLogin readByJson(HttpServletRequest request, HttpServletResponse response) {
     ReqLogin reqLogin = null;
-    PrintWriter writer;
 
     try {
       reqLogin = new ObjectMapper().readValue(request.getInputStream(), ReqLogin.class);
-    } catch (IOException e) {
+    } catch (Exception e) {
       log.error(e.getMessage());
-      throw new RuntimeException(e);
+      return null;
     }
 
-    if (Objects.isNull(reqLogin)
-      || reqLogin.email().trim().isEmpty() || reqLogin.password().trim().isEmpty()) {
-      try {
-        writer = response.getWriter();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-      writer.print(PARAMETER_NULL_OR_EMPTY_MSG);
-      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    if (Objects.isNull(reqLogin) || Objects.isNull(reqLogin.email())
+        || Objects.isNull(reqLogin.password())
+        || reqLogin.email().trim().isEmpty()
+        || reqLogin.password().trim().isEmpty()) {
+
       return null;
     }
 
@@ -139,6 +139,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
       HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
     throws IOException {
 
-    jwtUtil.setErrorResponse(response, ErrorCode.USER_NOT_MATCH_PASSWORD);
+    jwtUtil.setErrorResponse(response, ErrorCode.UNAUTHORIZED, failed.getMessage());
   }
 }

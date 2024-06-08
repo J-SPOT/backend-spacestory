@@ -145,4 +145,19 @@ public class JwtUtil {
     mapper.writeValue(out, data);
     out.flush();
   }
+
+  public void setErrorResponse(
+    HttpServletResponse response, ErrorCode errorCode, String msg) throws IOException {
+    response.setContentType(JwtUtil.CONTENT_TYPE);
+    response.setStatus(errorCode.getStatus().value());
+
+    Map<String, Object> data = new HashMap<>();
+    data.put(JwtUtil.ERROR_CODE, errorCode.getCode());
+    data.put(JwtUtil.ERROR_MSG, msg);
+
+    OutputStream out = response.getOutputStream();
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.writeValue(out, data);
+    out.flush();
+  }
 }
