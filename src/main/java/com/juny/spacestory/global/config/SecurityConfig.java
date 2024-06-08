@@ -1,9 +1,7 @@
 package com.juny.spacestory.global.config;
 
 import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Collections;
-
 import com.juny.spacestory.global.security.filter.JwtFilter;
 import com.juny.spacestory.global.security.filter.LoginFilter;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
