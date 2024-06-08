@@ -1,14 +1,12 @@
 package com.juny.spacestory.global.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.security.jwt.refresh.Refresh;
 import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
 import com.juny.spacestory.global.security.service.CustomUserDetails;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Objects;
@@ -19,7 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import java.io.IOException;
