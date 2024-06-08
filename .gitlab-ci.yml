@@ -29,7 +29,7 @@ test:
   script:
     - gradle build test
   tags:
-    - juny-aws
+    - juny
 
 build:
   stage: build
