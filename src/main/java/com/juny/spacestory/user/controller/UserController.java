@@ -26,7 +26,7 @@ public class UserController {
     this.userService = userService;
   }
 
-  @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행, 로그인 ")
+  @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행, 로그인")
   @Operation(summary = "회원 가입 요청 API")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204", description = "로그인 성공"),

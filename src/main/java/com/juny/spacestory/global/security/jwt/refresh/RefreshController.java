@@ -19,7 +19,7 @@ public class RefreshController {
     this.refreshService = refreshService;
   }
 
-  @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행")
+  @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행, 로그인")
   @Operation(
       summary = "액세스 토큰과 리프레시 토큰 재발행하는 API",
       description =
