@@ -18,7 +18,8 @@ public class Const {
   public static final String RESERVATION_INVALID_ID_MSG = "Reservation requested ID is invalid.";
 
   public static final String RESERVATION_MINIMUM_TIME_CODE = "R2";
-  public static final String RESERVATION_MINIMUM_TIME_MSG = "Minimum booking duration must be at least 1 hour.";
+  public static final String RESERVATION_MINIMUM_TIME_MSG =
+      "Minimum booking duration must be at least 1 hour.";
 
   public static final String RESERVATION_OVERLAPPED_TIME_CODE = "R3";
   public static final String RESERVATION_OVERLAPPED_TIME_MSG = "There is a scheduling conflict.";
@@ -62,6 +63,5 @@ public class Const {
   public static final String REFRESH_TOKEN_INVALID_CODE = "RT1";
   public static final String REFRESH_TOKEN_INVALID_MSG = "Refresh token is invalid.";
 
-  private Const() {
-  }
+  private Const() {}
 }

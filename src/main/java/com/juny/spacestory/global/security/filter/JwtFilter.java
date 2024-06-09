@@ -35,11 +35,12 @@ public class JwtFilter extends OncePerRequestFilter {
     this.jwtUtil = jwtUtil;
   }
 
-
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
-    String authorization= request.getHeader(AUTHORIZATION_HEADER);
+    String authorization = request.getHeader(AUTHORIZATION_HEADER);
 
     if (authorization == null || !authorization.startsWith(AUTHORIZATION_PREFIX)) {
       filterChain.doFilter(request, response);
@@ -54,8 +55,12 @@ public class JwtFilter extends OncePerRequestFilter {
     storeSecurityContextHolder(request, response, filterChain, token);
   }
 
-  private void storeSecurityContextHolder(HttpServletRequest request, HttpServletResponse response,
-    FilterChain filterChain, String token) throws IOException, ServletException {
+  private void storeSecurityContextHolder(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      FilterChain filterChain,
+      String token)
+      throws IOException, ServletException {
     String email = jwtUtil.getEmail(token);
     String role = jwtUtil.getRole(token);
 
@@ -65,21 +70,24 @@ public class JwtFilter extends OncePerRequestFilter {
 
     CustomUserDetails customUserDetails = new CustomUserDetails(user);
 
-    Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+    Authentication authToken =
+        new UsernamePasswordAuthenticationToken(
+            customUserDetails, null, customUserDetails.getAuthorities());
 
     SecurityContextHolder.getContext().setAuthentication(authToken);
 
     filterChain.doFilter(request, response);
   }
 
-  private boolean validateAccessToken(HttpServletResponse response, String token) throws IOException {
+  private boolean validateAccessToken(HttpServletResponse response, String token)
+      throws IOException {
     int errorType = jwtUtil.isValid(token);
     if (errorType == 1) {
-        jwtUtil.setErrorResponse(response, ErrorCode.ACCESS_TOKEN_EXPIRED);
+      jwtUtil.setErrorResponse(response, ErrorCode.ACCESS_TOKEN_EXPIRED);
       return false;
     }
     if (errorType == 2 || JwtUtil.ACCESS_TOKEN_PREFIX.equals(jwtUtil.getType(token))) {
-        jwtUtil.setErrorResponse(response, ErrorCode.ACCESS_TOKEN_INVALID);
+      jwtUtil.setErrorResponse(response, ErrorCode.ACCESS_TOKEN_INVALID);
       return false;
     }
     return true;

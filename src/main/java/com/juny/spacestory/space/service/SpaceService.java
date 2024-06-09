@@ -27,14 +27,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SpaceService {
 
-  private final SpaceRepository spaceRepository;
-
-  private final HostRepository hostRepository;
-
-  private final RealEstateRepository realEstateRepository;
-
-  private final SpaceMapper mapper;
-
   private static final Map<SpaceType, Set<DetailedType>> validDetailedTypesMap = Map.of(
     SpaceType.FRIENDSHIP, EnumSet.of(DetailedType.PARTY_ROOM, DetailedType.RESIDENCE, DetailedType.CAFE),
     SpaceType.EVENT, EnumSet.of(DetailedType.PERFORMANCE_VENUE, DetailedType.CONFERENCE_HALL, DetailedType.EXHIBITION_HALL),
@@ -43,6 +35,10 @@ public class SpaceService {
     SpaceType.SPORT, EnumSet.of(DetailedType.BADMINTON_COURT, DetailedType.FUTSAL_COURT, DetailedType.TENNIS_COURT),
     SpaceType.PHOTOGRAPHY, EnumSet.of(DetailedType.FILM_STUDIO, DetailedType.BROADCAST_ROOM)
   );
+  private final SpaceRepository spaceRepository;
+  private final HostRepository hostRepository;
+  private final RealEstateRepository realEstateRepository;
+  private final SpaceMapper mapper;
 
   public List<ResponseSpace> searchByTypeInSeoul(SpaceType spaceType, int page, int size) {
     PageRequest pageRequest = PageRequest.of(page, size);

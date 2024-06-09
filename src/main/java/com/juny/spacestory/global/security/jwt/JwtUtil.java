@@ -41,7 +41,6 @@ public class JwtUtil {
   public static final String ERROR_CODE = "code";
   public static final String ERROR_MSG = "msg";
 
-
   private final SecretKey secretKey;
 
   public JwtUtil(@Value("${jwt.secretKey}") String secret) {
@@ -131,8 +130,8 @@ public class JwtUtil {
     return localDateTime.toString();
   }
 
-  public void setErrorResponse(
-    HttpServletResponse response, ErrorCode errorCode) throws IOException {
+  public void setErrorResponse(HttpServletResponse response, ErrorCode errorCode)
+      throws IOException {
     response.setContentType(JwtUtil.CONTENT_TYPE);
     response.setStatus(errorCode.getStatus().value());
 
@@ -146,8 +145,8 @@ public class JwtUtil {
     out.flush();
   }
 
-  public void setErrorResponse(
-    HttpServletResponse response, ErrorCode errorCode, String msg) throws IOException {
+  public void setErrorResponse(HttpServletResponse response, ErrorCode errorCode, String msg)
+      throws IOException {
     response.setContentType(JwtUtil.CONTENT_TYPE);
     response.setStatus(errorCode.getStatus().value());
 

@@ -59,7 +59,17 @@ public class ReservationService {
     if (req.isUser()) {
       processPayment(user, space.getRealEstate().getHost(), usageFee);
     }
-    SpaceReservation savedReservation = reservationRepository.save(new SpaceReservation(req.userId(), req.reservationDate(), req.startTime(), req.endTime(), usageFee, true, false, space));
+    SpaceReservation savedReservation =
+        reservationRepository.save(
+            new SpaceReservation(
+                req.userId(),
+                req.reservationDate(),
+                req.startTime(),
+                req.endTime(),
+                usageFee,
+                true,
+                false,
+                space));
     return mapper.ReservationToResponseReservation(savedReservation);
   }
 
@@ -69,8 +79,11 @@ public class ReservationService {
     hostRepository.save(host);
   }
 
-  private boolean isReservationAvailable(Long spaceId, LocalDate reservationDate, LocalTime reqStart, LocalTime reqEnd) {
-    List<SpaceReservation> validReservations = reservationRepository.findBySpaceIdAndReservationDateAndIsDeletedFalse(spaceId, reservationDate);
+  private boolean isReservationAvailable(
+      Long spaceId, LocalDate reservationDate, LocalTime reqStart, LocalTime reqEnd) {
+    List<SpaceReservation> validReservations =
+        reservationRepository.findBySpaceIdAndReservationDateAndIsDeletedFalse(
+            spaceId, reservationDate);
     for (var e : validReservations) {
       if (reqStart.isBefore(e.getEndTime()) && reqEnd.isAfter(e.getStartTime())) {
         return false;
@@ -81,7 +94,9 @@ public class ReservationService {
 
   public List<TimeSlot> getAvailableReservation(Long spaceId, LocalDate reservationDate) {
     Space space = findSpaceById(spaceId);
-    List<SpaceReservation> reservedSpace = reservationRepository.findBySpaceIdAndReservationDateAndIsDeletedFalse(spaceId, reservationDate);
+    List<SpaceReservation> reservedSpace =
+        reservationRepository.findBySpaceIdAndReservationDateAndIsDeletedFalse(
+            spaceId, reservationDate);
     LocalTime openingTime = space.getOpeningTime();
     LocalTime closingTime = space.getClosingTime();
     List<TimeSlot> availableSlots = new ArrayList<>();
@@ -90,18 +105,18 @@ public class ReservationService {
       availableSlots.add(new TimeSlot(time, time.plusHours(1)));
     }
 
-    List<TimeSlot> reservedSlots = reservedSpace
-      .stream()
-      .map(reservation -> new TimeSlot(reservation.getStartTime(),
-        reservation.getEndTime()))
-      .toList();
+    List<TimeSlot> reservedSlots =
+        reservedSpace.stream()
+            .map(reservation -> new TimeSlot(reservation.getStartTime(), reservation.getEndTime()))
+            .toList();
 
     for (var e : reservedSlots) {
-      availableSlots.removeIf(slot -> {
-        LocalTime slotStart = slot.startTime();
-        LocalTime slotEnd = slot.endTime();
-        return (slotStart.isBefore(e.endTime()) && slotEnd.isAfter(e.startTime()));
-      });
+      availableSlots.removeIf(
+          slot -> {
+            LocalTime slotStart = slot.startTime();
+            LocalTime slotEnd = slot.endTime();
+            return (slotStart.isBefore(e.endTime()) && slotEnd.isAfter(e.startTime()));
+          });
     }
 
     return availableSlots;
@@ -116,7 +131,8 @@ public class ReservationService {
   }
 
   public List<ResponseReservation> getSpaceReservations(Long spaceId, LocalDate reservationDate) {
-    List<SpaceReservation> reservations = reservationRepository.findReservationsBySpaceIdAndDateJPQL(spaceId, reservationDate);
+    List<SpaceReservation> reservations =
+        reservationRepository.findReservationsBySpaceIdAndDateJPQL(spaceId, reservationDate);
 
     return mapper.ReservationsToResponseReservations(reservations);
   }
@@ -138,7 +154,8 @@ public class ReservationService {
     return mapper.ReservationToResponseReservation(savedReservation);
   }
 
-  private void calculateAvailableSlots(RequestUpdateReservation req, List<TimeSlot> availableSlots) {
+  private void calculateAvailableSlots(
+      RequestUpdateReservation req, List<TimeSlot> availableSlots) {
     for (LocalTime time = req.startTime(); time.isBefore(req.endTime()); time = time.plusHours(1)) {
       TimeSlot reqSlot = new TimeSlot(time, time.plusHours(1));
       if (!availableSlots.contains(reqSlot)) {
@@ -147,10 +164,13 @@ public class ReservationService {
     }
   }
 
-  private List<TimeSlot> calculateAvailableSlots(Long spaceId, RequestUpdateReservation req, SpaceReservation reservation) {
+  private List<TimeSlot> calculateAvailableSlots(
+      Long spaceId, RequestUpdateReservation req, SpaceReservation reservation) {
     List<TimeSlot> availableSlots = getAvailableReservation(spaceId, req.reservationDate());
     if (reservation.getReservationDate().equals(req.reservationDate())) {
-      for (LocalTime time = reservation.getStartTime(); time.isBefore(reservation.getEndTime()); time = time.plusHours(1)) {
+      for (LocalTime time = reservation.getStartTime();
+          time.isBefore(reservation.getEndTime());
+          time = time.plusHours(1)) {
         availableSlots.add(new TimeSlot(time, time.plusHours(1)));
       }
       availableSlots.sort(Comparator.comparing(TimeSlot::startTime));
@@ -183,4 +203,3 @@ public class ReservationService {
         .orElseThrow(() -> new UserInvalidIdBusinessException(ErrorCode.USER_INVALID_ID));
   }
 }
-

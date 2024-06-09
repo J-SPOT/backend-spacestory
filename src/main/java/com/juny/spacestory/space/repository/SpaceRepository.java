@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
-
 public interface SpaceRepository extends JpaRepository<Space, Long>, CustomSpaceRepository {
 
   Optional<Space> findByIdAndIsDeletedFalse(Long spaceId);

@@ -7,7 +7,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class CustomRefreshRepositoryImpl implements CustomRefreshRepository{
+public class CustomRefreshRepositoryImpl implements CustomRefreshRepository {
 
   private final JPAQueryFactory queryFactory;
 
@@ -15,8 +15,6 @@ public class CustomRefreshRepositoryImpl implements CustomRefreshRepository{
   @Transactional
   public int deleteExpiredTokens(String currentTime) {
 
-    return (int) queryFactory.delete(refresh1)
-      .where(refresh1.expiration.lt(currentTime))
-      .execute();
+    return (int) queryFactory.delete(refresh1).where(refresh1.expiration.lt(currentTime)).execute();
   }
 }

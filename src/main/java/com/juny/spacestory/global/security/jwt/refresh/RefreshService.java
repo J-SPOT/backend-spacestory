@@ -35,10 +35,12 @@ public class RefreshService {
 
     if (refreshToken == null || refreshToken.trim().isEmpty()) {
 
-      throw new ParameterIsNullOrEmpty(ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, REFRESH_TOKEN_NULL_OR_EMPTY_MSG);
+      throw new ParameterIsNullOrEmpty(
+          ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, REFRESH_TOKEN_NULL_OR_EMPTY_MSG);
     }
 
-    if (jwtUtil.isValid(refreshToken) < 0 || JwtUtil.REFRESH_TOKEN_PREFIX.equals(jwtUtil.getType(refreshToken))) {
+    if (jwtUtil.isValid(refreshToken) < 0
+        || JwtUtil.REFRESH_TOKEN_PREFIX.equals(jwtUtil.getType(refreshToken))) {
 
       throw new RefreshTokenInvalidException(ErrorCode.REFRESH_TOKEN_INVALID);
     }
@@ -51,13 +53,16 @@ public class RefreshService {
     String newAccessToken = jwtUtil.createJwt(JwtUtil.ACCESS_TOKEN_PREFIX, email, role);
     String newRefreshToken = jwtUtil.createJwt(JwtUtil.REFRESH_TOKEN_PREFIX, email, role);
 
-    String newAccessTokenExpiration = jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(newAccessToken));
-    String newRefreshTokenExpiration = jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(newRefreshToken));
+    String newAccessTokenExpiration =
+        jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(newAccessToken));
+    String newRefreshTokenExpiration =
+        jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(newRefreshToken));
 
     Refresh refresh = new Refresh(email, newRefreshToken, newRefreshTokenExpiration);
     refreshRepository.save(refresh);
 
-    return new ResReissueTokens(newAccessToken, newRefreshToken, newAccessTokenExpiration, newRefreshTokenExpiration);
+    return new ResReissueTokens(
+        newAccessToken, newRefreshToken, newAccessTokenExpiration, newRefreshTokenExpiration);
   }
 
   public void deleteExpiredTokens() {

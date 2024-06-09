@@ -59,10 +59,8 @@ public class SecurityConfig {
                 request -> {
                   CorsConfiguration config = new CorsConfiguration();
 
-                  config.setAllowedOrigins(List.of(
-                    "http://localhost:5173",
-                    "https://spacestory.duckdns.org"
-                  ));
+                  config.setAllowedOrigins(
+                      List.of("http://localhost:5173", "https://spacestory.duckdns.org"));
 
                   config.setAllowedMethods(Collections.singletonList("*"));
 
@@ -72,7 +70,12 @@ public class SecurityConfig {
     http.authorizeHttpRequests(
         (auth) ->
             auth.requestMatchers(
-                    "/", "/api/v1/auth/login", "/api/**", "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**")
+                    "/",
+                    "/api/v1/auth/login",
+                    "/api/**",
+                    "/swagger-ui/**",
+                    "/swagger-resources/**",
+                    "/v3/api-docs/**")
                 .permitAll()
                 .requestMatchers("/admin/**")
                 .hasAuthority("ADMIN")

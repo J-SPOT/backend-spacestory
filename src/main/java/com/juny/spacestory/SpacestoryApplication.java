@@ -15,10 +15,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     },
     factory = EnvConfig.class)
 @EnableScheduling
-@OpenAPIDefinition(servers = {
-  @Server(url = "https://spacestory.duckdns.org", description = "For JINBOKKK"),
-  @Server(url = "http://localhost:8080", description = "For JUNYYY")
-})
+@OpenAPIDefinition(
+    servers = {
+      @Server(url = "https://spacestory.duckdns.org", description = "For JINBOKKK"),
+      @Server(url = "http://localhost:8080", description = "For JUNYYY")
+    })
 public class SpacestoryApplication {
 
   public static void main(String[] args) {

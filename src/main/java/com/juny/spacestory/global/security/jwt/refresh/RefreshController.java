@@ -30,7 +30,6 @@ public class RefreshController {
         @ApiResponse(responseCode = "P1", description = "400, 파라미터가 비어 있거나 널인 경우"),
         @ApiResponse(responseCode = "RT1", description = "401, 리프레시 토큰이 유효하지 않은 경우"),
       })
-
   @PostMapping("/api/v1/auth/tokens")
   public ResponseEntity<ResReissueTokens> reissue(@RequestBody ReqReissueTokens req) {
 

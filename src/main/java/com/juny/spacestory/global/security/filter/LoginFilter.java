@@ -45,14 +45,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   private final String SET_LOGIN_ENDPOINT = "/api/v1/auth/login";
   private final String SET_LOGIN_ENDPOINT_METHOD = "POST";
 
-  public LoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil,
-    RefreshRepository refreshRepository) {
+  public LoginFilter(
+      AuthenticationManager authenticationManager,
+      JwtUtil jwtUtil,
+      RefreshRepository refreshRepository) {
 
     this.authenticationManager = authenticationManager;
     this.jwtUtil = jwtUtil;
     this.refreshRepository = refreshRepository;
     setUsernameParameter(SET_USERNAME_PARAMETER);
-    setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(SET_LOGIN_ENDPOINT, SET_LOGIN_ENDPOINT_METHOD));
+    setRequiresAuthenticationRequestMatcher(
+        new AntPathRequestMatcher(SET_LOGIN_ENDPOINT, SET_LOGIN_ENDPOINT_METHOD));
   }
 
   @Override
@@ -81,7 +84,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
       return null;
     }
 
-    if (Objects.isNull(reqLogin) || Objects.isNull(reqLogin.email())
+    if (Objects.isNull(reqLogin)
+        || Objects.isNull(reqLogin.email())
         || Objects.isNull(reqLogin.password())
         || reqLogin.email().trim().isEmpty()
         || reqLogin.password().trim().isEmpty()) {
@@ -97,7 +101,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
       HttpServletRequest request,
       HttpServletResponse response,
       FilterChain chain,
-      Authentication authentication) throws IOException {
+      Authentication authentication)
+      throws IOException {
 
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
@@ -112,8 +117,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     String accessToken = jwtUtil.createJwt(ACCESS_TOKEN_PREFIX, email, role);
     String refreshToken = jwtUtil.createJwt(REFRESH_TOKEN_PREFIX, email, role);
 
-    String accessTokenExpired = jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(accessToken));
-    String refreshTokenExpired = jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(refreshToken));
+    String accessTokenExpired =
+        jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(accessToken));
+    String refreshTokenExpired =
+        jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(refreshToken));
 
     refreshRepository.save(new Refresh(email, refreshToken, refreshTokenExpired));
 
@@ -134,7 +141,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   @Override
   protected void unsuccessfulAuthentication(
       HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
-    throws IOException {
+      throws IOException {
 
     jwtUtil.setErrorResponse(response, ErrorCode.UNAUTHORIZED, failed.getMessage());
   }

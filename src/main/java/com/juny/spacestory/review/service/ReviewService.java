@@ -30,7 +30,7 @@ public class ReviewService {
     PageRequest pageRequest = PageRequest.of(page, size);
 
     List<Review> reviews =
-      reviewRepository.findByUserIdAndIsDeletedFalse(userId, pageRequest).getContent();
+        reviewRepository.findByUserIdAndIsDeletedFalse(userId, pageRequest).getContent();
     return mapper.ReviewsToResponseReviews(reviews);
   }
 
@@ -58,14 +58,13 @@ public class ReviewService {
 
   private User findByUserId(Long userId) {
     return userRepository
-      .findById(userId)
-      .orElseThrow(() -> new UserInvalidIdBusinessException(ErrorCode.USER_INVALID_ID));
+        .findById(userId)
+        .orElseThrow(() -> new UserInvalidIdBusinessException(ErrorCode.USER_INVALID_ID));
   }
 
   private Review findByReviewId(Long reviewId) {
     return reviewRepository
-      .findById(reviewId)
-      .orElseThrow(() -> new ReviewInvalidIdBusinessException(ErrorCode.REVIEW_INVALID_ID));
+        .findById(reviewId)
+        .orElseThrow(() -> new ReviewInvalidIdBusinessException(ErrorCode.REVIEW_INVALID_ID));
   }
 }
-
