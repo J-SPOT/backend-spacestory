@@ -26,11 +26,9 @@ public class RefreshController {
           "API를 요청할 때 액세스 토큰이 만료되었다는 응답 코드인 \"AT1\"을 받으면 해당 엔드포인트에서 유효한 Refresh Token으로 액세스 토큰과 리프레시 토큰을 갱신 받아야 합니다.")
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "204", description = "로그인 성공"),
-        @ApiResponse(responseCode = "P1", description = "401, 파라미터가 비어 있거나 NULL인 경우"),
-        @ApiResponse(responseCode = "U4", description = "401, 이메일이 중복된 경우"),
-        @ApiResponse(responseCode = "U5", description = "401, 패스워드가 일치하지 않는 경우"),
-        @ApiResponse(responseCode = "U6", description = "401, 패스워드가 4자리 미만인 경우"),
+        @ApiResponse(responseCode = "200", description = "로그인 성공"),
+        @ApiResponse(responseCode = "P1", description = "400, 파라미터가 비어 있거나 널인 경우"),
+        @ApiResponse(responseCode = "RT1", description = "401, 리프레시 토큰이 유효하지 않은 경우"),
       })
 
   @PostMapping("/api/v1/auth/tokens")
