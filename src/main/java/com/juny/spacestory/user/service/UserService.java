@@ -2,12 +2,15 @@ package com.juny.spacestory.user.service;
 
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.hierarchy.user.UserDuplicatedEmailException;
+import com.juny.spacestory.global.exception.hierarchy.user.UserInvalidEmailException;
 import com.juny.spacestory.global.exception.hierarchy.user.UserNotMatchPasswordException;
 import com.juny.spacestory.global.exception.hierarchy.user.UserPasswordTooShortException;
 import com.juny.spacestory.global.exception.hierarchy.parameter.ParameterIsNullOrEmpty;
+import com.juny.spacestory.user.domain.Role;
 import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.dto.ReqRegisterUser;
 import com.juny.spacestory.user.repository.UserRepository;
+import java.util.regex.Pattern;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,13 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final String NAME_IS_NULL_OR_EMPTY = "Name is null or empty";
+  private final String EMAIL_IS_NULL_OR_EMPTY = "Email is null or empty";
+  private final String PASSWORD_IS_NULL_OR_EMPTY = "Password is null or empty";
+  private final String PASSWORD_CHECK_IS_NULL_OR_EMPTY = "PasswordCheck is null or empty";
+  private final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+  private final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+
 
   public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
 
@@ -27,7 +37,8 @@ public class UserService {
 
     validateParams(req);
 
-    User user = new User(req.name(), req.email(), bCryptPasswordEncoder.encode(req.password()));
+    User user =
+        new User(req.name(), req.email(), bCryptPasswordEncoder.encode(req.password()));
 
     userRepository.save(user);
   }
@@ -37,25 +48,30 @@ public class UserService {
     if (req.name() == null || req.name().trim().isEmpty()) {
 
       throw new ParameterIsNullOrEmpty(
-          ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, "register, req.name() is null or empty");
+          ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, NAME_IS_NULL_OR_EMPTY);
     }
 
     if (req.email() == null || req.email().trim().isEmpty()) {
 
       throw new ParameterIsNullOrEmpty(
-          ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, "register, req.email() is null or empty");
+          ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, EMAIL_IS_NULL_OR_EMPTY);
     }
 
     if (req.password() == null || req.password().trim().isEmpty()) {
 
       throw new ParameterIsNullOrEmpty(
-          ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, "register, req.password() is null or empty");
+          ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, PASSWORD_IS_NULL_OR_EMPTY);
     }
 
     if (req.passwordCheck() == null || req.passwordCheck().trim().isEmpty()) {
 
       throw new ParameterIsNullOrEmpty(
-          ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, "register, req.passwordCheck() is null or empty");
+          ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, PASSWORD_CHECK_IS_NULL_OR_EMPTY);
+    }
+
+    if (!pattern.matcher(req.password()).matches()) {
+
+      throw new UserInvalidEmailException(ErrorCode.USER_INVALID_EMAIL);
     }
 
     if (userRepository.existsByEmail(req.email())) {

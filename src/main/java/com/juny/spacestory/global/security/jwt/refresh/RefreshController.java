@@ -19,7 +19,7 @@ public class RefreshController {
     this.refreshService = refreshService;
   }
 
-  @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행, 로그인")
+  @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행, 로그인, 로그아웃")
   @Operation(
       summary = "액세스 토큰과 리프레시 토큰 재발행하는 API",
       description =
@@ -37,4 +37,23 @@ public class RefreshController {
 
     return new ResponseEntity<>(resReissueTokens, HttpStatus.OK);
   }
+
+  @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행, 로그인, 로그아웃")
+  @Operation(
+    summary = "로그아웃 요청 API",
+    description = "사용자가 로그아웃을 하면 해당 리프레시 토큰을 재사용할 수 없게 해당 앤드포인트를 호출해야 합니다.")
+  @ApiResponses(
+    value = {
+      @ApiResponse(responseCode = "200", description = "로그인 성공"),
+      @ApiResponse(responseCode = "P1", description = "400, 파라미터가 비어 있거나 널인 경우"),
+      @ApiResponse(responseCode = "RT1", description = "401, 리프레시 토큰이 유효하지 않은 경우"),
+    })
+  @PostMapping("/api/v1/auth/logout")
+  public ResponseEntity<Void> logout(@RequestBody ReqReissueTokens req) {
+
+    refreshService.logout(req.refreshToken());
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
 }

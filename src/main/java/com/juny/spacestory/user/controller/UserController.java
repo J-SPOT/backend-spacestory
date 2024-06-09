@@ -26,7 +26,7 @@ public class UserController {
     this.userService = userService;
   }
 
-  @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행, 로그인")
+  @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행, 로그인, 로그아웃")
   @Operation(summary = "회원 가입 요청 API")
   @ApiResponses(
       value = {
@@ -35,6 +35,7 @@ public class UserController {
         @ApiResponse(responseCode = "U4", description = "400, 이메일이 중복된 경우"),
         @ApiResponse(responseCode = "U5", description = "401, 패스워드가 일치하지 않는 경우"),
         @ApiResponse(responseCode = "U6", description = "400, 패스워드가 4자리 미만인 경우"),
+        @ApiResponse(responseCode = "U7", description = "400, 이메일 형식이 올바르지 않은 경우"),
       })
   @PostMapping("/api/v1/auth/register")
   public ResponseEntity<Void> register(@RequestBody ReqRegisterUser req) {

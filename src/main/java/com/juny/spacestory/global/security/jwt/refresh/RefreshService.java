@@ -39,8 +39,11 @@ public class RefreshService {
           ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, REFRESH_TOKEN_NULL_OR_EMPTY_MSG);
     }
 
-    if (jwtUtil.isValid(refreshToken) < 0
-        || JwtUtil.REFRESH_TOKEN_PREFIX.equals(jwtUtil.getType(refreshToken))) {
+    refreshRepository.findByRefresh(refreshToken).orElseThrow(
+      () -> new RefreshTokenInvalidException(ErrorCode.REFRESH_TOKEN_INVALID));
+
+    if (jwtUtil.isValid(refreshToken) != 0
+        || !JwtUtil.REFRESH_TOKEN_PREFIX.equals(jwtUtil.getType(refreshToken))) {
 
       throw new RefreshTokenInvalidException(ErrorCode.REFRESH_TOKEN_INVALID);
     }
@@ -69,5 +72,11 @@ public class RefreshService {
     LocalDateTime now = LocalDateTime.now();
 
     refreshRepository.deleteExpiredTokens(now.toString());
+  }
+
+  public void logout(String refreshToken) {
+    validateRefreshToken(refreshToken);
+
+    refreshRepository.deleteByRefresh(refreshToken);
   }
 }

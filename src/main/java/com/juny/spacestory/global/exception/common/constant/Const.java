@@ -54,6 +54,9 @@ public class Const {
   public static final String USER_PASSWORD_IS_SHORT_CODE = "U6";
   public static final String USER_PASSWORD_IS_SHORT_MSG = "User password is short.";
 
+  public static final String USER_EMAIL_INVALID_CODE = "U7";
+  public static final String USER_EMAIL_INVALID_MSG = "User email is invalid.";
+
   public static final String ACCESS_TOKEN_EXPIRED_CODE = "AT1";
   public static final String ACCESS_TOKEN_EXPIRED_MSG = "Access token is expired.";
 

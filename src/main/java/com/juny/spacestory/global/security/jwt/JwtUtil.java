@@ -82,7 +82,7 @@ public class JwtUtil {
       }
     }
 
-    return -1;
+    return 0;
   }
 
   public String getType(String token) {

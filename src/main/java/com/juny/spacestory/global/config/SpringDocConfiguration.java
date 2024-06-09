@@ -44,7 +44,7 @@ public class SpringDocConfiguration {
   @Bean
   public OpenAPI customOpenAPI() {
     return new OpenAPI()
-        .info(new Info().title("SpaceStory API").version("1.0.0").description("API description"))
+        .info(new Info().title("Ggorangjirang API").version("1.0.0").description("API description"))
         .addSecurityItem(new SecurityRequirement().addList("bearer"))
         .components(
             new io.swagger.v3.oas.models.Components()
@@ -138,7 +138,7 @@ public class SpringDocConfiguration {
           operation
               .addTagsItem("유저 인증 API")
               .summary("로그인 요청 API")
-              .description("테스트 email: user, password: 1234")
+              .description("테스트 email: user@gmail.com, password: 1234")
               .responses(
                   new ApiResponses()
                       .addApiResponse("200", new ApiResponse().description("로그인 성공"))
