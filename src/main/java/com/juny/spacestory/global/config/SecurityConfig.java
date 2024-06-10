@@ -1,6 +1,7 @@
 package com.juny.spacestory.global.config;
 
 import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
+import com.juny.spacestory.global.security.oauth2.CustomAuthenticationFailureHandler;
 import com.juny.spacestory.global.security.oauth2.CustomOAuth2UserService;
 import com.juny.spacestory.global.security.oauth2.CustomSuccessHandler;
 import java.util.Collections;
@@ -32,6 +33,7 @@ public class SecurityConfig {
   private final RefreshRepository refreshRepository;
   private final CustomOAuth2UserService customOAuth2UserService;
   private final CustomSuccessHandler customSuccessHandler;
+  private final CustomAuthenticationFailureHandler authenticationFailureHandler;
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -88,7 +90,8 @@ public class SecurityConfig {
                 .userInfoEndpoint(
                     (userInfoEndpointConfig) ->
                         userInfoEndpointConfig.userService(customOAuth2UserService))
-                .successHandler(customSuccessHandler));
+                .successHandler(customSuccessHandler)
+                .failureHandler(authenticationFailureHandler));
 
     http.addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
 

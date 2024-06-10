@@ -37,11 +37,22 @@ public class User {
   @Enumerated(EnumType.STRING)
   private Role role;
 
+  private String socialId;
+
   public User(String name, String email, String password) {
     this.name = name;
     this.email = email;
     this.password = password;
     this.point = 0L;
+    this.role = Role.USER;
+  }
+
+  public User(String name, String email, Role role, String socialId) {
+    this.name = name;
+    this.email = email;
+    this.point = 0L;
+    this.role = role;
+    this.socialId = socialId;
   }
 
   public User(String email, Role role) {
@@ -66,5 +77,10 @@ public class User {
   public void getRefund(long differenceAmount, Host host) {
     this.point += differenceAmount;
     host.receivedFee(-differenceAmount);
+  }
+
+  public void updateNameAndEmail(String name, String email) {
+    this.name = name;
+    this.email = email;
   }
 }
