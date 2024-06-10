@@ -1,11 +1,14 @@
 package com.juny.spacestory.global.config;
 
 import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
+import com.juny.spacestory.global.security.oauth2.CustomOAuth2UserService;
+import com.juny.spacestory.global.security.oauth2.CustomSuccessHandler;
 import java.util.Collections;
 import com.juny.spacestory.global.security.filter.JwtFilter;
 import com.juny.spacestory.global.security.filter.LoginFilter;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,21 +24,14 @@ import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity(debug = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
 
   private final AuthenticationConfiguration authenticationConfiguration;
   private final JwtUtil jwtUtil;
   private final RefreshRepository refreshRepository;
-
-  public SecurityConfig(
-      AuthenticationConfiguration authenticationConfiguration,
-      JwtUtil jwtUtil,
-      RefreshRepository refreshRepository) {
-
-    this.authenticationConfiguration = authenticationConfiguration;
-    this.jwtUtil = jwtUtil;
-    this.refreshRepository = refreshRepository;
-  }
+  private final CustomOAuth2UserService customOAuth2UserService;
+  private final CustomSuccessHandler customSuccessHandler;
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -85,6 +81,14 @@ public class SecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable);
+
+    http.oauth2Login(
+        (oauth2) ->
+            oauth2
+                .userInfoEndpoint(
+                    (userInfoEndpointConfig) ->
+                        userInfoEndpointConfig.userService(customOAuth2UserService))
+                .successHandler(customSuccessHandler));
 
     http.addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
 
