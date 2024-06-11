@@ -57,9 +57,9 @@ public class SecurityConfig {
                 request -> {
                   CorsConfiguration config = new CorsConfiguration();
 
+                  config.setAllowedHeaders(Collections.singletonList("*"));
                   config.setAllowedOrigins(
                       List.of("http://localhost:5173", "https://spacestory.duckdns.org"));
-
                   config.setAllowedMethods(Collections.singletonList("*"));
 
                   return config;
