@@ -1,6 +1,7 @@
 package com.juny.spacestory.reservation.repository;
 
 import com.juny.spacestory.reservation.entity.SpaceReservation;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -11,7 +12,7 @@ public interface ReservationRepository extends JpaRepository<SpaceReservation, L
   List<SpaceReservation> findBySpaceIdAndReservationDateAndIsDeletedFalse(
       Long spaceId, LocalDate reservationDate);
 
-  List<SpaceReservation> findByUserId(Long userId);
+  List<SpaceReservation> findByUserId(UUID userId);
 
   @Query(
       "SELECT sr FROM SpaceReservation sr "

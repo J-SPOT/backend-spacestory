@@ -12,6 +12,7 @@ import com.juny.spacestory.review.repository.ReviewRepository;
 import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.repository.UserRepository;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,7 @@ public class ReviewService {
     reviewRepository.save(review);
   }
 
-  private User findByUserId(Long userId) {
+  private User findByUserId(UUID userId) {
     return userRepository
         .findById(userId)
         .orElseThrow(() -> new UserInvalidIdBusinessException(ErrorCode.USER_INVALID_ID));

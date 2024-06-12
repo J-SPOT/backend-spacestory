@@ -5,6 +5,7 @@ import com.juny.spacestory.global.exception.hierarchy.parameter.ParameterIsNullO
 import com.juny.spacestory.global.exception.hierarchy.token.RefreshTokenInvalidException;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -50,18 +51,18 @@ public class RefreshService {
   }
 
   private ResReissueTokens issueNewTokens(String refreshToken) {
-    String email = jwtUtil.getEmail(refreshToken);
+    String id = jwtUtil.getId(refreshToken);
     String role = jwtUtil.getRole(refreshToken);
 
-    String newAccessToken = jwtUtil.createJwt(JwtUtil.ACCESS_TOKEN_PREFIX, email, role);
-    String newRefreshToken = jwtUtil.createJwt(JwtUtil.REFRESH_TOKEN_PREFIX, email, role);
+    String newAccessToken = jwtUtil.createJwt(JwtUtil.ACCESS_TOKEN_PREFIX, id, role);
+    String newRefreshToken = jwtUtil.createJwt(JwtUtil.REFRESH_TOKEN_PREFIX, id, role);
 
     String newAccessTokenExpiration =
         jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(newAccessToken));
     String newRefreshTokenExpiration =
         jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(newRefreshToken));
 
-    Refresh refresh = new Refresh(email, newRefreshToken, newRefreshTokenExpiration);
+    Refresh refresh = new Refresh(UUID.fromString(id), newRefreshToken, newRefreshTokenExpiration);
     refreshRepository.save(refresh);
 
     return new ResReissueTokens(

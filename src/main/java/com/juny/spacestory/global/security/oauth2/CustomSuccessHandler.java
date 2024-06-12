@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
 import com.juny.spacestory.global.security.jwt.refresh.Refresh;
 import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
-import com.juny.spacestory.global.security.service.CustomUserDetails;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -46,7 +46,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
 
-    String email = customUserDetails.getEmail();
+    String id = customUserDetails.getId();
 
     Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
     Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -54,18 +54,18 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     String role = auth.getAuthority();
 
-    System.out.println("email = " + email);
+    System.out.println("id = " + id);
     System.out.println("role = " + role);
 
-    String accessToken = jwtUtil.createJwt(ACCESS_TOKEN_PREFIX, email, role);
-    String refreshToken = jwtUtil.createJwt(REFRESH_TOKEN_PREFIX, email, role);
+    String accessToken = jwtUtil.createJwt(ACCESS_TOKEN_PREFIX, id, role);
+    String refreshToken = jwtUtil.createJwt(REFRESH_TOKEN_PREFIX, id, role);
 
     String accessTokenExpired =
       jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(accessToken));
     String refreshTokenExpired =
       jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(refreshToken));
 
-    refreshRepository.save(new Refresh(email, refreshToken, refreshTokenExpired));
+    refreshRepository.save(new Refresh(UUID.fromString(id), refreshToken, refreshTokenExpired));
 
     response.setContentType(CONTENT_TYPE);
     response.setCharacterEncoding(CHARACTER_ENCODING);

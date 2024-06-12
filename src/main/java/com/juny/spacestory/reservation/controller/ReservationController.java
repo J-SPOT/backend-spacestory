@@ -5,6 +5,7 @@ import com.juny.spacestory.reservation.dto.RequestUpdateReservation;
 import com.juny.spacestory.reservation.dto.ResponseReservation;
 import com.juny.spacestory.reservation.dto.TimeSlot;
 import com.juny.spacestory.reservation.service.ReservationService;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class ReservationController {
   }
 
   @GetMapping("/v1/users/{userId}/reservations")
-  public ResponseEntity<List<ResponseReservation>> getUserReservations(@PathVariable Long userId) {
+  public ResponseEntity<List<ResponseReservation>> getUserReservations(@PathVariable UUID userId) {
     List<ResponseReservation> reservations = reservationService.getReservationsByUserId(userId);
 
     return new ResponseEntity<>(reservations, HttpStatus.OK);

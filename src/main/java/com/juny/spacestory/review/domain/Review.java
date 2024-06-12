@@ -12,6 +12,7 @@ import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.repository.UserRepository;
 import jakarta.persistence.*;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,14 +37,14 @@ public class Review {
   private Double rating;
 
   @Column(nullable = false)
-  private Long userId;
+  private UUID userId;
 
   @Column(nullable = false)
   private Boolean isDeleted;
 
   private String imgPath;
 
-  public Review(String content, Double rating, Long userId, Boolean isDeleted) {
+  public Review(String content, Double rating, UUID userId, Boolean isDeleted) {
     this.content = content;
     this.rating = rating;
     this.userId = userId;

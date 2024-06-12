@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,7 @@ public class JwtUtil {
   public static final String ACCESS_TOKEN_EXPIRAION = "accessTokenExpired";
   public static final String REFRESH_TOKEN_EXPIRAION = "refreshTokenExpired";
   public static final String JWT_CLAIM_TYPE = "type";
-  public static final String JWT_CLAIM_EMAIL = "email";
+  public static final String JWT_CLAIM_ID = "id";
   public static final String JWT_CLAIM_ROLE = "role";
   public static final Long ACCESS_TOKEN_EXPIRED = 60 * 5 * 1000L; // 5분
   public static final Long REFRESH_TOKEN_EXPIRED = 60 * 60 * 24 * 1000L; // 1일
@@ -50,14 +51,14 @@ public class JwtUtil {
             secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
   }
 
-  public String getEmail(String token) {
+  public String getId(String token) {
 
     return Jwts.parser()
         .verifyWith(secretKey)
         .build()
         .parseSignedClaims(token)
         .getPayload()
-        .get(JWT_CLAIM_EMAIL, String.class);
+        .get(JWT_CLAIM_ID, String.class);
   }
 
   public String getRole(String token) {
@@ -105,7 +106,7 @@ public class JwtUtil {
         .getExpiration();
   }
 
-  public String createJwt(String type, String email, String role) {
+  public String createJwt(String type, String id, String role) {
 
     Long expiredMs = ACCESS_TOKEN_EXPIRED;
 
@@ -116,7 +117,7 @@ public class JwtUtil {
 
     return Jwts.builder()
         .claim(JWT_CLAIM_TYPE, type)
-        .claim(JWT_CLAIM_EMAIL, email)
+        .claim(JWT_CLAIM_ID, id)
         .claim(JWT_CLAIM_ROLE, role)
         .issuedAt(new Date())
         .expiration(new Date(System.currentTimeMillis() + expiredMs))

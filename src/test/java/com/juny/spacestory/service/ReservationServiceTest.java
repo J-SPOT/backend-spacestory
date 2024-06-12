@@ -66,8 +66,8 @@ public class ReservationServiceTest {
         user2 = new User("user2", "email2", "1234");
         Field idField = User.class.getDeclaredField("id");
         idField.setAccessible(true);
-        idField.set(user1, 1L);
-        idField.set(user2, 2L);
+        idField.set(user1, UUID.randomUUID());
+        idField.set(user2, UUID.randomUUID());
         host = new Host(1L, "host1", 0L, null);
         Address address1 = new Address("서울특별시 성동구 아차산로 17길 48", "서울특별시 성동구 성수동2가 280 성수 SK V1 CENTER 1", "서울특별시", "성동구", "성수동");
         RealEstate realEstate = new RealEstate(1L, address1, 2, false, true, false, host);
@@ -126,7 +126,7 @@ public class ReservationServiceTest {
     @Test
     void GetUserReservation() {
         //given
-        Long userId = user1.getId();
+        UUID userId = user1.getId();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(12, 0);
@@ -159,7 +159,7 @@ public class ReservationServiceTest {
     @Test
     void Reserve() {
         //given
-        Long userId = user1.getId();
+        UUID userId = user1.getId();
         Long spaceId = space.getId();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
@@ -193,7 +193,7 @@ public class ReservationServiceTest {
     @Test
     void Reserve_WithLessThanOneHour() {
         //given
-        Long userId = user1.getId();
+        UUID userId = user1.getId();
         Long spaceId = space.getId();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
@@ -214,7 +214,7 @@ public class ReservationServiceTest {
     @DisplayName("[실패] 공간 예약 시 이미 예약된 공간은 예약할 수 없다. 9~12시 예약이 있을 경우 7~10시 예약은 실패한다.")
     @Test
     void Reserve_WithOverlappedReservationTime_1() {
-        Long userId = user1.getId();
+        UUID userId = user1.getId();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of( 12, 0);
@@ -225,7 +225,7 @@ public class ReservationServiceTest {
         List<SpaceReservation> validReservations = new ArrayList<>();
         validReservations.add(reservation);
 
-        Long reqUserId = user2.getId();
+        UUID reqUserId = user2.getId();
         Long reqSpaceId = space.getId();
         LocalTime reqStart = LocalTime.of( 7, 0);
         LocalTime reqEnd = LocalTime.of(10, 0);
@@ -245,7 +245,7 @@ public class ReservationServiceTest {
     @DisplayName("[실패] 공간 예약 시 이미 예약된 공간은 예약할 수 없다. 9~12시 예약이 있을 경우 11~14시 예약은 실패한다.")
     @Test
     void Reserve_WithOverlappedReservationTime_2() {
-        Long userId = user1.getId();
+        UUID userId = user1.getId();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(12, 0);
@@ -256,7 +256,7 @@ public class ReservationServiceTest {
         List<SpaceReservation> validReservations = new ArrayList<>();
         validReservations.add(reservation);
 
-        Long reqUserId = user2.getId();
+        UUID reqUserId = user2.getId();
         Long reqSpaceId = space.getId();
         LocalTime reqStart = LocalTime.of(11, 0);
         LocalTime reqEnd = LocalTime.of(14, 0);
@@ -277,7 +277,7 @@ public class ReservationServiceTest {
     @Test
     void Reserve_WithNotEnoughPoint() {
         //given
-        Long userId = user2.getId();
+        UUID userId = user2.getId();
         Long spaceId = space.getId();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
@@ -299,7 +299,7 @@ public class ReservationServiceTest {
     @Test
     void UpdateReservation_2() {
         //given
-        Long userId = user1.getId();
+        UUID userId = user1.getId();
         Long spaceId = space.getId();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
@@ -343,7 +343,7 @@ public class ReservationServiceTest {
     @Test
     void UpdateReservation() {
         //given
-        Long userId = user1.getId();
+        UUID userId = user1.getId();
         Long spaceId = space.getId();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
@@ -386,9 +386,9 @@ public class ReservationServiceTest {
     @Test
     void UpdateReservation_WithInvalidUserId() {
         //given
-        Long userId = user1.getId();
+        UUID userId = user1.getId();
         Long spaceId = space.getId();
-        Long invalidUserId = Long.MAX_VALUE;
+        UUID invalidUserId = UUID.randomUUID();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(12, 0);
@@ -416,7 +416,7 @@ public class ReservationServiceTest {
     @Test
     void DeleteReservation_WithValidReservationId() {
         //given
-        Long userId = user1.getId();
+        UUID userId = user1.getId();
         LocalDate reservationDate = LocalDate.of(2024, 3, 3);
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(12, 0);

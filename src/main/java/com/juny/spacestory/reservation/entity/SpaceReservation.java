@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,7 @@ public class SpaceReservation {
   private Long id;
 
   @Column(nullable = false)
-  private Long userId;
+  private UUID userId;
 
   @Column(nullable = false)
   private LocalDate reservationDate;
@@ -57,7 +58,7 @@ public class SpaceReservation {
   private Space space;
 
   public SpaceReservation(
-      Long userId,
+      UUID userId,
       LocalDate reservationDate,
       LocalTime startTime,
       LocalTime endTime,

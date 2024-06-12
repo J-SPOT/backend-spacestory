@@ -1,11 +1,12 @@
 package com.juny.spacestory.global.security.service;
 
 import com.juny.spacestory.user.domain.User;
+import java.util.UUID;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -34,8 +35,7 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public String getUsername() {
-
-    return user.getEmail();
+    return user.getName();
   }
 
   @Override
@@ -61,4 +61,10 @@ public class CustomUserDetails implements UserDetails {
 
     return true;
   }
+
+  public String getId() {
+
+    return user.getId().toString();
+  }
+
 }

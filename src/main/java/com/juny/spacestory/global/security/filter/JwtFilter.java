@@ -1,22 +1,16 @@
 package com.juny.spacestory.global.security.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.user.domain.Role;
 import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
 import com.juny.spacestory.global.security.service.CustomUserDetails;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -62,12 +56,13 @@ public class JwtFilter extends OncePerRequestFilter {
       FilterChain filterChain,
       String token)
       throws IOException, ServletException {
-    String email = jwtUtil.getEmail(token);
+
+    String id = jwtUtil.getId(token);
     String role = jwtUtil.getRole(token);
 
-    log.info("jwt token login, email: {}, role: {}", email, role);
+    log.info("jwt token login, id: {}, role: {}", id, role);
 
-    User user = new User(email, Role.valueOf(role));
+    User user = new User(UUID.fromString(id), Role.valueOf(role));
 
     CustomUserDetails customUserDetails = new CustomUserDetails(user);
 

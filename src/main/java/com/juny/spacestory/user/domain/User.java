@@ -4,11 +4,14 @@ import com.juny.spacestory.host.Host;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.hierarchy.user.UserExceededPointBusinessException;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 @Entity
 @AllArgsConstructor
@@ -19,8 +22,10 @@ import java.time.LocalDateTime;
 public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @GeneratedValue(generator = "uuid2")
+  @GenericGenerator(name = "uuid2", strategy = "uuid2")
+  @Column(columnDefinition = "BINARY(16)")
+  private UUID id;
 
   @Column(nullable = false)
   private String name;
@@ -55,8 +60,8 @@ public class User {
     this.socialId = socialId;
   }
 
-  public User(String email, Role role) {
-    this.email = email;
+  public User(UUID id, Role role) {
+    this.id = id;
     this.role = role;
   }
 

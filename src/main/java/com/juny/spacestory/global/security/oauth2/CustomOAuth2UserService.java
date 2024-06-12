@@ -51,9 +51,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
       return null;
     }
     String socialId = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
-
-    ReqOAuth2User reqOAuth2User =
-        new ReqOAuth2User(oAuth2Response.getName(), oAuth2Response.getEmail(), Role.USER, socialId);
+    String name = oAuth2Response.getName();
+    String email = oAuth2Response.getEmail();
 
     if (userRepository.findByEmail(oAuth2Response.getEmail()).isPresent()) {
 
@@ -65,14 +64,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     user.ifPresentOrElse(
         u -> {
-          u.updateNameAndEmail(reqOAuth2User.name(), reqOAuth2User.email());
+          u.updateNameAndEmail(name, email);
           userRepository.save(u);
         },
         () -> {
-          User u = new User(reqOAuth2User.name(), reqOAuth2User.email(), Role.USER, socialId);
+          User u = new User(name, email, Role.USER, socialId);
           userRepository.save(u);
         });
 
-    return new CustomOAuth2User(reqOAuth2User);
+    return new CustomOAuth2User(name, user.get().getId(), Role.USER, socialId);
   }
 }

@@ -10,6 +10,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -62,6 +63,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   public Authentication attemptAuthentication(
       HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
+    log.info("attemptAuthentication");
     ReqLogin reqLogin = readByJson(request, response);
     if (reqLogin == null) {
 
@@ -71,6 +73,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     UsernamePasswordAuthenticationToken authToken =
         new UsernamePasswordAuthenticationToken(reqLogin.email(), reqLogin.password(), null);
 
+    log.info("authenticate");
     return authenticationManager.authenticate(authToken);
   }
 
@@ -106,7 +109,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-    String email = customUserDetails.getUsername();
+    String id = customUserDetails.getId();
 
     Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
     Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -114,15 +117,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     String role = auth.getAuthority();
 
-    String accessToken = jwtUtil.createJwt(ACCESS_TOKEN_PREFIX, email, role);
-    String refreshToken = jwtUtil.createJwt(REFRESH_TOKEN_PREFIX, email, role);
+    String accessToken = jwtUtil.createJwt(ACCESS_TOKEN_PREFIX, id, role);
+    String refreshToken = jwtUtil.createJwt(REFRESH_TOKEN_PREFIX, id, role);
 
     String accessTokenExpired =
         jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(accessToken));
     String refreshTokenExpired =
         jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(refreshToken));
 
-    refreshRepository.save(new Refresh(email, refreshToken, refreshTokenExpired));
+    refreshRepository.save(new Refresh(UUID.fromString(id), refreshToken, refreshTokenExpired));
 
     response.setContentType(CONTENT_TYPE);
     response.setCharacterEncoding(CHARACTER_ENCODING);

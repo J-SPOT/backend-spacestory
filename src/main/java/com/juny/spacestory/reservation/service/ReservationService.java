@@ -26,6 +26,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -122,7 +123,7 @@ public class ReservationService {
     return availableSlots;
   }
 
-  public List<ResponseReservation> getReservationsByUserId(Long userId) {
+  public List<ResponseReservation> getReservationsByUserId(UUID userId) {
     findUserById(userId);
 
     List<SpaceReservation> byUserId = reservationRepository.findByUserId(userId);
@@ -197,7 +198,7 @@ public class ReservationService {
         .orElseThrow(() -> new SpaceInvalidIdBusinessException(ErrorCode.SPACE_INVALID_ID));
   }
 
-  private User findUserById(Long userId) {
+  private User findUserById(UUID userId) {
     return userRepository
         .findById(userId)
         .orElseThrow(() -> new UserInvalidIdBusinessException(ErrorCode.USER_INVALID_ID));

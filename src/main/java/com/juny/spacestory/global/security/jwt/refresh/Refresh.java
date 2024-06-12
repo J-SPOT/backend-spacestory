@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -20,7 +21,7 @@ public class Refresh {
   private Long id;
 
   @Column(nullable = false)
-  private String email; // refresh token owner
+  private UUID userId; // refresh token owner
 
   @Column(nullable = false)
   private String refresh;
@@ -28,8 +29,8 @@ public class Refresh {
   @Column(nullable = false)
   private String expiration;
 
-  public Refresh(String email, String refresh, String expiration) {
-    this.email = email;
+  public Refresh(UUID id, String refresh, String expiration) {
+    this.userId = id;
     this.refresh = refresh;
     this.expiration = expiration;
   }

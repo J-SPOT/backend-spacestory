@@ -9,6 +9,8 @@ import com.juny.spacestory.review.dto.ResponseReview;
 import com.juny.spacestory.review.mapper.ReviewMapper;
 import com.juny.spacestory.review.repository.ReviewRepository;
 import com.juny.spacestory.user.repository.UserRepository;
+import java.lang.reflect.Field;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,10 +39,14 @@ public class ReviewServiceTest {
     private ReviewService reviewService;
     private User user;
     @BeforeEach
-    void setUp() {
+    void setUp() throws NoSuchFieldException, IllegalAccessException {
         ReflectionTestUtils.setField(reviewService, "mapper", mapper);
         user = new User("user1", "user1@gmail.com", null);
+        Field idField = User.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(user, UUID.randomUUID());
     }
+
     @DisplayName("리뷰를 등록한다.")
     @Test
     void createReview() {
@@ -49,7 +55,7 @@ public class ReviewServiceTest {
         Review expectedReview = new Review("comment1", 4.5, user.getId(), false);
         ResponseReview expected = mapper.ReviewToResponseReview(expectedReview);
 
-        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(user));
         when(reviewRepository.save(any(Review.class))).thenReturn(expectedReview);
 
         //when
