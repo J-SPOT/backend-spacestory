@@ -11,11 +11,7 @@ stages:
 compile:
   stage: compile
   before_script: 
-    - whoami
-    - echo $PATH
     - export PATH="/home/ubuntu/.sdkman/candidates/gradle/current/bin:$PATH"
-    - echo $PATH
-    - /home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -v
   script:
     - gradle build --exclude-task test
   tags:
