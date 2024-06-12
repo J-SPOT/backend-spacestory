@@ -44,7 +44,7 @@ public class SpringDocConfiguration {
   @Bean
   public OpenAPI customOpenAPI() {
     return new OpenAPI()
-        .info(new Info().title("Ggorangjirang API").version("1.0.0").description("API description"))
+        .info(new Info().title("SpaceStory API").version("1.0.0").description("API description"))
         .addSecurityItem(new SecurityRequirement().addList("bearer"))
         .components(
             new io.swagger.v3.oas.models.Components()
