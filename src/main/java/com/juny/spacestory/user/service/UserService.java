@@ -69,7 +69,7 @@ public class UserService {
           ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, PASSWORD_CHECK_IS_NULL_OR_EMPTY);
     }
 
-    if (!pattern.matcher(req.password()).matches()) {
+    if (!pattern.matcher(req.email()).matches()) {
 
       throw new UserInvalidEmailException(ErrorCode.USER_INVALID_EMAIL);
     }
