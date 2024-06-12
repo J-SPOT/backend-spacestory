@@ -4,6 +4,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +26,11 @@ public class TestController {
     return "Post Hello";
   }
 
+  @PatchMapping("/api/v1/hello")
+  public String patchHello() {
+
+    return "Patch Hello";
+  }
   @GetMapping("/api/v1/test")
   public String testHello() {
 
