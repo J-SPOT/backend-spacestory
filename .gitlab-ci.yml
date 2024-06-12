@@ -19,7 +19,7 @@ compile:
   script:
     - gradle build --exclude-task test
   tags:
-    - juny
+    - juny-local
 
 test:
   stage: test
@@ -29,7 +29,7 @@ test:
   script:
     - gradle build test
   tags:
-    - juny
+    - juny-local
 
 build:
   stage: build
@@ -47,7 +47,7 @@ build:
     - docker push $IMAGE_NAME:$IMAGE_TAG
     - docker push $IMAGE_NAME:latest
   tags:
-    - juny
+    - juny-local
 
 deploy:
   stage: deploy
@@ -58,4 +58,4 @@ deploy:
   script:
     - ssh -i $SSH_KEY ubuntu@13.125.206.46 "echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin && docker rm spring-app -f || true && docker pull $IMAGE_NAME:latest && docker run -d -p 8080:8080 --name spring-app --network juny $IMAGE_NAME:latest"
   tags:
-    - juny
+    - juny-local
