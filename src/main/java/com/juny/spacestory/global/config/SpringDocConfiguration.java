@@ -138,7 +138,7 @@ public class SpringDocConfiguration {
           operation
               .addTagsItem("유저 인증 API")
               .summary("로그인 요청 API")
-              .description("테스트 email: user@gmail.com, password: 1234")
+              .description("테스트 계정<br>email: user@gmail.com, password: 1234 role: USER<br>email: admin@gmail.com, password: 1234 role: ADMIN")
               .responses(
                   new ApiResponses()
                       .addApiResponse("200", new ApiResponse().description("로그인 성공"))
