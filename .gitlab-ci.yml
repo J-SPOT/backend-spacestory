@@ -76,7 +76,7 @@ build_junylocal:
   <<: *build_template
   script:
     - cat $DOCKER_FILE > Dockerfile
-	  - gradle build --exclude-task test
+    - gradle build --exclude-task test
     - docker login
     - docker run --privileged --rm tonistiigi/binfmt --install all
     - docker buildx build --platform linux/amd64 -t $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:latest --push .
