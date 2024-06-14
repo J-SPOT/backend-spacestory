@@ -21,29 +21,33 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
   private final UserRepository userRepository;
+  private final String REGISTRATION_NAVER = "NAVER";
+  private final String REGISTRATION_GOOGLE = "GOOGLE";
+  private final String REGISTRATION_KAKAO = "KAKAO";
+
+
 
   @Override
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
-    log.info("loadUser");
     OAuth2User oAuth2User = super.loadUser(userRequest);
 
     String registrationId = userRequest.getClientRegistration().getRegistrationId();
-    System.out.println("registrationId = " + registrationId);
+
     log.info("OAuth2User.getAttributes() = {} ", oAuth2User.getAttributes());
 
     Map<String, Object> attributes = oAuth2User.getAttributes();
 
     OAuth2Response oAuth2Response = null;
-    if (registrationId.equals("naver")) {
-
-      oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
-    }
-    else if (registrationId.equals("google")) {
+    if (registrationId.equals(REGISTRATION_GOOGLE)) {
 
       oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
     }
-    else if (registrationId.equals("kakao")) {
+    else if (registrationId.equals(REGISTRATION_NAVER)) {
+
+      oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
+    }
+    else if (registrationId.equals(REGISTRATION_KAKAO)) {
 
       oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
     } else {
@@ -54,9 +58,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     String name = oAuth2Response.getName();
     String email = oAuth2Response.getEmail();
 
-    if (userRepository.findByEmail(oAuth2Response.getEmail()).isPresent()) {
+    if (userRepository.findByEmailAndSocialIdNot(oAuth2Response.getEmail(), email).isPresent()) {
 
-      log.error("중복된 메일입니다.");
+      log.error("Already done a social login with another account.");
       throw new UserDuplicatedEmailException(ErrorCode.USER_DUPLICATED_EMAIL);
     }
 
