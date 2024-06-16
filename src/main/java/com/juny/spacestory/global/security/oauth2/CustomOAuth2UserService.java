@@ -21,11 +21,9 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
   private final UserRepository userRepository;
-  private final String REGISTRATION_NAVER = "NAVER";
-  private final String REGISTRATION_GOOGLE = "GOOGLE";
-  private final String REGISTRATION_KAKAO = "KAKAO";
-
-
+  private final String REGISTRATION_NAVER = "naver";
+  private final String REGISTRATION_GOOGLE = "google";
+  private final String REGISTRATION_KAKAO = "kakao";
 
   @Override
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -58,24 +56,29 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     String name = oAuth2Response.getName();
     String email = oAuth2Response.getEmail();
 
-    if (userRepository.findByEmailAndSocialIdNot(oAuth2Response.getEmail(), email).isPresent()) {
+    if (userRepository.findByEmailAndSocialIdNot(oAuth2Response.getEmail(), socialId).isPresent()) {
 
       log.error("Already done a social login with another account.");
       throw new UserDuplicatedEmailException(ErrorCode.USER_DUPLICATED_EMAIL);
     }
 
-    Optional<User> user = userRepository.findBySocialId(socialId);
+    Optional<User> userOptional = userRepository.findBySocialId(socialId);
 
-    user.ifPresentOrElse(
-        u -> {
-          u.updateNameAndEmail(name, email);
-          userRepository.save(u);
-        },
-        () -> {
-          User u = new User(name, email, Role.USER, socialId);
-          userRepository.save(u);
-        });
+    User user = userOptional.map(u -> {
 
-    return new CustomOAuth2User(name, user.get().getId(), Role.USER, socialId);
+      log.info("User already exists with socialId = {}", socialId);
+
+      u.updateNameAndEmail(name, email);
+      return userRepository.save(u);
+
+    }).orElseGet(() -> {
+
+      log.info("User not found with socialId = {}", socialId);
+
+      User newUser = new User(name, email, Role.USER, socialId);
+      return userRepository.save(newUser);
+    });
+
+    return new CustomOAuth2User(name, user.getId(), Role.USER, socialId);
   }
 }
