@@ -1,27 +1,15 @@
 package com.juny.spacestory.global.security.oauth2;
 
-import static com.juny.spacestory.global.security.jwt.JwtUtil.ACCESS_TOKEN_EXPIRAION;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.ACCESS_TOKEN_KEY;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.ACCESS_TOKEN_PREFIX;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.CHARACTER_ENCODING;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.CONTENT_TYPE;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.REFRESH_TOKEN_EXPIRAION;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.REFRESH_TOKEN_KEY;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.REFRESH_TOKEN_PREFIX;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
 import com.juny.spacestory.global.security.jwt.refresh.Refresh;
 import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,46 +45,25 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     System.out.println("id = " + id);
     System.out.println("role = " + role);
 
-    String accessToken = jwtUtil.createJwt(ACCESS_TOKEN_PREFIX, id, role);
-    String refreshToken = jwtUtil.createJwt(REFRESH_TOKEN_PREFIX, id, role);
+    String refreshToken = jwtUtil.createJwt(jwtUtil.REFRESH_TOKEN_PREFIX, id, role);
 
-    String accessTokenExpired =
-      jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(accessToken));
     String refreshTokenExpired =
       jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(refreshToken));
 
     refreshRepository.save(new Refresh(UUID.fromString(id), refreshToken, refreshTokenExpired));
 
-    response.setContentType(CONTENT_TYPE);
-    response.setCharacterEncoding(CHARACTER_ENCODING);
+    response.addCookie(createCookie("refresh", refreshToken, jwtUtil.REFRESH_TOKEN_EXPIRED));
+    response.sendRedirect("http://localhost:5173/social_login_handler?social_login=success");
+  }
 
-    Map<String, String> responseBody = new HashMap<>();
-    responseBody.put(ACCESS_TOKEN_KEY, accessToken);
-    responseBody.put(REFRESH_TOKEN_KEY, refreshToken);
-    responseBody.put(ACCESS_TOKEN_EXPIRAION, accessTokenExpired);
-    responseBody.put(REFRESH_TOKEN_EXPIRAION, refreshTokenExpired);
+  private Cookie createCookie(String refresh, String refreshToken, Long expiration) {
+    Cookie cookie = new Cookie(refresh, refreshToken);
+    cookie.setMaxAge(expiration.intValue());
+    cookie.setPath("/");
+    cookie.setHttpOnly(true);
+//    cookie.setSecure(true);
+//    cookie.setDomain("spacestory.duckdns.org");
 
-    String jsonResponse = new ObjectMapper().writeValueAsString(responseBody);
-
-    response.setContentType("text/html");
-    response.setCharacterEncoding("UTF-8");
-    PrintWriter writer = response.getWriter();
-    writer.write("<html><body>");
-    writer.write("<script>");
-    writer.write("const response = " + jsonResponse + ";");
-    writer.write("if (window.opener) {");
-    writer.write("  window.opener.postMessage(response, '*');");
-    writer.write("  window.close();");
-    writer.write("} else {");
-    writer.write("  console.error('No window.opener available');");
-    writer.write("}");
-    writer.write("</script>");
-    writer.write("</body></html>");
-    writer.flush();
-//    response.sendRedirect("localhost:5173asdkfjasdklfjsadklfjsadlkj");
-
-//    PrintWriter writer = response.getWriter();
-//    writer.write(new ObjectMapper().writeValueAsString(responseBody));
-//    writer.flush();
+    return cookie;
   }
 }

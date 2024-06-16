@@ -62,6 +62,10 @@ public class SecurityConfig {
                       List.of("http://localhost:5173", "https://spacestory.duckdns.org"));
                   config.setAllowedMethods(Collections.singletonList("*"));
 
+                  config.setAllowCredentials(true);
+                  config.setExposedHeaders(Collections.singletonList("Set-Cookie"));
+                  config.setMaxAge(jwtUtil.REFRESH_TOKEN_EXPIRED);
+
                   return config;
                 }));
 
