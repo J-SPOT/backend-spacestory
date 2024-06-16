@@ -44,7 +44,7 @@ public class RefreshService {
       () -> new RefreshTokenInvalidException(ErrorCode.REFRESH_TOKEN_INVALID));
 
     if (jwtUtil.isValid(refreshToken) != 0
-        || !JwtUtil.REFRESH_TOKEN_PREFIX.equals(jwtUtil.getType(refreshToken))) {
+        || !jwtUtil.REFRESH_TOKEN_PREFIX.equals(jwtUtil.getType(refreshToken))) {
 
       throw new RefreshTokenInvalidException(ErrorCode.REFRESH_TOKEN_INVALID);
     }
@@ -54,8 +54,8 @@ public class RefreshService {
     String id = jwtUtil.getId(refreshToken);
     String role = jwtUtil.getRole(refreshToken);
 
-    String newAccessToken = jwtUtil.createJwt(JwtUtil.ACCESS_TOKEN_PREFIX, id, role);
-    String newRefreshToken = jwtUtil.createJwt(JwtUtil.REFRESH_TOKEN_PREFIX, id, role);
+    String newAccessToken = jwtUtil.createJwt(jwtUtil.ACCESS_TOKEN_PREFIX, id, role);
+    String newRefreshToken = jwtUtil.createJwt(jwtUtil.REFRESH_TOKEN_PREFIX, id, role);
 
     String newAccessTokenExpiration =
         jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(newAccessToken));

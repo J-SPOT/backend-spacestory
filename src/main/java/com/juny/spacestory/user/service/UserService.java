@@ -6,7 +6,6 @@ import com.juny.spacestory.global.exception.hierarchy.user.UserInvalidEmailExcep
 import com.juny.spacestory.global.exception.hierarchy.user.UserNotMatchPasswordException;
 import com.juny.spacestory.global.exception.hierarchy.user.UserPasswordTooShortException;
 import com.juny.spacestory.global.exception.hierarchy.parameter.ParameterIsNullOrEmpty;
-import com.juny.spacestory.user.domain.Role;
 import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.dto.ReqRegisterUser;
 import com.juny.spacestory.user.repository.UserRepository;

@@ -1,11 +1,9 @@
 package com.juny.spacestory.global.security.service;
 
 import com.juny.spacestory.user.domain.User;
-import java.util.UUID;
-import org.springframework.security.core.GrantedAuthority;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {

@@ -27,15 +27,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.juny.spacestory.global.security.jwt.JwtUtil.ACCESS_TOKEN_EXPIRAION;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.ACCESS_TOKEN_KEY;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.ACCESS_TOKEN_PREFIX;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.CHARACTER_ENCODING;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.CONTENT_TYPE;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.REFRESH_TOKEN_EXPIRAION;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.REFRESH_TOKEN_KEY;
-import static com.juny.spacestory.global.security.jwt.JwtUtil.REFRESH_TOKEN_PREFIX;
-
 @Slf4j
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -117,8 +108,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     String role = auth.getAuthority();
 
-    String accessToken = jwtUtil.createJwt(ACCESS_TOKEN_PREFIX, id, role);
-    String refreshToken = jwtUtil.createJwt(REFRESH_TOKEN_PREFIX, id, role);
+    String accessToken = jwtUtil.createJwt(jwtUtil.ACCESS_TOKEN_PREFIX, id, role);
+    String refreshToken = jwtUtil.createJwt(jwtUtil.REFRESH_TOKEN_PREFIX, id, role);
 
     String accessTokenExpired =
         jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(accessToken));
@@ -127,14 +118,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     refreshRepository.save(new Refresh(UUID.fromString(id), refreshToken, refreshTokenExpired));
 
-    response.setContentType(CONTENT_TYPE);
-    response.setCharacterEncoding(CHARACTER_ENCODING);
+    response.setContentType(jwtUtil.CONTENT_TYPE);
+    response.setCharacterEncoding(jwtUtil.CHARACTER_ENCODING);
 
     Map<String, String> responseBody = new HashMap<>();
-    responseBody.put(ACCESS_TOKEN_KEY, accessToken);
-    responseBody.put(REFRESH_TOKEN_KEY, refreshToken);
-    responseBody.put(ACCESS_TOKEN_EXPIRAION, accessTokenExpired);
-    responseBody.put(REFRESH_TOKEN_EXPIRAION, refreshTokenExpired);
+    responseBody.put(jwtUtil.ACCESS_TOKEN_KEY, accessToken);
+    responseBody.put(jwtUtil.REFRESH_TOKEN_KEY, refreshToken);
+    responseBody.put(jwtUtil.ACCESS_TOKEN_EXPIRAION, accessTokenExpired);
+    responseBody.put(jwtUtil.REFRESH_TOKEN_EXPIRAION, refreshTokenExpired);
 
     PrintWriter writer = response.getWriter();
     writer.write(new ObjectMapper().writeValueAsString(responseBody));

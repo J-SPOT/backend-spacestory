@@ -7,40 +7,38 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
 
 @Slf4j
 @Component
 public class JwtUtil {
 
-  public static final String CONTENT_TYPE = "application/json";
-  public static final String CHARACTER_ENCODING = "UTF-8";
-  public static final String ACCESS_TOKEN_PREFIX = "access";
-  public static final String REFRESH_TOKEN_PREFIX = "refresh";
-  public static final String ACCESS_TOKEN_KEY = "accessToken";
-  public static final String REFRESH_TOKEN_KEY = "refreshToken";
-  public static final String ACCESS_TOKEN_EXPIRAION = "accessTokenExpired";
-  public static final String REFRESH_TOKEN_EXPIRAION = "refreshTokenExpired";
-  public static final String JWT_CLAIM_TYPE = "type";
-  public static final String JWT_CLAIM_ID = "id";
-  public static final String JWT_CLAIM_ROLE = "role";
-  public static final Long ACCESS_TOKEN_EXPIRED = 60 * 5 * 1000L; // 5분
-  public static final Long REFRESH_TOKEN_EXPIRED = 60 * 60 * 24 * 1000L; // 1일
-  public static final String ERROR_CODE = "code";
-  public static final String ERROR_MSG = "msg";
+  public final static String CONTENT_TYPE = "application/json";
+  public final static String CHARACTER_ENCODING = "UTF-8";
+  public final static String ERROR_CODE = "code";
+  public final static String ERROR_MSG = "msg";
+  public final String ACCESS_TOKEN_PREFIX = "access";
+  public final String REFRESH_TOKEN_PREFIX = "refresh";
+  public final String ACCESS_TOKEN_KEY = "accessToken";
+  public final String REFRESH_TOKEN_KEY = "refreshToken";
+  public final String ACCESS_TOKEN_EXPIRAION = "accessTokenExpired";
+  public final String REFRESH_TOKEN_EXPIRAION = "refreshTokenExpired";
+  public final String JWT_CLAIM_TYPE = "type";
+  public final String JWT_CLAIM_ID = "id";
+  public final String JWT_CLAIM_ROLE = "role";
+  public final Long ACCESS_TOKEN_EXPIRED = 60 * 5 * 1000L; // 5분
+  public final Long REFRESH_TOKEN_EXPIRED = 60 * 60 * 24 * 1000L; // 1일
 
   private final SecretKey secretKey;
 

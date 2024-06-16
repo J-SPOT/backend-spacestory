@@ -82,7 +82,7 @@ public class JwtFilter extends OncePerRequestFilter {
       jwtUtil.setErrorResponse(response, ErrorCode.ACCESS_TOKEN_EXPIRED);
       return false;
     }
-    if (errorType == 2 || !JwtUtil.ACCESS_TOKEN_PREFIX.equals(jwtUtil.getType(token))) {
+    if (errorType == 2 || !jwtUtil.ACCESS_TOKEN_PREFIX.equals(jwtUtil.getType(token))) {
       jwtUtil.setErrorResponse(response, ErrorCode.ACCESS_TOKEN_INVALID);
       return false;
     }
