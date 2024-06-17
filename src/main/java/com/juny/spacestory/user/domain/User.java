@@ -43,6 +43,7 @@ public class User {
 
   private String socialId;
 
+  // 일반 로그인
   public User(String name, String email, String password) {
     this.name = name;
     this.email = email;
@@ -51,6 +52,7 @@ public class User {
     this.role = Role.USER;
   }
 
+  // 소셜 로그인
   public User(String name, String email, Role role, String socialId) {
     this.name = name;
     this.email = email;
@@ -59,6 +61,7 @@ public class User {
     this.socialId = socialId;
   }
 
+  // jwt토큰으로 SecurityContextHolder에 저장
   public User(UUID id, Role role) {
     this.id = id;
     this.role = role;

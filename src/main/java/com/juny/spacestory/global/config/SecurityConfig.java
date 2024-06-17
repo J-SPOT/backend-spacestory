@@ -64,6 +64,7 @@ public class SecurityConfig {
 
                   config.setAllowCredentials(true);
                   config.setExposedHeaders(Collections.singletonList("Set-Cookie"));
+                  config.setExposedHeaders(Collections.singletonList("refresh"));
                   config.setMaxAge(jwtUtil.REFRESH_TOKEN_EXPIRED);
 
                   return config;
