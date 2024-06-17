@@ -15,7 +15,7 @@ public class CorsMvcConfig implements WebMvcConfigurer {
         .allowedMethods("*")
         .allowedOrigins("http://localhost:5173")
         .exposedHeaders("Set-Cookie")
-        .exposedHeaders("refresh")
+        .exposedHeaders("refreshToken")
         .allowCredentials(true);
   }
 }
