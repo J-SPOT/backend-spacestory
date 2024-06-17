@@ -8,6 +8,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,18 +77,17 @@ public class RefreshController {
 
     ResReissueTokens resReissueTokens = refreshService.reissue(refreshToken);
 
-    response.addCookie(deleteCookie("refresh", null, 0L));
+    response.addHeader("Set-Cookie", deleteCookie("refresh", null, 0L).toString());
 
     return new ResponseEntity<>(resReissueTokens, HttpStatus.OK);
   }
 
-  private Cookie deleteCookie(String refresh, String refreshToken, Long expiration) {
-    Cookie cookie = new Cookie(refresh, refreshToken);
-    cookie.setMaxAge(expiration.intValue());
-    cookie.setPath("/");
-    cookie.setHttpOnly(true);
-//    cookie.setSecure(true);
-//    cookie.setDomain("spacestory.duckdns.org");
+  private ResponseCookieBuilder deleteCookie(String refresh, String refreshToken, Long expiration) {
+    ResponseCookieBuilder cookie = ResponseCookie.from(refresh, refreshToken)
+      .path("/")
+      .maxAge(expiration)
+      .httpOnly(true)
+      .sameSite("None");
 
     return cookie;
   }
