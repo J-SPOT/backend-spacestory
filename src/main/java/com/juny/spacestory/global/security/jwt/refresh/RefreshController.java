@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -82,15 +81,13 @@ public class RefreshController {
     return new ResponseEntity<>(resReissueTokens, HttpStatus.OK);
   }
 
-  private ResponseCookieBuilder deleteCookie(String refresh, String refreshToken, Long expiration) {
-    ResponseCookieBuilder cookie = ResponseCookie.from(refresh, refreshToken)
+  private ResponseCookie deleteCookie(String refresh, String refreshToken, Long expiration) {
+    return ResponseCookie.from(refresh, refreshToken)
       .path("/")
       .maxAge(expiration)
       .httpOnly(true)
       .secure(true)
-      .sameSite("None");
-
-    return cookie;
+      .sameSite("None")
+      .build();
   }
-
 }

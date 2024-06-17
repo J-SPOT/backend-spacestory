@@ -13,7 +13,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -61,15 +60,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     response.sendRedirect("http://localhost:5173/social_login_handler?social_login=success");
   }
 
-  private ResponseCookieBuilder createCookie(String refresh, String refreshToken, Long expiration) {
-    ResponseCookieBuilder cookie =
-        ResponseCookie.from(refresh, refreshToken)
-            .path("/")
-            .maxAge(expiration)
-            .httpOnly(true)
-            .secure(true)
-            .sameSite("None");
+  private ResponseCookie createCookie(String refresh, String refreshToken, Long expiration) {
 
-    return cookie;
+    return ResponseCookie.from(refresh, refreshToken)
+      .path("/")
+      .maxAge(expiration)
+      .httpOnly(true)
+      .secure(true)
+      .sameSite("None")
+      .build();
   }
 }
