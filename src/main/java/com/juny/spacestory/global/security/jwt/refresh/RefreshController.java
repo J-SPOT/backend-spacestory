@@ -61,13 +61,13 @@ public class RefreshController {
   }
 
   @GetMapping("/api/v1/auth/tokens-by-cookie")
-  public ResponseEntity<ResReissueTokens> reissueByCookie(@CookieValue(value = "refresh", required = true) String refreshToken, HttpServletResponse response) {
+  public ResponseEntity<ResReissueTokens> reissueByCookie(@CookieValue String refreshToken, HttpServletResponse response) {
 
     ResReissueTokens resReissueTokens = refreshService.reissue(refreshToken);
 
     response.addCookie(deleteCookie("refresh", null, 0L));
 
-    return new ResponseEntity<>(resReissueTokens, HttpStatus.OK);
+    return new ResponseEntity<>(null, HttpStatus.OK);
   }
 
   private Cookie deleteCookie(String refresh, String refreshToken, Long expiration) {

@@ -52,7 +52,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     refreshRepository.save(new Refresh(UUID.fromString(id), refreshToken, refreshTokenExpired));
 
-    response.addCookie(createCookie("refresh", refreshToken, jwtUtil.REFRESH_TOKEN_EXPIRED));
+    response.addCookie(createCookie(jwtUtil.REFRESH_TOKEN_KEY, refreshToken, jwtUtil.REFRESH_TOKEN_EXPIRED));
     response.sendRedirect("http://localhost:5173/social_login_handler?social_login=success");
   }
 
