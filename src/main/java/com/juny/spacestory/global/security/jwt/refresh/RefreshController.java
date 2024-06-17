@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,13 +61,23 @@ public class RefreshController {
   }
 
   @GetMapping("/api/v1/auth/tokens-by-cookie")
-  public ResponseEntity<ResReissueTokens> reissueByCookie(@CookieValue String refreshToken, HttpServletResponse response) {
+  public ResponseEntity<ResReissueTokens> reissueByCookie(HttpServletRequest request, HttpServletResponse response) {
+    Cookie[] cookies = request.getCookies();
+
+    String refreshToken = null;
+    for(var e : cookies) {
+      System.out.println("e.getName() = " + e.getName());
+      System.out.println("e.getValue() = " + e.getValue());
+      if ("refreshToken".equals(e.getName())) {
+        refreshToken = e.getValue();
+      }
+    }
 
     ResReissueTokens resReissueTokens = refreshService.reissue(refreshToken);
 
     response.addCookie(deleteCookie("refresh", null, 0L));
 
-    return new ResponseEntity<>(null, HttpStatus.OK);
+    return new ResponseEntity<>(resReissueTokens, HttpStatus.OK);
   }
 
   private Cookie deleteCookie(String refresh, String refreshToken, Long expiration) {
