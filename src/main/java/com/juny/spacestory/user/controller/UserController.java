@@ -1,11 +1,14 @@
 package com.juny.spacestory.user.controller;
 
+import com.juny.spacestory.global.exception.ErrorResponse;
 import com.juny.spacestory.global.security.service.CustomUserDetails;
 import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.repository.UserRepository;
 import com.juny.spacestory.user.service.UserService;
 import com.juny.spacestory.user.dto.ReqRegisterUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,11 +43,26 @@ public class UserController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "204", description = "로그인 성공"),
-        @ApiResponse(responseCode = "P1", description = "400, 파라미터가 비어 있거나 널인 경우"),
-        @ApiResponse(responseCode = "U4", description = "400, 이메일이 중복된 경우"),
-        @ApiResponse(responseCode = "U5", description = "401, 패스워드가 일치하지 않는 경우"),
-        @ApiResponse(responseCode = "U6", description = "400, 패스워드가 4자리 미만인 경우"),
-        @ApiResponse(responseCode = "U7", description = "400, 이메일 형식이 올바르지 않은 경우"),
+        @ApiResponse(
+            responseCode = "P1",
+            description = "400, 파라미터가 비어 있거나 널인 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "U4",
+            description = "400, 이메일이 중복된 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "U5",
+            description = "401, 패스워드가 일치하지 않는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "U6",
+            description = "400, 패스워드가 4자리 미만인 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "U7",
+            description = "400, 이메일 형식이 올바르지 않은 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       })
   @PostMapping("/api/v1/auth/register")
   public ResponseEntity<Void> register(@RequestBody ReqRegisterUser req) {
@@ -67,7 +85,7 @@ public class UserController {
     System.out.println("customUserDetails.getUsername() = " + customUserDetails.getUsername());
     System.out.println("auth = " + auth);
 
-//    userRepository.findById(customUserDetails.getUsername())
+    //    userRepository.findById(customUserDetails.getUsername())
 
     return null;
   }

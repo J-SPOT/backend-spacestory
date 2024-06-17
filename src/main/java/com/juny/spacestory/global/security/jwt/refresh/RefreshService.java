@@ -40,8 +40,9 @@ public class RefreshService {
           ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, REFRESH_TOKEN_NULL_OR_EMPTY_MSG);
     }
 
-    refreshRepository.findByRefresh(refreshToken).orElseThrow(
-      () -> new RefreshTokenInvalidException(ErrorCode.REFRESH_TOKEN_INVALID));
+    refreshRepository
+        .findByRefresh(refreshToken)
+        .orElseThrow(() -> new RefreshTokenInvalidException(ErrorCode.REFRESH_TOKEN_INVALID));
 
     if (jwtUtil.isValid(refreshToken) != 0
         || !jwtUtil.REFRESH_TOKEN_PREFIX.equals(jwtUtil.getType(refreshToken))) {

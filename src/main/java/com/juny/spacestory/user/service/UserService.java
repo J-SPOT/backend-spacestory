@@ -25,7 +25,6 @@ public class UserService {
   private final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
   private final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
 
-
   public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
 
     this.userRepository = userRepository;
@@ -36,8 +35,7 @@ public class UserService {
 
     validateParams(req);
 
-    User user =
-        new User(req.name(), req.email(), bCryptPasswordEncoder.encode(req.password()));
+    User user = new User(req.name(), req.email(), bCryptPasswordEncoder.encode(req.password()));
 
     userRepository.save(user);
   }
@@ -46,8 +44,7 @@ public class UserService {
 
     if (req.name() == null || req.name().trim().isEmpty()) {
 
-      throw new ParameterIsNullOrEmpty(
-          ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, NAME_IS_NULL_OR_EMPTY);
+      throw new ParameterIsNullOrEmpty(ErrorCode.PARAMETER_IS_NULL_OR_EMPTY, NAME_IS_NULL_OR_EMPTY);
     }
 
     if (req.email() == null || req.email().trim().isEmpty()) {

@@ -24,10 +24,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
-  public final static String CONTENT_TYPE = "application/json";
-  public final static String CHARACTER_ENCODING = "UTF-8";
-  public final static String ERROR_CODE = "code";
-  public final static String ERROR_MSG = "msg";
+  public static final String CONTENT_TYPE = "application/json";
+  public static final String CHARACTER_ENCODING = "UTF-8";
+  public static final String ERROR_CODE = "code";
+  public static final String ERROR_MSG = "msg";
   public final String ACCESS_TOKEN_PREFIX = "access";
   public final String REFRESH_TOKEN_PREFIX = "refresh";
   public final String ACCESS_TOKEN_KEY = "accessToken";

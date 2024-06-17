@@ -135,14 +135,39 @@ public class SpringDocConfiguration {
               String.valueOf(HttpStatus.FORBIDDEN.value()),
               (new ApiResponse()).description(HttpStatus.FORBIDDEN.getReasonPhrase()));
           operation.responses(apiResponses);
+
+          ApiResponse successResponse =
+              new ApiResponse()
+                  .description("로그인 성공")
+                  .content(
+                      new Content()
+                          .addMediaType(
+                              "application/json",
+                              new MediaType()
+                                  .schema(
+                                      new Schema<>()
+                                          .$ref("#/components/schemas/ResReissueTokens"))));
+
+          ApiResponse p1ErrorResponse =
+              new ApiResponse()
+                  .description("E3, 인증에 실패한 경우")
+                  .content(
+                      new Content()
+                          .addMediaType(
+                              "application/json",
+                              new MediaType()
+                                  .schema(
+                                      new Schema<>().$ref("#/components/schemas/ErrorResponse"))));
+
           operation
               .addTagsItem("유저 인증 API")
               .summary("로그인 요청 API")
-              .description("테스트 계정<br>email: user@gmail.com, password: 1234 role: USER<br>email: admin@gmail.com, password: 1234 role: ADMIN")
+              .description(
+                  "테스트 계정<br>email: user@gmail.com, password: 1234 role: USER<br>email: admin@gmail.com, password: 1234 role: ADMIN")
               .responses(
                   new ApiResponses()
-                      .addApiResponse("200", new ApiResponse().description("로그인 성공"))
-                      .addApiResponse("E3", new ApiResponse().description("401, 인증에 실패한 경우")));
+                      .addApiResponse("200", successResponse)
+                      .addApiResponse("E3", p1ErrorResponse));
           PathItem pathItem = (new PathItem()).post(operation);
 
           try {

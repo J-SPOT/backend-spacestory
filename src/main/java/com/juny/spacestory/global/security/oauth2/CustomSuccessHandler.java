@@ -27,8 +27,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
   private final RefreshRepository refreshRepository;
 
   @Override
-  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-    Authentication authentication) throws IOException, ServletException {
+  public void onAuthenticationSuccess(
+      HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+      throws IOException, ServletException {
 
     log.info("onAuthenticationSuccess");
 
@@ -48,7 +49,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     String refreshToken = jwtUtil.createJwt(jwtUtil.REFRESH_TOKEN_PREFIX, id, role);
 
     String refreshTokenExpired =
-      jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(refreshToken));
+        jwtUtil.convertDateToLocalDateTime(jwtUtil.getExpiration(refreshToken));
 
     refreshRepository.save(new Refresh(UUID.fromString(id), refreshToken, refreshTokenExpired));
 
@@ -63,11 +64,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
   private ResponseCookie createCookie(String refresh, String refreshToken, Long expiration) {
 
     return ResponseCookie.from(refresh, refreshToken)
-      .path("/")
-      .maxAge(expiration)
-      .httpOnly(true)
-      .secure(true)
-      .sameSite("None")
-      .build();
+        .path("/")
+        .maxAge(expiration)
+        .httpOnly(true)
+        .secure(true)
+        .sameSite("None")
+        .build();
   }
 }

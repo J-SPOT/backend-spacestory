@@ -40,12 +40,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     if (registrationId.equals(REGISTRATION_GOOGLE)) {
 
       oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
-    }
-    else if (registrationId.equals(REGISTRATION_NAVER)) {
+    } else if (registrationId.equals(REGISTRATION_NAVER)) {
 
       oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
-    }
-    else if (registrationId.equals(REGISTRATION_KAKAO)) {
+    } else if (registrationId.equals(REGISTRATION_KAKAO)) {
 
       oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
     } else {
@@ -64,20 +62,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     Optional<User> userOptional = userRepository.findBySocialId(socialId);
 
-    User user = userOptional.map(u -> {
+    User user =
+        userOptional
+            .map(
+                u -> {
+                  log.info("User already exists with socialId = {}", socialId);
 
-      log.info("User already exists with socialId = {}", socialId);
+                  u.updateNameAndEmail(name, email);
+                  return userRepository.save(u);
+                })
+            .orElseGet(
+                () -> {
+                  log.info("User not found with socialId = {}", socialId);
 
-      u.updateNameAndEmail(name, email);
-      return userRepository.save(u);
-
-    }).orElseGet(() -> {
-
-      log.info("User not found with socialId = {}", socialId);
-
-      User newUser = new User(name, email, Role.USER, socialId);
-      return userRepository.save(newUser);
-    });
+                  User newUser = new User(name, email, Role.USER, socialId);
+                  return userRepository.save(newUser);
+                });
 
     return new CustomOAuth2User(name, user.getId(), Role.USER, socialId);
   }
