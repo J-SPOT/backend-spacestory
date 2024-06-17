@@ -4,6 +4,7 @@ import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
 import com.juny.spacestory.global.security.oauth2.CustomAuthenticationFailureHandler;
 import com.juny.spacestory.global.security.oauth2.CustomOAuth2UserService;
 import com.juny.spacestory.global.security.oauth2.CustomSuccessHandler;
+import java.util.Arrays;
 import java.util.Collections;
 import com.juny.spacestory.global.security.filter.JwtFilter;
 import com.juny.spacestory.global.security.filter.LoginFilter;
@@ -63,8 +64,7 @@ public class SecurityConfig {
                   config.setAllowedMethods(Collections.singletonList("*"));
 
                   config.setAllowCredentials(true);
-                  config.setExposedHeaders(Collections.singletonList("Set-Cookie"));
-                  config.setExposedHeaders(Collections.singletonList("refreshToken"));
+                  config.setExposedHeaders(Arrays.asList("Set-Cookie", "refreshToken"));
                   config.setMaxAge(jwtUtil.REFRESH_TOKEN_EXPIRED);
 
                   return config;
