@@ -79,7 +79,8 @@ public class SecurityConfig {
                     "/api/v1/auth/register",
                     "/swagger-ui/**",
                     "/swagger-resources/**",
-                    "/v3/api-docs/**")
+                    "/v3/api-docs/**",
+                    "/api/v1/auth/tokens-by-cookie")
                 .permitAll()
                 .requestMatchers("/admin/**")
                 .hasAuthority("ADMIN")
