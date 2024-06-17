@@ -25,7 +25,7 @@ public class TestController {
   @GetMapping("/api/set-cookie")
   public String setCookie(HttpServletResponse response) {
 
-    Cookie cookie = new Cookie("refresh", "1234");
+    Cookie cookie = new Cookie("refreshToken", "1234");
     cookie.setPath("/");
     cookie.setHttpOnly(true);
     cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
