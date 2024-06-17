@@ -23,6 +23,7 @@ public class JwtFilter extends OncePerRequestFilter {
   private final JwtUtil jwtUtil;
   private final String AUTHORIZATION_HEADER = "Authorization";
   private final String AUTHORIZATION_PREFIX = "Bearer ";
+  private final String SKIP_REISSUE_TOKEN_API = "/api/v1/auth/tokens";
 
   public JwtFilter(JwtUtil jwtUtil) {
 
@@ -36,8 +37,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
     log.info("JwtFilter doFilterInternal, ip: {}", request.getRemoteAddr());
     String authorization = request.getHeader(AUTHORIZATION_HEADER);
+    String requestURI = request.getRequestURI();
 
-    if (authorization == null || !authorization.startsWith(AUTHORIZATION_PREFIX)) {
+    if (authorization == null
+        || !authorization.startsWith(AUTHORIZATION_PREFIX)
+        || requestURI.startsWith(SKIP_REISSUE_TOKEN_API)) {
       filterChain.doFilter(request, response);
       return;
     }
