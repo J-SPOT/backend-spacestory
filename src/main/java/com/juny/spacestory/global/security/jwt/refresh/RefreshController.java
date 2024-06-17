@@ -87,6 +87,7 @@ public class RefreshController {
       .path("/")
       .maxAge(expiration)
       .httpOnly(true)
+      .secure(true)
       .sameSite("None");
 
     return cookie;

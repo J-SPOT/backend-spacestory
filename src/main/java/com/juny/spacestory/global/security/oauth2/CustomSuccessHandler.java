@@ -67,6 +67,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             .path("/")
             .maxAge(expiration)
             .httpOnly(true)
+            .secure(true)
             .sameSite("None");
 
     return cookie;
