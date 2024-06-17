@@ -1,5 +1,7 @@
 package com.juny.spacestory;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,19 @@ public class TestController {
   public String getHello() {
 
     return "Get Hello";
+  }
+
+  @GetMapping("/api/set-cookie")
+  public String setCookie(HttpServletResponse response) {
+
+    Cookie cookie = new Cookie("refresh", "1234");
+    cookie.setPath("/");
+    cookie.setHttpOnly(true);
+    cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
+
+    response.addCookie(cookie);
+
+    return "Cookie set successfully";
   }
 
   @PostMapping("/api/v1/hello")
