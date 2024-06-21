@@ -98,7 +98,8 @@ public class SecurityConfig {
                 .userInfoEndpoint(
                     (userInfoEndpointConfig) ->
                         userInfoEndpointConfig.userService(customOAuth2UserService))
-                .successHandler(customSuccessHandler)
+              .loginPage("/social_login")
+              .successHandler(customSuccessHandler)
                 .failureHandler(authenticationFailureHandler));
 
     http.addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
