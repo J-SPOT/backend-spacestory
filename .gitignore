@@ -4,7 +4,6 @@ env.yml
 nohup.out
 .env
 HELP.md
-gradle/
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
