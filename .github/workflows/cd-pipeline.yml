@@ -25,8 +25,8 @@ jobs:
         run: |
           echo "${{ secrets.ENV_YML }}" > ./src/main/resources/env.yml
           echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin
-          run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
-          run: docker push $IMAGE_NAME:$IMAGE_TAG
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          docker push $IMAGE_NAME:$IMAGE_TAG
 
   deploy:
     needs: build
