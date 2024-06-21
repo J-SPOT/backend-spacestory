@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build image
-      - run: |
+        run: |
           echo "${{ secrets.ENV_YML }}" > ./src/main/resources/env.yml
           echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin
           run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
@@ -36,11 +36,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup ssh
-      - run: |
+        run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 34.64.229.17 >> ~/.ssh/known_hosts
       
       - name: Deploy image
-      - run: ssh -i ~/.ssh/id_rsa ubuntu@13.125.206.46 "echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin && docker rm app -f || true && docker pull $IMAGE_NAME:$IMAGE_TAG && docker run -d -p 8080:8080 --name app --network elice $IMAGE_NAME:$IMAGE_TAG"
+        run: ssh -i ~/.ssh/id_rsa ubuntu@13.125.206.46 "echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin && docker rm app -f || true && docker pull $IMAGE_NAME:$IMAGE_TAG && docker run -d -p 8080:8080 --name app --network elice $IMAGE_NAME:$IMAGE_TAG"
