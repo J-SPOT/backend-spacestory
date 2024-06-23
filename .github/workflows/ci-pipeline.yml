@@ -2,10 +2,6 @@ name: CI Pipeline
 run-name: ${{ github.actor }} is currently working on continuous integration 🚀
 
 on:
-  push:
-    branches:
-      - main
-      - dev
   pull_request:
     branches:
       - main
