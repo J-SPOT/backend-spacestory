@@ -23,6 +23,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
@@ -31,7 +34,6 @@ import org.springframework.web.cors.CorsConfiguration;
 public class SecurityConfig {
 
   private final AuthenticationConfiguration authenticationConfiguration;
-  private final JwtUtil jwtUtil;
   private final RefreshRepository refreshRepository;
   private final CustomOAuth2UserService customOAuth2UserService;
   private final CustomSuccessHandler customSuccessHandler;
@@ -90,8 +92,9 @@ public class SecurityConfig {
           .authenticated());
 
     http
-      .csrf(csrf -> csrf
-        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+      .csrf(AbstractHttpConfigurer::disable)
+      .formLogin(AbstractHttpConfigurer::disable)
+      .httpBasic(AbstractHttpConfigurer::disable);
 
     http.oauth2Login(
       (oauth2) ->
