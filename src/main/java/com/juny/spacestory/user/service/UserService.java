@@ -1,6 +1,8 @@
 package com.juny.spacestory.user.service;
 
+import com.juny.spacestory.email.repository.EmailVerificationCodeRepository;
 import com.juny.spacestory.global.exception.ErrorCode;
+import com.juny.spacestory.global.exception.common.BadRequestException;
 import com.juny.spacestory.global.exception.hierarchy.user.UserDuplicatedEmailException;
 import com.juny.spacestory.global.exception.hierarchy.user.UserInvalidEmailException;
 import com.juny.spacestory.global.exception.hierarchy.user.UserNotMatchPasswordException;
@@ -10,26 +12,24 @@ import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.dto.ReqRegisterUser;
 import com.juny.spacestory.user.repository.UserRepository;
 import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
   private final UserRepository userRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final EmailVerificationCodeRepository codeRepository;
+
   private final String NAME_IS_NULL_OR_EMPTY = "Name is null or empty";
   private final String EMAIL_IS_NULL_OR_EMPTY = "Email is null or empty";
   private final String PASSWORD_IS_NULL_OR_EMPTY = "Password is null or empty";
   private final String PASSWORD_CHECK_IS_NULL_OR_EMPTY = "PasswordCheck is null or empty";
   private final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
   private final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-
-  public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
-
-    this.userRepository = userRepository;
-    this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-  }
 
   public void register(ReqRegisterUser req) {
 
@@ -83,6 +83,11 @@ public class UserService {
     if (req.password().length() < 4) {
 
       throw new UserPasswordTooShortException(ErrorCode.UserPasswordIsShort);
+    }
+
+    if (codeRepository.findByEmailAndIsVerifiedFalse(req.email()).isPresent()) {
+
+      throw new BadRequestException(ErrorCode.EMAIL_CODE_INVALID);
     }
   }
 }

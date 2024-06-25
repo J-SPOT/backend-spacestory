@@ -66,5 +66,11 @@ public class Const {
   public static final String REFRESH_TOKEN_INVALID_CODE = "RT1";
   public static final String REFRESH_TOKEN_INVALID_MSG = "Refresh token is invalid.";
 
+  public static final String EMAIL_CODE_INVALID_CODE = "EM1";
+  public static final String EMAIL_CODE_INVALID_MSG = "Email code is invalid.";
+
+  public static final String EMAIL_CODE_IS_EXPIRED_CODE = "EM2";
+  public static final String EMAIL_CODE_IS_EXPIRED_MSG = "Email code is expired.";
+
   private Const() {}
 }

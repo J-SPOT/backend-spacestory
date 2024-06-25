@@ -24,6 +24,7 @@ repositories {
 dependencies {
 	implementation ("org.springframework.security:spring-security-oauth2-authorization-server")
 	implementation ("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation ("org.springframework.boot:spring-boot-starter-mail")
 	implementation ("io.jsonwebtoken:jjwt-api:0.12.5")
 	implementation ("io.jsonwebtoken:jjwt-impl:0.12.5")
 	implementation ("io.jsonwebtoken:jjwt-jackson:0.12.5")
