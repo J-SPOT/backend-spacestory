@@ -22,6 +22,7 @@ repositories {
 }
 
 dependencies {
+	implementation ("com.google.guava:guava:33.2.1-jre")
 	implementation ("org.springframework.security:spring-security-oauth2-authorization-server")
 	implementation ("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation ("org.springframework.boot:spring-boot-starter-mail")

@@ -4,6 +4,7 @@ import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
 import com.juny.spacestory.global.security.oauth2.CustomAuthenticationFailureHandler;
 import com.juny.spacestory.global.security.oauth2.CustomOAuth2UserService;
 import com.juny.spacestory.global.security.oauth2.CustomSuccessHandler;
+import com.juny.spacestory.login.LoginAttemptService;
 import java.util.Arrays;
 import java.util.Collections;
 import com.juny.spacestory.global.security.filter.JwtFilter;
@@ -22,10 +23,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfFilter;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
@@ -38,6 +35,7 @@ public class SecurityConfig {
   private final CustomOAuth2UserService customOAuth2UserService;
   private final CustomSuccessHandler customSuccessHandler;
   private final CustomAuthenticationFailureHandler authenticationFailureHandler;
+  private final LoginAttemptService loginAttemptService;
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -109,7 +107,7 @@ public class SecurityConfig {
 
     http.addFilterAt(
       new LoginFilter(
-        authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository),
+        authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository, loginAttemptService),
       UsernamePasswordAuthenticationFilter.class);
 
     http.sessionManagement(
