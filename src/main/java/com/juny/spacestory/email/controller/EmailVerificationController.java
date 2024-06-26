@@ -24,7 +24,9 @@ public class EmailVerificationController {
   private final EmailVerificationService emailVerificationService;
 
   @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행, 로그인, 로그아웃")
-  @Operation(summary = "이메일 인증 시 인증 코드 발급 API")
+  @Operation(
+    summary = "이메일 인증 시 인증 코드 발급 API",
+    description = "인증 코드는 3분간 유효합니다.")
   @ApiResponses(
     value = {
       @ApiResponse(responseCode = "204", description = "사용자가 지정한 메일로 인증 코드 발송 성공"),
