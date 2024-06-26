@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Collection;
 import java.util.Iterator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,17 +27,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @Slf4j
 public class UserController {
 
   private final UserService userService;
-  private final UserRepository userRepository;
-
-  public UserController(UserService userService, UserRepository userRepository) {
-
-    this.userService = userService;
-    this.userRepository = userRepository;
-  }
 
   @Tag(name = "유저 인증 API", description = "회원 가입, 토큰 발행, 로그인, 로그아웃")
   @Operation(summary = "회원 가입 요청 API")
@@ -61,11 +56,12 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(
             responseCode = "U7",
-            description = "400, 이메일 형식이 올바르지 않은 경우",
+            description = "400, 이메일이 올바르지 않은 경우",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       })
   @PostMapping("/api/v1/auth/register")
   public ResponseEntity<Void> register(@RequestBody ReqRegisterUser req) {
+
     userService.register(req);
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

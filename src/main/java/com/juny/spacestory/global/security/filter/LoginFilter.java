@@ -1,16 +1,19 @@
 package com.juny.spacestory.global.security.filter;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.security.jwt.refresh.Refresh;
 import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
 import com.juny.spacestory.global.security.service.CustomUserDetails;
+import com.juny.spacestory.login.LoginAttemptService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -33,18 +36,22 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   private final AuthenticationManager authenticationManager;
   private final JwtUtil jwtUtil;
   private final RefreshRepository refreshRepository;
+  private final LoginAttemptService loginAttemptService;
+
   private final String SET_USERNAME_PARAMETER = "email";
   private final String SET_LOGIN_ENDPOINT = "/api/v1/auth/login";
   private final String SET_LOGIN_ENDPOINT_METHOD = "POST";
+  private String email;
 
   public LoginFilter(
       AuthenticationManager authenticationManager,
       JwtUtil jwtUtil,
-      RefreshRepository refreshRepository) {
+      RefreshRepository refreshRepository, LoginAttemptService loginAttemptService) {
 
     this.authenticationManager = authenticationManager;
     this.jwtUtil = jwtUtil;
     this.refreshRepository = refreshRepository;
+    this.loginAttemptService = loginAttemptService;
     setUsernameParameter(SET_USERNAME_PARAMETER);
     setRequiresAuthenticationRequestMatcher(
         new AntPathRequestMatcher(SET_LOGIN_ENDPOINT, SET_LOGIN_ENDPOINT_METHOD));
@@ -86,6 +93,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
       return null;
     }
+    email = reqLogin.email();
 
     return reqLogin;
   }
@@ -127,6 +135,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     responseBody.put(jwtUtil.ACCESS_TOKEN_EXPIRAION, accessTokenExpired);
     responseBody.put(jwtUtil.REFRESH_TOKEN_EXPIRAION, refreshTokenExpired);
 
+    loginAttemptService.loginSuccess(id);
+
     PrintWriter writer = response.getWriter();
     writer.write(new ObjectMapper().writeValueAsString(responseBody));
     writer.flush();
@@ -138,5 +148,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
       throws IOException {
 
     jwtUtil.setErrorResponse(response, ErrorCode.UNAUTHORIZED, failed.getMessage());
+
+    loginAttemptService.loginFailed(email);
   }
 }
