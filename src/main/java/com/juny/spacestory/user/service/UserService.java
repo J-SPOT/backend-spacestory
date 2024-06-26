@@ -23,11 +23,13 @@ public class UserService {
   private final UserRepository userRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final EmailVerificationCodeRepository codeRepository;
+  private final GoogleRecaptchaService recaptchaService;
 
   private final String NAME_IS_NULL_OR_EMPTY = "Name is null or empty";
   private final String EMAIL_IS_NULL_OR_EMPTY = "Email is null or empty";
   private final String PASSWORD_IS_NULL_OR_EMPTY = "Password is null or empty";
   private final String PASSWORD_CHECK_IS_NULL_OR_EMPTY = "PasswordCheck is null or empty";
+  private final String RECAPTCHA_IS_INVALID = "Recaptcha is invalid";
   private final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
   private final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
 
@@ -88,6 +90,10 @@ public class UserService {
     if (codeRepository.findByEmailAndIsVerifiedFalse(req.email()).isPresent()) {
 
       throw new BadRequestException(ErrorCode.EMAIL_CODE_INVALID);
+    }
+
+    if (!recaptchaService.verifyRecaptcha(req.captchaToken())) {
+      throw new BadRequestException(ErrorCode.BAD_REQUEST, RECAPTCHA_IS_INVALID);
     }
   }
 }
