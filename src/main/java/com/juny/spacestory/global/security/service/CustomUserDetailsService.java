@@ -31,14 +31,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     if (loginAttemptService.isBlocked(email)) {
       log.error("loadUserByUsername, Email is blocked.");
 
-      throw new LockedException("user account is locked.");
+      throw new LockedException("user account: " + email + " is locked.");
     }
 
-    if (user != null) {
-
-      return new CustomUserDetails(user);
-    }
-
-    return null;
+    return new CustomUserDetails(user);
   }
 }

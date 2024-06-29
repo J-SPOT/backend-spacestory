@@ -3,6 +3,7 @@ package com.juny.spacestory.global.security.service;
 import com.juny.spacestory.user.domain.User;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -60,8 +61,23 @@ public class CustomUserDetails implements UserDetails {
     return true;
   }
 
+  public String getEmail() {
+
+    return user.getEmail();
+  }
+
   public String getId() {
 
     return user.getId().toString();
+  }
+
+  public List<String> getIpAddresses() {
+
+    return user.getIpAddresses();
+  }
+
+  public boolean isTotpEnabled() {
+
+    return user.isTotpEnabled();
   }
 }
