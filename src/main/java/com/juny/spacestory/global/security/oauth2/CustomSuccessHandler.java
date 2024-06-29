@@ -55,7 +55,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     response.addHeader(
         "Set-Cookie",
-        createCookie(jwtUtil.REFRESH_TOKEN_KEY, refreshToken, jwtUtil.REFRESH_TOKEN_EXPIRED)
+        createCookie(jwtUtil.REFRESH_TOKEN_PREFIX, refreshToken, jwtUtil.REFRESH_TOKEN_EXPIRED)
             .toString());
 
     response.sendRedirect("https://spacestory.duckdns.org/social_login_handler?social_login=success");
