@@ -1,6 +1,6 @@
 package com.juny.spacestory.user.service;
 
-import com.juny.spacestory.email.repository.EmailVerificationCodeRepository;
+import com.juny.spacestory.user.repository.EmailVerificationCodeRepository;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.common.BadRequestException;
 import com.juny.spacestory.global.exception.hierarchy.user.UserDuplicatedEmailException;
@@ -33,11 +33,11 @@ public class UserService {
   private final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
   private final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
 
-  public void register(ReqRegisterUser req) {
+  public void register(ReqRegisterUser req, String remoteAddr) {
 
     validateParams(req);
 
-    User user = new User(req.name(), req.email(), bCryptPasswordEncoder.encode(req.password()));
+    User user = new User(req.name(), req.email(), bCryptPasswordEncoder.encode(req.password()), remoteAddr);
 
     userRepository.save(user);
   }
@@ -87,13 +87,21 @@ public class UserService {
       throw new UserPasswordTooShortException(ErrorCode.UserPasswordIsShort);
     }
 
-    if (codeRepository.findByEmailAndIsVerifiedFalse(req.email()).isPresent()) {
-
-      throw new BadRequestException(ErrorCode.EMAIL_CODE_INVALID);
-    }
+    codeRepository.findByEmail(req.email()).orElseThrow(
+      () -> new BadRequestException(ErrorCode.EMAIL_CODE_INVALID));
 
     if (!recaptchaService.verifyRecaptcha(req.captchaToken())) {
       throw new BadRequestException(ErrorCode.BAD_REQUEST, RECAPTCHA_IS_INVALID);
     }
+  }
+
+  public void addIpAddress(User user, String ipAddress) {
+    user.getIpAddresses().add(ipAddress);
+
+    if (user.getIpAddresses().size() > 20) {
+      user.getIpAddresses().remove(0);
+    }
+
+    userRepository.save(user);
   }
 }

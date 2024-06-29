@@ -70,7 +70,7 @@ class SpacestoryApplicationTests {
     // 3월 3일 17~19시 예약을 취소한다.
     // 3월 3일 9~12시 예약을 9~11시 예약으로 변경한다.
     // 이용가능한 시간이 11~22시인지 확인한다.
-    User u1 = new User("user@1", "user@1@gmail.com", "1234");
+    User u1 = new User("user@1", "user@1@gmail.com", "1234", null);
     User user1 = userRepository.save(u1);
 
     Host ho = new Host("host1", 0L, null);

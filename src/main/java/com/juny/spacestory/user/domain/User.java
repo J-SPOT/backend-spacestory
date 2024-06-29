@@ -4,6 +4,8 @@ import com.juny.spacestory.host.Host;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.hierarchy.user.UserExceededPointBusinessException;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,13 +45,21 @@ public class User {
 
   private String socialId;
 
+  private boolean isTotpEnabled;
+
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "user_ip_addresses", joinColumns = @JoinColumn(name = "user_id"))
+  private List<String> ipAddresses = new ArrayList<>();
+
   // 일반 로그인
-  public User(String name, String email, String password) {
+  public User(String name, String email, String password, String ip) {
     this.name = name;
     this.email = email;
     this.password = password;
     this.point = 0L;
     this.role = Role.USER;
+    this.ipAddresses.add(ip);
+    this.isTotpEnabled = false;
   }
 
   // 소셜 로그인
@@ -59,6 +69,7 @@ public class User {
     this.point = 0L;
     this.role = role;
     this.socialId = socialId;
+    this.isTotpEnabled = false;
   }
 
   // jwt토큰으로 SecurityContextHolder에 저장
@@ -89,5 +100,9 @@ public class User {
   public void updateNameAndEmail(String name, String email) {
     this.name = name;
     this.email = email;
+  }
+
+  public void setTotpEnable() {
+    this.isTotpEnabled = true;
   }
 }

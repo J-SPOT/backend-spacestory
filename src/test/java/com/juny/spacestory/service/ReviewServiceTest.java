@@ -41,7 +41,7 @@ public class ReviewServiceTest {
     @BeforeEach
     void setUp() throws NoSuchFieldException, IllegalAccessException {
         ReflectionTestUtils.setField(reviewService, "mapper", mapper);
-        user = new User("user1", "user1@gmail.com", null);
+        user = new User("user1", "user1@gmail.com", "1234", null);
         Field idField = User.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(user, UUID.randomUUID());

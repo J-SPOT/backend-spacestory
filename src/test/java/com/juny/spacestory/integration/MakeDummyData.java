@@ -121,7 +121,7 @@ public class MakeDummyData {
             spaceRepository.save(space2);
             spaceRepository.save(space3);
 
-            User user = new User("user" + i, "user email" + i, "1234");
+            User user = new User("user" + i, "user email" + i, "1234", null);
             userRepository.save(user);
             LocalTime startTime = LocalTime.of(random.nextInt(3) + 9, 0);
             LocalTime endTime = LocalTime.of(random.nextInt(2) + 12, 0);
