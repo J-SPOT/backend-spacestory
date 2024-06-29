@@ -73,7 +73,12 @@ public enum ErrorCode {
     HttpStatus.UNAUTHORIZED, Const.EMAIL_CODE_INVALID_CODE, Const.EMAIL_CODE_INVALID_MSG),
   EMAIL_CODE_EXPIRED(
     HttpStatus.BAD_REQUEST, Const.EMAIL_CODE_IS_EXPIRED_CODE, Const.EMAIL_CODE_IS_EXPIRED_MSG
-  );
+  ),
+  TOTP_NOT_ACTIVATED(
+    HttpStatus.BAD_REQUEST, Const.TOTP_IS_NOT_ACTIVATED_CODE, Const.TOTP_IS_NOT_ACTIVATED_MSG),
+  TOTP_CODE_INVALID(
+    HttpStatus.BAD_REQUEST, Const.TOTP_CODE_IS_INVALID_CODE, Const.TOTP_CODE_IS_INVALID_MSG),
+  ;
 
   private final HttpStatus status;
   private final String code;

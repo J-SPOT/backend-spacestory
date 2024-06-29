@@ -1,4 +1,4 @@
-package com.juny.spacestory.global.exception.hierarchy.email;
+package com.juny.spacestory.global.exception.hierarchy.user;
 
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.common.BadRequestException;

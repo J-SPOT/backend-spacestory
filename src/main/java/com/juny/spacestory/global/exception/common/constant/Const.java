@@ -72,5 +72,10 @@ public class Const {
   public static final String EMAIL_CODE_IS_EXPIRED_CODE = "EM2";
   public static final String EMAIL_CODE_IS_EXPIRED_MSG = "Email code is expired.";
 
+  public static final String TOTP_IS_NOT_ACTIVATED_CODE = "TO1";
+  public static final String TOTP_IS_NOT_ACTIVATED_MSG = "Totp is not activated.";
+  public static final String TOTP_CODE_IS_INVALID_CODE = "TO2";
+  public static final String TOTP_CODE_IS_INVALID_MSG = "Totp code is invalid.";
+
   private Const() {}
 }
