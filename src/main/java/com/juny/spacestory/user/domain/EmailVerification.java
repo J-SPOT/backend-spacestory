@@ -1,4 +1,4 @@
-package com.juny.spacestory.email.domain;
+package com.juny.spacestory.user.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,18 +19,11 @@ public class EmailVerification {
   private String email;
   private String code;
   private LocalDateTime expirationDate;
-  private boolean isVerified;
 
   public EmailVerification(String email, String code, LocalDateTime expirationDate) {
     this.email = email;
     this.code = code;
     this.expirationDate = expirationDate;
-    this.isVerified = false;
-  }
-
-  public void verifyCode() {
-
-    this.isVerified = true;
   }
 
   public void resendCode(String code) {

@@ -1,10 +1,12 @@
 package com.juny.spacestory.global.config;
 
+import com.juny.spacestory.global.security.filter.TwoFactorAuthFilter;
 import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
 import com.juny.spacestory.global.security.oauth2.CustomAuthenticationFailureHandler;
 import com.juny.spacestory.global.security.oauth2.CustomOAuth2UserService;
 import com.juny.spacestory.global.security.oauth2.CustomSuccessHandler;
 import com.juny.spacestory.login.LoginAttemptService;
+import com.juny.spacestory.user.service.EmailVerificationService;
 import java.util.Arrays;
 import java.util.Collections;
 import com.juny.spacestory.global.security.filter.JwtFilter;
@@ -51,7 +53,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http, JwtUtil jwtUtil) throws Exception {
+  public SecurityFilterChain filterChain(HttpSecurity http, JwtUtil jwtUtil,
+    EmailVerificationService emailVerificationService) throws Exception {
 
     http.cors(
       (cors) ->
@@ -65,7 +68,7 @@ public class SecurityConfig {
             config.setAllowedMethods(Collections.singletonList("*"));
 
             config.setAllowCredentials(true);
-            config.setExposedHeaders(Arrays.asList("Set-Cookie", "refreshToken"));
+            config.setExposedHeaders(Arrays.asList("Set-Cookie", "refresh"));
             config.setMaxAge(jwtUtil.REFRESH_TOKEN_EXPIRED);
 
             return config;
@@ -78,6 +81,9 @@ public class SecurityConfig {
             "/api/v1/auth/login",
             "/api/v1/auth/logout",
             "/api/v1/auth/register",
+            "/api/v1/auth/email-verification",
+            "/api/v1/auth/email-verification/verify",
+            "/api/v1/auth/login/email-verification/verify",
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/v3/api-docs/**",
@@ -109,6 +115,8 @@ public class SecurityConfig {
       new LoginFilter(
         authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository, loginAttemptService),
       UsernamePasswordAuthenticationFilter.class);
+
+    http.addFilterAfter(new TwoFactorAuthFilter(emailVerificationService, jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
 
     http.sessionManagement(
       (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
