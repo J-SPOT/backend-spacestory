@@ -50,8 +50,8 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
       setRefreshTokenByCookie(response, sh);
 
-//      response.sendRedirect("https://spacestory.duckdns.org/login/2fa/totp");
-      response.sendRedirect("http://localhost:5173/login/2fa/totp");
+      setCookieAndRedirectUrl(response, "https://spacestory.duckdns.org/login/2fa/totp");
+//      setCookieAndRedirectUrl(response, "http://localhost:5173/login/2fa/totp");
       return;
     }
 
@@ -61,24 +61,25 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
       setRefreshTokenByCookie(response, sh);
 
-//      response.sendRedirect("https://spacestory.duckdns.org/login/2fa/email");
-//      response.sendRedirect("http://localhost:5173/login/2fa/email");
-
-      response.setContentType(jwtUtil.CONTENT_TYPE);
-      response.setCharacterEncoding(jwtUtil.CHARACTER_ENCODING);
-
-      Map<String, String> responseBody = new HashMap<>();
-      responseBody.put("redirectUrl", "http://localhost:5173/login/2fa/email");
-
-      PrintWriter writer = response.getWriter();
-      writer.write(new ObjectMapper().writeValueAsString(responseBody));
-      writer.flush();
+      setCookieAndRedirectUrl(response, "https://spacestory.duckdns.org/login/2fa/email");
+//      setCookieAndRedirectUrl(response, "http://localhost:5173/login/2fa/email");
     }
   }
 
-  private void setRefreshTokenByCookie(HttpServletResponse response, ResSecurityContextHolder sh) {
+  private void setCookieAndRedirectUrl(HttpServletResponse response, String url)
+    throws IOException {
+    response.setContentType(jwtUtil.CONTENT_TYPE);
+    response.setCharacterEncoding(jwtUtil.CHARACTER_ENCODING);
 
-    System.out.println("TwoFactorAuthFilter.setRefreshTokenByCookie");
+    Map<String, String> responseBody = new HashMap<>();
+    responseBody.put("redirectUrl", url);
+
+    PrintWriter writer = response.getWriter();
+    writer.write(new ObjectMapper().writeValueAsString(responseBody));
+    writer.flush();
+  }
+
+  private void setRefreshTokenByCookie(HttpServletResponse response, ResSecurityContextHolder sh) {
 
     String refreshToken = jwtUtil.createJwt(jwtUtil.REFRESH_TOKEN_PREFIX, sh.id(), sh.role());
 

@@ -11,6 +11,7 @@ import com.juny.spacestory.global.exception.hierarchy.parameter.ParameterIsNullO
 import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.dto.ReqRegisterUser;
 import com.juny.spacestory.user.repository.UserRepository;
+import java.util.List;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -96,7 +97,13 @@ public class UserService {
   }
 
   public void addIpAddress(User user, String ipAddress) {
-    user.getIpAddresses().add(ipAddress);
+
+    List<String> ipAddresses = user.getIpAddresses();
+    if (ipAddresses.contains(ipAddress)) {
+      return;
+    }
+
+    ipAddresses.add(ipAddress);
 
     if (user.getIpAddresses().size() > 20) {
       user.getIpAddresses().remove(0);

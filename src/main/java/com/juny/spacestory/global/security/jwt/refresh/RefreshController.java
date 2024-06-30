@@ -100,9 +100,9 @@ public class RefreshController {
       })
   @GetMapping("/api/v1/auth/tokens-by-cookie")
   public ResponseEntity<ResReissueTokens> reissueByCookie(
-      @CookieValue String refreshToken, HttpServletResponse response) {
+      @CookieValue String refresh, HttpServletResponse response) {
 
-    ResReissueTokens resReissueTokens = refreshService.reissue(refreshToken);
+    ResReissueTokens resReissueTokens = refreshService.reissue(refresh);
 
     response.addHeader("Set-Cookie", deleteCookie("refresh", null, 0L).toString());
 

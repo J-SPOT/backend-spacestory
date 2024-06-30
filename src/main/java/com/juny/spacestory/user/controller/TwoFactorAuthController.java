@@ -55,10 +55,10 @@ public class TwoFactorAuthController {
         content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
   @PostMapping("/api/v1/auth/login/email-verification/verify")
-  public ResponseEntity<ResTokens> verifyEmailCodeAndAddIPAddress(HttpServletRequest request,  HttpServletResponse response,  @CookieValue String refreshToken, @RequestBody EmailCode reqCode) {
+  public ResponseEntity<ResTokens> verifyEmailCodeAndAddIPAddress(HttpServletRequest request, HttpServletResponse response, @CookieValue String refresh, @RequestBody EmailCode reqCode) {
 
-    System.out.println("refreshToken = " + refreshToken);
-    ResTokens resTokens = twoFactorAuthService.verifyEmailCodeAndIssueTokens(refreshToken, reqCode.code(),
+    System.out.println("refresh = " + refresh);
+    ResTokens resTokens = twoFactorAuthService.verifyEmailCodeAndIssueTokens(refresh, reqCode.code(),
       request.getRemoteAddr(), false);
 
     response.addHeader("Set-Cookie", deleteCookie("refresh", null, 0L).toString());
@@ -97,11 +97,9 @@ public class TwoFactorAuthController {
         content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
   @PostMapping("/api/v1/auth/login/totp-verification/verify")
-  public ResponseEntity<ResTokens> verifyTotpCodeAndAddIpAddress(HttpServletRequest request,  HttpServletResponse response,  @CookieValue String refreshToken, @RequestBody TotpCode code) {
+  public ResponseEntity<ResTokens> verifyTotpCodeAndAddIpAddress(HttpServletRequest request,  HttpServletResponse response,  @CookieValue String refresh, @RequestBody TotpCode code) {
 
-    System.out.println("TwoFactorAuthController.verifyTotpCodeAndAddIpAddress");
-
-    ResTokens resTokens = twoFactorAuthService.verifyTotpCodeAndIssueTokens(refreshToken, code.code(),
+    ResTokens resTokens = twoFactorAuthService.verifyTotpCodeAndIssueTokens(refresh, code.code(),
       request.getRemoteAddr());
 
     response.addHeader("Set-Cookie", deleteCookie("refresh", null, 0L).toString());

@@ -105,23 +105,24 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
       Authentication authentication)
     throws IOException, ServletException {
 
+    log.info("successfulAuthentication");
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
     Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
     Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
     GrantedAuthority auth = iterator.next();
 
     String id = customUserDetails.getId();
+    boolean totpEnabled = customUserDetails.isTotpEnabled();
     String role = auth.getAuthority();
     List<String> ipAddresses = customUserDetails.getIpAddresses();
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    if (ipAddresses.contains(id)) {
+    if (ipAddresses.contains(request.getRemoteAddr()) && !totpEnabled) {
       issueTokens(response, id, role);
       return;
     }
 
-    // Two-Factor-Auth Filter
     chain.doFilter(request, response);
   }
 
