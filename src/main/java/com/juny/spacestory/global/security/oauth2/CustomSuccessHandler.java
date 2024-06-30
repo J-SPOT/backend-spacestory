@@ -43,9 +43,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     String role = auth.getAuthority();
 
-    System.out.println("id = " + id);
-    System.out.println("role = " + role);
-
     String refreshToken = jwtUtil.createJwt(jwtUtil.REFRESH_TOKEN_PREFIX, id, role);
 
     String refreshTokenExpired =
@@ -55,10 +52,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     response.addHeader(
         "Set-Cookie",
-        createCookie(jwtUtil.REFRESH_TOKEN_KEY, refreshToken, jwtUtil.REFRESH_TOKEN_EXPIRED)
+        createCookie(jwtUtil.REFRESH_TOKEN_PREFIX, refreshToken, jwtUtil.REFRESH_TOKEN_EXPIRED)
             .toString());
 
     response.sendRedirect("https://spacestory.duckdns.org/social_login_handler?social_login=success");
+//    response.sendRedirect("http://localhost:5173/social_login_handler?social_login=success");
   }
 
   private ResponseCookie createCookie(String refresh, String refreshToken, Long expiration) {

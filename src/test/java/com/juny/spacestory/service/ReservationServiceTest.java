@@ -62,8 +62,8 @@ public class ReservationServiceTest {
     @BeforeEach
     void setUp() throws IllegalAccessException, NoSuchFieldException {
         ReflectionTestUtils.setField(reservationService, "mapper", mapper);
-        user1 = new User("user1", "email1", "1234");
-        user2 = new User("user2", "email2", "1234");
+        user1 = new User("user1", "email1", "1234", null);
+        user2 = new User("user2", "email2", "1234", null);
         Field idField = User.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(user1, UUID.randomUUID());

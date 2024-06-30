@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Iterator;
 import lombok.RequiredArgsConstructor;
@@ -60,9 +61,9 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       })
   @PostMapping("/api/v1/auth/register")
-  public ResponseEntity<Void> register(@RequestBody ReqRegisterUser req) {
+  public ResponseEntity<Void> register(@RequestBody ReqRegisterUser req, HttpServletRequest httpServletRequest) {
 
-    userService.register(req);
+    userService.register(req, httpServletRequest.getRemoteAddr());
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
