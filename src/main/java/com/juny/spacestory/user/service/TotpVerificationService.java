@@ -47,10 +47,8 @@ public class TotpVerificationService {
 
     validateEmail(email);
 
-    User user = userRepository.findByEmail(email).orElseThrow(
+    userRepository.findByEmail(email).orElseThrow(
       () -> new UserInvalidEmailException(ErrorCode.USER_INVALID_EMAIL));
-
-    user.setTotpEnable();
 
     GoogleAuthenticatorKey authenticationKey = googleAuth.createCredentials();
     String secret = authenticationKey.getKey();
@@ -87,12 +85,18 @@ public class TotpVerificationService {
   }
 
   public void verifyTotpCode(String email, int code) {
+    User user = userRepository.findByEmail(email).orElseThrow(
+      () -> new UserInvalidEmailException(ErrorCode.USER_INVALID_EMAIL));
+
     TotpVerification totp = codeRepository.findByEmail(email).orElseThrow(
       () -> new TotpNotActivatedException(ErrorCode.TOTP_NOT_ACTIVATED));
 
     boolean authorize = googleAuth.authorize(totp.getSecret(), code);
     if (!authorize) {
       throw new TotpCodeInvalidException(ErrorCode.TOTP_CODE_INVALID);
+    }
+    if (!user.isTotpEnabled()) {
+      user.setTotpEnable();
     }
   }
 }
