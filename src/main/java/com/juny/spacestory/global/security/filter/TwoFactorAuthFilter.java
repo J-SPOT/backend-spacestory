@@ -50,7 +50,7 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
       setRefreshTokenByCookie(response, sh);
 
-      setCookieAndRedirectUrl(response, "https://spacestory.duckdns.org/login/2fa/totp");
+      setCookieAndRedirectUrlAndEmail(response, "https://spacestory.duckdns.org/login/2fa/totp", sh.email());
 //      setCookieAndRedirectUrl(response, "http://localhost:5173/login/2fa/totp");
       return;
     }
@@ -64,6 +64,20 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
       setCookieAndRedirectUrl(response, "https://spacestory.duckdns.org/login/2fa/email");
 //      setCookieAndRedirectUrl(response, "http://localhost:5173/login/2fa/email");
     }
+  }
+
+  private void setCookieAndRedirectUrlAndEmail(HttpServletResponse response, String url,
+    String email) throws IOException {
+    response.setContentType(jwtUtil.CONTENT_TYPE);
+    response.setCharacterEncoding(jwtUtil.CHARACTER_ENCODING);
+
+    Map<String, String> responseBody = new HashMap<>();
+    responseBody.put("redirectUrl", url);
+    responseBody.put("email", email);
+
+    PrintWriter writer = response.getWriter();
+    writer.write(new ObjectMapper().writeValueAsString(responseBody));
+    writer.flush();
   }
 
   private void setCookieAndRedirectUrl(HttpServletResponse response, String url)
