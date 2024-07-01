@@ -163,7 +163,7 @@ public class SpringDocConfiguration {
               .addTagsItem("유저 인증 API")
               .summary("로그인 요청 API")
               .description(
-                    "테스트 계정<br>email: user@gmail.com, password: 1234 role: USER<br>email: admin@gmail.com, password: 1234 role: ADMIN<br><br>비밀번호 3번 틀렸을 경우 계정을 1시간 동안 잠급니다.<br><br>새로운 장소에서 로그인한 경우 2단계 인증이 진행됩니다. (이메일 인증 또는 totp 인증)")
+                    "테스트 계정<br>email: user@gmail.com, password: 1234 role: USER<br>email: admin@gmail.com, password: 1234 role: ADMIN<br><br>비밀번호 3번 틀렸을 경우 계정을 1시간 동안 잠급니다.<br><br>새로운 장소에서 로그인한 경우 2단계 인증이 진행됩니다. (이메일 인증 또는 totp 인증)<br>이메일 인증의 경우 redirectUrl 반환합니다. <br>Totp 인증의 경우 redirectUrl, email 반환합니다.")
               .responses(
                   new ApiResponses()
                       .addApiResponse("200", successResponse)
