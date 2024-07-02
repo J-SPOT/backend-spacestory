@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
   private final JwtUtil jwtUtil;
   private final RefreshRepository refreshRepository;
+  @Value("${login.redirect_url.social_login}")
+  private String SOCIAL_LOGIN_REDIRECT_URL;
 
   @Override
   public void onAuthenticationSuccess(
@@ -55,8 +58,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         createCookie(jwtUtil.REFRESH_TOKEN_PREFIX, refreshToken, jwtUtil.REFRESH_TOKEN_EXPIRED)
             .toString());
 
-    response.sendRedirect("https://spacestory.duckdns.org/social_login_handler?social_login=success");
-//    response.sendRedirect("http://localhost:5173/social_login_handler?social_login=success");
+    response.sendRedirect(SOCIAL_LOGIN_REDIRECT_URL);
   }
 
   private ResponseCookie createCookie(String refresh, String refreshToken, Long expiration) {

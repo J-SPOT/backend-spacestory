@@ -14,6 +14,7 @@ import com.juny.spacestory.global.security.filter.LoginFilter;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,6 +39,10 @@ public class SecurityConfig {
   private final CustomSuccessHandler customSuccessHandler;
   private final CustomAuthenticationFailureHandler authenticationFailureHandler;
   private final LoginAttemptService loginAttemptService;
+  @Value("${login.redirect_url.totp}")
+  private String TOTP_REDIRECT_URL;
+  @Value("${login.redirect_url.email}")
+  private String EMAIL_REDIRECT_URL;
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -117,7 +122,7 @@ public class SecurityConfig {
         authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository, loginAttemptService),
       UsernamePasswordAuthenticationFilter.class);
 
-    http.addFilterAfter(new TwoFactorAuthFilter(emailVerificationService, jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterAfter(new TwoFactorAuthFilter(emailVerificationService, jwtUtil, refreshRepository, TOTP_REDIRECT_URL, EMAIL_REDIRECT_URL), UsernamePasswordAuthenticationFilter.class);
 
     http.sessionManagement(
       (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -93,6 +93,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
       return null;
     }
+    request.setAttribute("email", reqLogin.email());
 
     return reqLogin;
   }

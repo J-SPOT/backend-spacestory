@@ -37,7 +37,7 @@ public class JwtUtil {
   public final String JWT_CLAIM_TYPE = "type";
   public final String JWT_CLAIM_ID = "id";
   public final String JWT_CLAIM_ROLE = "role";
-  public final Long ACCESS_TOKEN_EXPIRED = 60 * 5 * 1000L; // 5분
+  public final Long ACCESS_TOKEN_EXPIRED = 60 * 60 * 1000L; // 5분
   public final Long REFRESH_TOKEN_EXPIRED = 60 * 60 * 24 * 1000L; // 1일
 
   private final SecretKey secretKey;
