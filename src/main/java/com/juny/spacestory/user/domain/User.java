@@ -3,6 +3,7 @@ package com.juny.spacestory.user.domain;
 import com.juny.spacestory.host.Host;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.hierarchy.user.UserExceededPointBusinessException;
+import com.juny.spacestory.user.dto.ReqModifyProfile;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,8 @@ public class User {
 
   @Column(nullable = false, unique = true)
   private String email;
+
+  private String phoneNumber;
 
   @Column private String password;
 
@@ -104,5 +107,23 @@ public class User {
 
   public void setTotpEnable() {
     this.isTotpEnabled = true;
+  }
+
+  public void setTotpDisable() {
+    this.isTotpEnabled = false;
+  }
+
+  public void modifyUser(ReqModifyProfile req) {
+    this.name = req.name();
+    this.email = req.email();
+    this.phoneNumber = req.phoneNumber();
+  }
+
+  public void changePassword(String password) {
+    this.password = password;
+  }
+
+  public void softDelete() {
+    this.deletedAt = LocalDateTime.now();
   }
 }

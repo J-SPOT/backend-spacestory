@@ -19,19 +19,34 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@RequiredArgsConstructor
+@Slf4j
 public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
   private final EmailVerificationService emailVerificationService;
   private final JwtUtil jwtUtil;
   private final RefreshRepository refreshRepository;
+  private final String LOGIN_ENDPOINT = "/api/v1/auth/login";
+  private final String TOTP_REDIRECT_URL;
+  private final String EMAIL_REDIRECT_URL;
+  private final String REDIRECT_URL_KEY = "redirectUrl";
+  private final String EMAIL_KEY = "email";
+  private final String SET_COOKIE_KEY = "Set-Cookie";
+
+  public TwoFactorAuthFilter(EmailVerificationService emailVerificationService, JwtUtil jwtUtil,
+    RefreshRepository refreshRepository, String totpRedirectUrl, String EMAIL_REDIRECT_URL) {
+    this.emailVerificationService = emailVerificationService;
+    this.jwtUtil = jwtUtil;
+    this.refreshRepository = refreshRepository;
+    this.TOTP_REDIRECT_URL = totpRedirectUrl;
+    this.EMAIL_REDIRECT_URL = EMAIL_REDIRECT_URL;
+  }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -39,7 +54,10 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
     String requestURI = request.getRequestURI();
 
-    if (!requestURI.equals("/api/v1/auth/login")) {
+    log.info("Two-factor auth filter TOTP_REDIRECT_EMAIL: {}", TOTP_REDIRECT_URL);
+    log.info("Two-factor auth filter EMAIL_REDIRECT_EMAIL: {}", EMAIL_REDIRECT_URL);
+
+    if (!requestURI.equals(LOGIN_ENDPOINT)) {
       filterChain.doFilter(request, response);
       return;
     }
@@ -50,8 +68,7 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
       setRefreshTokenByCookie(response, sh);
 
-      setCookieAndRedirectUrlAndEmail(response, "https://spacestory.duckdns.org/login/2fa/totp", sh.email());
-//      setCookieAndRedirectUrl(response, "http://localhost:5173/login/2fa/totp");
+      setCookieAndRedirectUrlAndEmail(response, TOTP_REDIRECT_URL, sh.email());
       return;
     }
 
@@ -61,8 +78,7 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
       setRefreshTokenByCookie(response, sh);
 
-      setCookieAndRedirectUrl(response, "https://spacestory.duckdns.org/login/2fa/email");
-//      setCookieAndRedirectUrl(response, "http://localhost:5173/login/2fa/email");
+      setCookieAndRedirectUrl(response, EMAIL_REDIRECT_URL);
     }
   }
 
@@ -72,8 +88,8 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
     response.setCharacterEncoding(jwtUtil.CHARACTER_ENCODING);
 
     Map<String, String> responseBody = new HashMap<>();
-    responseBody.put("redirectUrl", url);
-    responseBody.put("email", email);
+    responseBody.put(REDIRECT_URL_KEY, url);
+    responseBody.put(EMAIL_KEY, email);
 
     PrintWriter writer = response.getWriter();
     writer.write(new ObjectMapper().writeValueAsString(responseBody));
@@ -86,7 +102,7 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
     response.setCharacterEncoding(jwtUtil.CHARACTER_ENCODING);
 
     Map<String, String> responseBody = new HashMap<>();
-    responseBody.put("redirectUrl", url);
+    responseBody.put(REDIRECT_URL_KEY, url);
 
     PrintWriter writer = response.getWriter();
     writer.write(new ObjectMapper().writeValueAsString(responseBody));
@@ -103,7 +119,7 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
     refreshRepository.save(new Refresh(UUID.fromString(sh.id()), refreshToken, refreshTokenExpired));
 
     response.addHeader(
-      "Set-Cookie",
+      SET_COOKIE_KEY,
       createCookie(jwtUtil.REFRESH_TOKEN_PREFIX, refreshToken, jwtUtil.REFRESH_TOKEN_EXPIRED)
         .toString());
   }

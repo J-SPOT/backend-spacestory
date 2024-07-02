@@ -1,7 +1,4 @@
 spring:
-  application:
-    name: SpaceStory
-
   security:
     oauth2:
       client:
@@ -10,7 +7,7 @@ spring:
             client-name: naver
             client-id: 0X6PaMWszFEfdk5uHyit
             client-secret: ${OAUTH2_NAVER_SECRET_KEY}
-            redirect-uri: https://spacestory.duckdns.org/login/oauth2/code/naver
+            redirect-uri: http://localhost:8080/login/oauth2/code/naver
             authorization-grant-type: authorization_code
             scope:
               - name
@@ -19,7 +16,7 @@ spring:
             client-name: kakao
             client-id: 355a2e7f42dfd28fae09a13c55db702e
             client-secret: ${OAUTH2_KAKAO_SECRET_KEY}
-            redirect-uri: https://spacestory.duckdns.org/login/oauth2/code/kakao
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
             scope:
@@ -29,7 +26,7 @@ spring:
             client-name: google
             client-id: 15683748038-kndmsc37419grhklg27ra02qogmsc98a.apps.googleusercontent.com
             client-secret: ${OAUTH2_GOOGLE_SECRET_KEY}
-            redirect-uri: https://spacestory.duckdns.org/login/oauth2/code/google
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
             authorization-grant-type: authorization_code
             scope:
               - profile
@@ -46,18 +43,6 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${GMAIL_USERNAME}
-    password: ${GMAIL_PASSWORD}
-    protocol: smtp
-    test-connection: false
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls.enable: true
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -72,19 +57,16 @@ spring:
     hibernate:
       ddl-auto: validate
 
-jwt:
-  secretKey: ${JWT_SECRET_KEY}
-
-springdoc:
-  api-docs:
-    enabled: true
-  enable-spring-security: true
-
 server:
   port: 8080
 
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: DEBUG
+
 login:
   redirect_url:
-    totp: "https://spacestory.duckdns.org/login/2fa/totp"
-    email: "https://spacestory.duckdns.org/login/2fa/email"
-    social_login: "https://spacestory.duckdns.org/social_login_handler?social_login=success"
+    totp: "http://localhost:5173/login/2fa/totp"
+    email: "http://localhost:5173/login/2fa/email"
+    social_login: "http://localhost:5173/social_login_handler?social_login=success"

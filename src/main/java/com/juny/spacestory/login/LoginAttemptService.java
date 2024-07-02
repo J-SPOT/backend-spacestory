@@ -3,9 +3,13 @@ package com.juny.spacestory.login;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.juny.spacestory.global.exception.ErrorCode;
+import com.juny.spacestory.global.exception.hierarchy.user.UserInvalidEmailException;
+import com.juny.spacestory.user.repository.UserRepository;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +20,12 @@ public class LoginAttemptService {
 
   private static final int MAX_ATTEMPTS = 3;
 
+  private final UserRepository userRepository;
+
   private LoadingCache<String, Integer> loginAttemptCache;
 
-  public LoginAttemptService() {
+  public LoginAttemptService(UserRepository userRepository) {
+    this.userRepository = userRepository;
     loginAttemptCache = CacheBuilder.newBuilder()
       .expireAfterWrite(1, TimeUnit.HOURS)
       .build(
@@ -36,6 +43,9 @@ public class LoginAttemptService {
   }
 
   public void loginFailed(String email) {
+
+    userRepository.findByEmail(email).orElseThrow(
+      () -> new UserInvalidEmailException(ErrorCode.USER_INVALID_EMAIL));
 
     int failedCount = 0;
 
