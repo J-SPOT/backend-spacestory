@@ -39,6 +39,7 @@ public class SecurityConfig {
   private final CustomSuccessHandler customSuccessHandler;
   private final CustomAuthenticationFailureHandler authenticationFailureHandler;
   private final LoginAttemptService loginAttemptService;
+
   @Value("${login.redirect_url.totp}")
   private String TOTP_REDIRECT_URL;
   @Value("${login.redirect_url.email}")
@@ -96,7 +97,7 @@ public class SecurityConfig {
             "/api/v1/auth/tokens",
             "/api/v1/auth/tokens-by-cookie")
           .permitAll()
-          .requestMatchers("/admin/**")
+          .requestMatchers("/api/admin/**")
           .hasAuthority("ADMIN")
           .anyRequest()
           .authenticated());
