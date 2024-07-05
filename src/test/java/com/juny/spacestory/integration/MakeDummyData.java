@@ -6,32 +6,23 @@ import com.juny.spacestory.realestate.Address;
 import com.juny.spacestory.realestate.RealEstate;
 import com.juny.spacestory.realestate.RealEstateRepository;
 import com.juny.spacestory.reservation.repository.ReservationRepository;
-import com.juny.spacestory.reservation.entity.SpaceReservation;
-import com.juny.spacestory.space.domain.DetailedType;
-import com.juny.spacestory.space.domain.Space;
-import com.juny.spacestory.space.domain.SpaceType;
+import com.juny.spacestory.space.dto.ResMainCategory;
+import com.juny.spacestory.space.dto.ResSubCategory;
 import com.juny.spacestory.space.repository.SpaceRepository;
+import com.juny.spacestory.space.service.CategoryService;
 import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+
 @SpringBootTest
 public class MakeDummyData {
 
-    private static final Map<SpaceType, Set<DetailedType>> validDetailedTypesMap = Map.of(
-            SpaceType.FRIENDSHIP, EnumSet.of(DetailedType.PARTY_ROOM, DetailedType.RESIDENCE, DetailedType.CAFE),
-            SpaceType.EVENT, EnumSet.of(DetailedType.PERFORMANCE_VENUE, DetailedType.CONFERENCE_HALL, DetailedType.EXHIBITION_HALL),
-            SpaceType.EDUCATION, EnumSet.of(DetailedType.STUDY_ROOM, DetailedType.LECTURE_ROOM, DetailedType.SEMINAR_ROOM, DetailedType.MEETING_ROOM),
-            SpaceType.ART, EnumSet.of(DetailedType.DANCE_ROOM, DetailedType.VOCAL_ROOM, DetailedType.INSTRUMENT_ROOM, DetailedType.DRAWING_ROOM, DetailedType.CRAFT_ROOM),
-            SpaceType.SPORT, EnumSet.of(DetailedType.BADMINTON_COURT, DetailedType.FUTSAL_COURT, DetailedType.TENNIS_COURT),
-            SpaceType.PHOTOGRAPHY, EnumSet.of(DetailedType.FILM_STUDIO, DetailedType.BROADCAST_ROOM) );
-    private static final Map<String, List<String>> districtsAndDongs = new HashMap<>();
+    private final Map<String, List<String>> districtsAndDongs = new HashMap<>();
     @Autowired
     HostRepository hostRepository;
     @Autowired
@@ -42,31 +33,50 @@ public class MakeDummyData {
     UserRepository userRepository;
     @Autowired
     ReservationRepository reservationRepository;
+    @Autowired
+    CategoryService categoryService;
 
-    private static SpaceType getRandomSpaceType () {
+    private ResMainCategory getRandomMainCategory() {
         Random random = new Random();
-        SpaceType[] values = SpaceType.values();
-        return values[random.nextInt(values.length)];
+        List<ResMainCategory> mainCategories = categoryService.findMainCategories();
+
+        return mainCategories.get(random.nextInt(mainCategories.size()));
     }
 
-    private static DetailedType getRandomDetailedType(Set<DetailedType> set) {
-        int index = new Random().nextInt(set.size());
-        Iterator<DetailedType> iter = set.iterator();
-        for (int i = 0; i < index; i++) {
-            iter.next();
-        }
-        return iter.next();
+    private ResSubCategory getRandomSubCategory(Long id) {
+        Random random = new Random();
+        List<ResSubCategory> subCategories = categoryService.findSubCategoriesByMainCategoryId(id);
+
+        return subCategories.get(random.nextInt(subCategories.size()));
     }
 
-    private static String getRandomDistrict(Set<String> districts) {
+    private String getRandomDistrict(Set<String> districts) {
         Random random = new Random();
         List<String> districtList = new ArrayList<>(districts);
         return districtList.get(random.nextInt(districtList.size()));
     }
 
-    private static String getRandomDong(List<String> list) {
+    private String getRandomDong(List<String> list) {
         Random random = new Random();
         return list.get(random.nextInt(list.size()));
+    }
+
+    @Test
+    public void test() {
+        List<ResMainCategory> mainCategories = new ArrayList<>();
+        ArrayList<ResSubCategory> subCategories = new ArrayList<>();
+        for (int i = 0; i < 10; ++i) {
+            ResMainCategory mainCategory = getRandomMainCategory();
+            mainCategories.add(mainCategory);
+        }
+        for (var e : mainCategories) {
+            ResSubCategory randomSubCategory = getRandomSubCategory(e.id());
+            subCategories.add(randomSubCategory);
+        }
+        for (int i = 0; i < 10; ++i) {
+            System.out.println("mainCategories.get(i) = " + mainCategories.get(i));
+            System.out.println("subCategories.get(i) = " + subCategories.get(i));
+        }
     }
 
     @Test
@@ -99,14 +109,14 @@ public class MakeDummyData {
 
         int st = 1;
         int n = 0;
-        LocalDate reservationDate = LocalDate.of(2024, 5, 25);
+        LocalDate reservationDate = LocalDate.of(2024, 7, 31);
         for (int i = st; i <= n; ++i) {
             String selectedDistrict = getRandomDistrict(districtsAndDongs.keySet());
             List<String> selectedDongs = districtsAndDongs.get(selectedDistrict);
             String selectedDong = getRandomDong(selectedDongs);
-            SpaceType selectedSpaceType = getRandomSpaceType();
-            Set<DetailedType> detailedTypes = validDetailedTypesMap.get(selectedSpaceType);
-            DetailedType selectedDetailedType = getRandomDetailedType(detailedTypes);
+//            SpaceType selectedSpaceType = getRandomSpaceType();
+//            Set<DetailedType> detailedTypes = validDetailedTypesMap.get(selectedSpaceType);
+//            DetailedType selectedDetailedType = getRandomDetailedType(detailedTypes);
 
             Random random = new Random();
 			Host host = new Host("host" + i, 0L, null);
@@ -114,24 +124,24 @@ public class MakeDummyData {
             Address address = new Address("도로명주소" + i, "저번주소" + i, "서울특별시", selectedDistrict, selectedDong);
             RealEstate realEstate = new RealEstate(address, random.nextInt(20) + 1, random.nextBoolean(), random.nextBoolean(), false, host);
             realEstateRepository.save(realEstate);
-            Space space1 = new Space(selectedSpaceType, "spaceA" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i, false, Set.of(selectedDetailedType), realEstate);
-            Space space2 = new Space(selectedSpaceType, "spaceB" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i + 1, false, Set.of(selectedDetailedType), realEstate);
-            Space space3 = new Space(selectedSpaceType, "spaceC" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i + 2, false, Set.of(selectedDetailedType), realEstate);
-            spaceRepository.save(space1);
-            spaceRepository.save(space2);
-            spaceRepository.save(space3);
+//            Space space1 = new Space(selectedSpaceType, "spaceA" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i, false, Set.of(selectedDetailedType), realEstate);
+//            Space space2 = new Space(selectedSpaceType, "spaceB" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i + 1, false, Set.of(selectedDetailedType), realEstate);
+//            Space space3 = new Space(selectedSpaceType, "spaceC" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i + 2, false, Set.of(selectedDetailedType), realEstate);
+//            spaceRepository.save(space1);
+//            spaceRepository.save(space2);
+//            spaceRepository.save(space3);
 
             User user = new User("user" + i, "user email" + i, "1234", null);
             userRepository.save(user);
             LocalTime startTime = LocalTime.of(random.nextInt(3) + 9, 0);
             LocalTime endTime = LocalTime.of(random.nextInt(2) + 12, 0);
-            long usageFee = Duration.between(startTime, endTime).toHours() * space1.getHourlyRate();
-            SpaceReservation spaceReservation1 = new SpaceReservation(user.getId(), reservationDate, startTime, endTime, usageFee, true, false, space1);
-            SpaceReservation spaceReservation2 = new SpaceReservation(user.getId(), reservationDate, startTime, endTime, usageFee, true, false, space2);
-            SpaceReservation spaceReservation3 = new SpaceReservation(user.getId(), reservationDate, startTime, endTime, usageFee, true, false, space3);
-            reservationRepository.save(spaceReservation1);
-            reservationRepository.save(spaceReservation2);
-            reservationRepository.save(spaceReservation3);
+//            long usageFee = Duration.between(startTime, endTime).toHours() * space1.getHourlyRate();
+//            SpaceReservation spaceReservation1 = new SpaceReservation(user.getId(), reservationDate, startTime, endTime, usageFee, true, false, space1);
+//            SpaceReservation spaceReservation2 = new SpaceReservation(user.getId(), reservationDate, startTime, endTime, usageFee, true, false, space2);
+//            SpaceReservation spaceReservation3 = new SpaceReservation(user.getId(), reservationDate, startTime, endTime, usageFee, true, false, space3);
+//            reservationRepository.save(spaceReservation1);
+//            reservationRepository.save(spaceReservation2);
+//            reservationRepository.save(spaceReservation3);
         }
     }
 }
