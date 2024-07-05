@@ -1,14 +1,13 @@
 package com.juny.spacestory.space.domain;
 
 import com.juny.spacestory.realestate.RealEstate;
-import com.juny.spacestory.space.dto.RequestUpdateSpace;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -19,9 +18,6 @@ public class Space {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @Enumerated(EnumType.STRING)
-  private SpaceType spaceType;
 
   @Column(nullable = false)
   private String spaceName;
@@ -41,48 +37,44 @@ public class Space {
   @Column(nullable = false)
   private Integer maxCapacity;
 
-  @Column private Integer reviewCount;
-
   @Column(nullable = false)
   private String spaceDescription;
 
-  @Column(nullable = false)
-  private Boolean isDeleted;
+  @Column private Integer reviewCount;
 
-  @ElementCollection(fetch = FetchType.LAZY, targetClass = FacilityType.class)
-  @CollectionTable(name = "space_facility_type", joinColumns = @JoinColumn(name = "space_id"))
-  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private Set<FacilityType> facilityTypes = new HashSet<>();
-
-  @ElementCollection(fetch = FetchType.LAZY, targetClass = DetailedType.class)
-  @CollectionTable(name = "space_detailed_type", joinColumns = @JoinColumn(name = "space_id"))
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private Set<DetailedType> detailedTypes = new HashSet<>();
-
-  @ElementCollection(fetch = FetchType.LAZY, targetClass = String.class)
-  @CollectionTable(name = "space_hashTag", joinColumns = @JoinColumn(name = "space_id"))
-  @Column(nullable = false)
-  private Set<String> hashTags = new HashSet<>();
+  private LocalDateTime deletedAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "realEstate_id")
   private RealEstate realEstate;
 
-  public Space(
-      SpaceType spaceType,
-      String spaceName,
-      LocalTime openingTime,
-      LocalTime closingTime,
-      Integer hourlyRate,
-      Integer spaceSize,
-      Integer maxCapacity,
-      String spaceDescription,
-      Boolean isDeleted,
-      Set<DetailedType> detailedTypes,
-      RealEstate realEstate) {
-    this.spaceType = spaceType;
+  @ManyToMany
+  @JoinTable(
+    name = "space_sub_categories",
+    joinColumns = @JoinColumn(name = "space_id"),
+    inverseJoinColumns = @JoinColumn(name = "sub_category_id")
+  )
+  private List<SubCategory> subCategories;
+
+  @ManyToMany
+  @JoinTable(
+    name = "space_options",
+    joinColumns = @JoinColumn(name = "space_id"),
+    inverseJoinColumns = @JoinColumn(name = "option_id")
+  )
+  private List<Option> options;
+
+  @ManyToMany
+  @JoinTable(
+    name = "space_hashtags",
+    joinColumns = @JoinColumn(name = "space_id"),
+    inverseJoinColumns = @JoinColumn(name = "hashtag_id")
+  )
+  private List<Hashtag> hashtags;
+
+  public Space(String spaceName, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate,
+    Integer spaceSize, Integer maxCapacity, String spaceDescription) {
     this.spaceName = spaceName;
     this.openingTime = openingTime;
     this.closingTime = closingTime;
@@ -90,24 +82,64 @@ public class Space {
     this.spaceSize = spaceSize;
     this.maxCapacity = maxCapacity;
     this.spaceDescription = spaceDescription;
-    this.isDeleted = isDeleted;
-    this.detailedTypes = detailedTypes;
+    this.reviewCount = 0;
+    this.deletedAt = null;
+  }
+
+  // 연관관계 편의 메서드
+  public void setRealEstate(RealEstate realEstate) {
     this.realEstate = realEstate;
   }
 
-  public void updateSpace(RequestUpdateSpace req) {
-    this.spaceType = req.spaceType();
-    this.spaceName = req.spaceName();
-    this.openingTime = req.openingTime();
-    this.closingTime = req.closingTime();
-    this.hourlyRate = req.hourlyRate();
-    this.spaceSize = req.spaceSize();
-    this.maxCapacity = req.maxCapacity();
-    this.spaceDescription = req.spaceDescription();
-    this.detailedTypes = req.detailedTypes();
+  // 연관관계 편의 메서드
+  public void addSubCategory(SubCategory subCategory) {
+    if (!this.subCategories.contains(subCategory)) {
+      this.subCategories.add(subCategory);
+      subCategory.addSpace(this);
+    }
   }
 
-  public void softDelete(Space space) {
-    space.isDeleted = true;
+  // 연관관계 편의 메서드
+  public void removeSubCategory(SubCategory subCategory) {
+    if (this.subCategories.contains(subCategory)) {
+      this.subCategories.remove(subCategory);
+      subCategory.removeSpace(this);
+    }
   }
+
+  // 연관관계 편의 메서드
+  public void addOption(Option option) {
+    if (!this.options.contains(option)) {
+      this.options.add(option);
+      option.addSpace(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void removeOption(Option option) {
+    if (this.options.contains(option)) {
+      this.options.remove(option);
+      option.removeSpace(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void addHashtag(Hashtag hashtag) {
+    if (!this.hashtags.contains(hashtag)) {
+      this.hashtags.add(hashtag);
+      hashtag.addSpace(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void removeHashtag(Hashtag hashtag) {
+    if (this.hashtags.contains(hashtag)) {
+      this.hashtags.remove(hashtag);
+      hashtag.removeSpace(this);
+    }
+  }
+
+//  public void softDelete(Space space) {
+//    this.deletedAt = LocalDateTime.now();
+//  }
 }

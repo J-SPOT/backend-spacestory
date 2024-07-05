@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -22,11 +23,10 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
-public class SpaceReservation {
+@Table(name = "reservations")
+public class Reservation {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,7 +57,7 @@ public class SpaceReservation {
   @JoinColumn(name = "space_id")
   private Space space;
 
-  public SpaceReservation(
+  public Reservation(
       UUID userId,
       LocalDate reservationDate,
       LocalTime startTime,
@@ -89,7 +89,7 @@ public class SpaceReservation {
     this.fee -= differenceAmount;
   }
 
-  public void softDelete(SpaceReservation reservation) {
+  public void softDelete(Reservation reservation) {
     reservation.isDeleted = true;
   }
 }
