@@ -48,7 +48,7 @@ public class User {
 
   private String socialId;
 
-  private boolean isTotpEnabled;
+  private Boolean isTotpEnabled;
 
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "user_ip_addresses", joinColumns = @JoinColumn(name = "user_id"))

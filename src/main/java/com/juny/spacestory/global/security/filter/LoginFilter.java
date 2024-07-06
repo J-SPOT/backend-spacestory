@@ -113,13 +113,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     GrantedAuthority auth = iterator.next();
 
     String id = customUserDetails.getId();
-    boolean totpEnabled = customUserDetails.isTotpEnabled();
+    boolean isTotpEnabled = customUserDetails.getIsTotpEnabled();
     String role = auth.getAuthority();
     List<String> ipAddresses = customUserDetails.getIpAddresses();
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    if (ipAddresses.contains(request.getRemoteAddr()) && !totpEnabled) {
+    if (ipAddresses.contains(request.getRemoteAddr()) && !isTotpEnabled) {
       issueTokens(response, id, role);
       return;
     }

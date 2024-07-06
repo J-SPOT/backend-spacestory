@@ -135,7 +135,7 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
     String id = customUserDetails.getId();
     String email = customUserDetails.getEmail();
-    boolean totpEnabled = customUserDetails.isTotpEnabled();
+    boolean totpEnabled = customUserDetails.getIsTotpEnabled();
     List<String> ipAddresses = customUserDetails.getIpAddresses();
     String role = auth.getAuthority();
 
