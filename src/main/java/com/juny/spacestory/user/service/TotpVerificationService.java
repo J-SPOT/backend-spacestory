@@ -95,7 +95,7 @@ public class TotpVerificationService {
     if (!authorize) {
       throw new TotpCodeInvalidException(ErrorCode.TOTP_CODE_INVALID);
     }
-    if (!user.isTotpEnabled()) {
+    if (!user.getIsTotpEnabled()) {
       user.setTotpEnable();
     }
   }

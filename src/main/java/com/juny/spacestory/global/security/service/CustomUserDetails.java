@@ -76,8 +76,8 @@ public class CustomUserDetails implements UserDetails {
     return user.getIpAddresses();
   }
 
-  public boolean isTotpEnabled() {
+  public Boolean getIsTotpEnabled() {
 
-    return user.isTotpEnabled();
+    return user.getIsTotpEnabled();
   }
 }

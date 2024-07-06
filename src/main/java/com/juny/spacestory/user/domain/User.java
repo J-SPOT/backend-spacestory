@@ -24,8 +24,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class User {
 
   @Id
-  @GeneratedValue(generator = "uuid2")
-  @GenericGenerator(name = "uuid2", strategy = "uuid2")
+  @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(columnDefinition = "BINARY(16)")
   private UUID id;
 
@@ -48,7 +47,7 @@ public class User {
 
   private String socialId;
 
-  private boolean isTotpEnabled;
+  private Boolean isTotpEnabled;
 
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "user_ip_addresses", joinColumns = @JoinColumn(name = "user_id"))
