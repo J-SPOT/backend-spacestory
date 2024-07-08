@@ -60,7 +60,7 @@ public class LoginAttemptService {
 
     ++failedCount;
 
-    System.out.println("failedCount = " + failedCount);
+    log.info("failedCount: " + failedCount);
 
     loginAttemptCache.put(email, failedCount);
   }
