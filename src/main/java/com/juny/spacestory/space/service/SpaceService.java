@@ -1,11 +1,33 @@
 package com.juny.spacestory.space.service;
 
+import com.juny.spacestory.space.domain.Space;
+import com.juny.spacestory.space.dto.ResSpace;
+import com.juny.spacestory.space.mapper.SpaceMapper;
+import com.juny.spacestory.space.repository.SpaceRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class SpaceService {
+
+  private final SpaceRepository spaceRepository;
+  private final SpaceMapper mapper;
+
+  public List<ResSpace> findAllSpaces() {
+
+    List<Space> spaces = spaceRepository.findAll();
+
+    return mapper.toResSpaces(spaces);
+  }
+
+  public List<ResSpace> findSpacesByRealEstateId(Long id) {
+
+    List<Space> spaces = spaceRepository.findByRealEstateId(id);
+
+    return mapper.toResSpaces(spaces);
+  }
 
 //  private static final Map<SpaceType, Set<DetailedType>> validDetailedTypesMap =
 //      Map.of(

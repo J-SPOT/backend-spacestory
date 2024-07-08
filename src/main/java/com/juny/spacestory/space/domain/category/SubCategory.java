@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,7 @@ public class SubCategory {
   private MainCategory mainCategory;
 
   @ManyToMany(mappedBy = "subCategories")
-  private List<Space> spaces;
+  private List<Space> spaces = new ArrayList<>();
 
   public SubCategory(String name) {
     this.name = name;

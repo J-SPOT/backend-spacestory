@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,7 @@ public class Hashtag {
   private String name;
 
   @ManyToMany(mappedBy = "hashtags")
-  private List<Space> spaces;
+  private List<Space> spaces = new ArrayList<>();
 
   public Hashtag(String name) {
     this.name = name;

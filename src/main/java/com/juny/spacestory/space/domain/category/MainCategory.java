@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class MainCategory {
   private String name;
 
   @OneToMany(mappedBy = "mainCategory")
-  private List<SubCategory> subCategories;
+  private List<SubCategory> subCategories = new ArrayList<>();
 
   public MainCategory(String name) {
     this.name = name;

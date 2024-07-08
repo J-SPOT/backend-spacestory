@@ -1,10 +1,12 @@
 package com.juny.spacestory.space.repository;
 
 import com.juny.spacestory.space.domain.Space;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SpaceRepository extends JpaRepository<Space, Long> {
 
+  List<Space> findByRealEstateId(Long id);
 //  Optional<Space> findByIdAndIsDeletedFalse(Long spaceId);
 //
 //  @Query(
