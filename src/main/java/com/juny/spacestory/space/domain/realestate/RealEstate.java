@@ -1,4 +1,4 @@
-package com.juny.spacestory.realestate;
+package com.juny.spacestory.space.domain.realestate;
 
 import com.juny.spacestory.host.Host;
 import jakarta.persistence.*;
@@ -32,18 +32,15 @@ public class RealEstate {
   @JoinColumn(name = "host_id")
   private Host host;
 
-  public RealEstate(
-      Address address,
-      Integer floor,
-      Boolean hasParking,
-      Boolean hasElevator,
-      Boolean isDeleted,
-      Host host) {
+  public RealEstate(Address address, Integer floor, Boolean hasParking, Boolean hasElevator) {
     this.address = address;
     this.floor = floor;
     this.hasParking = hasParking;
     this.hasElevator = hasElevator;
-    this.isDeleted = isDeleted;
+  }
+
+  // 연관관계 편의 메서드
+  public void setHost(Host host) {
     this.host = host;
   }
 }

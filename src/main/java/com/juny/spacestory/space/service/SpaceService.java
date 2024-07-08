@@ -1,23 +1,7 @@
 package com.juny.spacestory.space.service;
 
-import com.juny.spacestory.global.exception.ErrorCode;
-import com.juny.spacestory.global.exception.hierarchy.host.HostInvalidIdBusinessException;
-import com.juny.spacestory.global.exception.hierarchy.space.SpaceInvalidDetailedTypeBusinessException;
-import com.juny.spacestory.global.exception.hierarchy.space.SpaceInvalidIdBusinessException;
-import com.juny.spacestory.host.Host;
-import com.juny.spacestory.host.HostRepository;
-import com.juny.spacestory.realestate.Address;
-import com.juny.spacestory.realestate.RealEstate;
-import com.juny.spacestory.realestate.RealEstateRepository;
-import com.juny.spacestory.space.domain.Space;
-import com.juny.spacestory.space.mapper.SpaceMapper;
-import com.juny.spacestory.space.repository.SpaceRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor

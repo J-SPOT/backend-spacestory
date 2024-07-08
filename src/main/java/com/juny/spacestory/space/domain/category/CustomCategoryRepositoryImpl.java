@@ -1,9 +1,8 @@
-package com.juny.spacestory.space.repository;
+package com.juny.spacestory.space.domain.category;
 
-import static com.juny.spacestory.space.domain.QMainCategory.mainCategory;
-import static com.juny.spacestory.space.domain.QSubCategory.subCategory;
+import static com.juny.spacestory.space.domain.category.QMainCategory.mainCategory;
+import static com.juny.spacestory.space.domain.category.QSubCategory.subCategory;
 
-import com.juny.spacestory.space.domain.MainCategory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

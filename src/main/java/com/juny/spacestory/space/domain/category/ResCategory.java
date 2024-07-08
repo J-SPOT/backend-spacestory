@@ -1,4 +1,4 @@
-package com.juny.spacestory.space.dto;
+package com.juny.spacestory.space.domain.category;
 
 import java.util.List;
 

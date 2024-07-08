@@ -1,10 +1,5 @@
-package com.juny.spacestory.space.mapper;
+package com.juny.spacestory.space.domain.category;
 
-import com.juny.spacestory.space.domain.MainCategory;
-import com.juny.spacestory.space.domain.SubCategory;
-import com.juny.spacestory.space.dto.ResCategory;
-import com.juny.spacestory.space.dto.ResMainCategory;
-import com.juny.spacestory.space.dto.ResSubCategory;
 import java.util.List;
 import org.mapstruct.Mapper;
 

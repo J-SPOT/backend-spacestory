@@ -1,11 +1,6 @@
-package com.juny.spacestory.space.controller;
+package com.juny.spacestory.space.domain.category;
 
 import com.juny.spacestory.global.exception.ErrorResponse;
-import com.juny.spacestory.space.dto.ReqCategoryName;
-import com.juny.spacestory.space.dto.ResCategory;
-import com.juny.spacestory.space.dto.ResMainCategory;
-import com.juny.spacestory.space.dto.ResSubCategory;
-import com.juny.spacestory.space.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -2,14 +2,19 @@ package com.juny.spacestory.integration;
 
 import com.juny.spacestory.host.Host;
 import com.juny.spacestory.host.HostRepository;
-import com.juny.spacestory.realestate.Address;
-import com.juny.spacestory.realestate.RealEstate;
-import com.juny.spacestory.realestate.RealEstateRepository;
+import com.juny.spacestory.space.domain.realestate.Address;
+import com.juny.spacestory.space.domain.category.MainCategory;
+import com.juny.spacestory.space.domain.realestate.RealEstate;
+import com.juny.spacestory.space.domain.realestate.RealEstateRepository;
 import com.juny.spacestory.reservation.repository.ReservationRepository;
-import com.juny.spacestory.space.dto.ResMainCategory;
-import com.juny.spacestory.space.dto.ResSubCategory;
+import com.juny.spacestory.space.domain.Space;
+import com.juny.spacestory.space.domain.category.SubCategory;
+import com.juny.spacestory.space.domain.category.ResMainCategory;
+import com.juny.spacestory.space.domain.category.ResSubCategory;
+import com.juny.spacestory.space.domain.category.MainCategoryRepository;
 import com.juny.spacestory.space.repository.SpaceRepository;
-import com.juny.spacestory.space.service.CategoryService;
+import com.juny.spacestory.space.domain.category.SubCategoryRepository;
+import com.juny.spacestory.space.domain.category.CategoryService;
 import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -35,19 +40,29 @@ public class MakeDummyData {
     ReservationRepository reservationRepository;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    MainCategoryRepository mainCategoryRepository;
+    @Autowired
+    SubCategoryRepository subCategoryRepository;
 
-    private ResMainCategory getRandomMainCategory() {
+    private MainCategory getRandomMainCategory() {
         Random random = new Random();
         List<ResMainCategory> mainCategories = categoryService.findMainCategories();
 
-        return mainCategories.get(random.nextInt(mainCategories.size()));
+        Long mainCategoryId = mainCategories.get(random.nextInt(mainCategories.size())).id();
+
+        return mainCategoryRepository.findById(mainCategoryId).orElseThrow(
+          () -> new RuntimeException());
     }
 
-    private ResSubCategory getRandomSubCategory(Long id) {
+    private SubCategory getRandomSubCategory(Long id) {
         Random random = new Random();
         List<ResSubCategory> subCategories = categoryService.findSubCategoriesByMainCategoryId(id);
 
-        return subCategories.get(random.nextInt(subCategories.size()));
+        Long subCategoryId = subCategories.get(random.nextInt(subCategories.size())).id();
+
+        return subCategoryRepository.findById(subCategoryId).orElseThrow(
+          () -> new RuntimeException());
     }
 
     private String getRandomDistrict(Set<String> districts) {
@@ -61,25 +76,25 @@ public class MakeDummyData {
         return list.get(random.nextInt(list.size()));
     }
 
-    @Test
+//    @Test
     public void test() {
-        List<ResMainCategory> mainCategories = new ArrayList<>();
-        ArrayList<ResSubCategory> subCategories = new ArrayList<>();
+        List<MainCategory> mainCategories = new ArrayList<>();
+        List<SubCategory> subCategories = new ArrayList<>();
         for (int i = 0; i < 10; ++i) {
-            ResMainCategory mainCategory = getRandomMainCategory();
-            mainCategories.add(mainCategory);
+            MainCategory randomMainCategory = getRandomMainCategory();
+            mainCategories.add(randomMainCategory);
         }
         for (var e : mainCategories) {
-            ResSubCategory randomSubCategory = getRandomSubCategory(e.id());
+            SubCategory randomSubCategory = getRandomSubCategory(e.getId());
             subCategories.add(randomSubCategory);
         }
         for (int i = 0; i < 10; ++i) {
-            System.out.println("mainCategories.get(i) = " + mainCategories.get(i));
-            System.out.println("subCategories.get(i) = " + subCategories.get(i));
+            System.out.println("mainCategories.get(i).getName() = " + mainCategories.get(i).getName());
+            System.out.println("subCategories = " + subCategories.get(i).getName());
         }
     }
 
-    @Test
+//    @Test
     void HostAndRealEstateAndSpace() {
         districtsAndDongs.put("강남구", Arrays.asList("역삼동", "개포동", "청담동", "삼성동", "대치동", "신사동", "논현동", "압구정동", "세곡동", "자곡동", "율현동", "일원동", "수서동", "도곡동"));
         districtsAndDongs.put("강동구", Arrays.asList("명일동", "고덕동", "상일동", "길동", "둔춘동", "암사동", "성내동", "천호동", "강일동"));
@@ -111,19 +126,49 @@ public class MakeDummyData {
         int n = 0;
         LocalDate reservationDate = LocalDate.of(2024, 7, 31);
         for (int i = st; i <= n; ++i) {
+            Random random = new Random();
+
+            // Host
+            Host host = new Host("host" + i, 0L, null);
+            hostRepository.save(host);
+
+            // RealEstate
             String selectedDistrict = getRandomDistrict(districtsAndDongs.keySet());
             List<String> selectedDongs = districtsAndDongs.get(selectedDistrict);
             String selectedDong = getRandomDong(selectedDongs);
-//            SpaceType selectedSpaceType = getRandomSpaceType();
-//            Set<DetailedType> detailedTypes = validDetailedTypesMap.get(selectedSpaceType);
-//            DetailedType selectedDetailedType = getRandomDetailedType(detailedTypes);
 
-            Random random = new Random();
-			Host host = new Host("host" + i, 0L, null);
-			hostRepository.save(host);
             Address address = new Address("도로명주소" + i, "저번주소" + i, "서울특별시", selectedDistrict, selectedDong);
-            RealEstate realEstate = new RealEstate(address, random.nextInt(20) + 1, random.nextBoolean(), random.nextBoolean(), false, host);
+            RealEstate realEstate = new RealEstate(address, random.nextInt(20) + 1, random.nextBoolean(), random.nextBoolean());
+
+            // RealEstate - Host
+            realEstate.setHost(host);
             realEstateRepository.save(realEstate);
+
+            // Category
+            MainCategory randomMainCategory = getRandomMainCategory();
+            SubCategory randomSubCategory1 = getRandomSubCategory(randomMainCategory.getId());
+            SubCategory randomSubCategory2 = getRandomSubCategory(randomMainCategory.getId());
+
+            // SubCategory - MainCategory
+            randomSubCategory1.setMainCategory(randomMainCategory);
+            randomSubCategory2.setMainCategory(randomMainCategory);
+
+            // Space
+            LocalTime openingTime = LocalTime.of(random.nextInt(9) + 1, 0);
+            LocalTime closingTime = LocalTime.of(random.nextInt(5) + 18, 0);
+            int hourlyRate = (random.nextInt(5) + 1) * 10_000;
+            int spaceSize = random.nextInt(50) + 10;
+            int maxCapacity = random.nextInt(20) + 1;
+            Space space = new Space("space" + i, openingTime, closingTime, hourlyRate, spaceSize,
+              maxCapacity,
+              "description" + i);
+
+            // Space - Subcategory
+            space.addSubCategory(randomSubCategory1);
+            space.addSubCategory(randomSubCategory2);
+
+            // Space - Option
+
 //            Space space1 = new Space(selectedSpaceType, "spaceA" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i, false, Set.of(selectedDetailedType), realEstate);
 //            Space space2 = new Space(selectedSpaceType, "spaceB" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i + 1, false, Set.of(selectedDetailedType), realEstate);
 //            Space space3 = new Space(selectedSpaceType, "spaceC" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i + 2, false, Set.of(selectedDetailedType), realEstate);
