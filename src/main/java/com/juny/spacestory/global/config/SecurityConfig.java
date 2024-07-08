@@ -92,6 +92,8 @@ public class SecurityConfig {
             "/api/v1/auth/login/email-verification/verify",
             "/api/v1/auth/login/totp-verification/verify",
             "/api/v1/categories/**",
+            "/api/v1/options/**",
+            "/api/v1/hashtags/**",
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/v3/api-docs/**",
