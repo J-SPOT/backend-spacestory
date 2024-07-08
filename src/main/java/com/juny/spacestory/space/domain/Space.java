@@ -1,6 +1,9 @@
 package com.juny.spacestory.space.domain;
 
-import com.juny.spacestory.realestate.RealEstate;
+import com.juny.spacestory.space.domain.category.SubCategory;
+import com.juny.spacestory.space.domain.hashtag.Hashtag;
+import com.juny.spacestory.space.domain.option.Option;
+import com.juny.spacestory.space.domain.realestate.RealEstate;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
