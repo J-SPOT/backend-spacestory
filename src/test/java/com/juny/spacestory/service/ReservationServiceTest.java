@@ -2,8 +2,8 @@ package com.juny.spacestory.service;
 
 //import com.juny.spacestory.global.exception.ErrorCode;
 //import com.juny.spacestory.host.Host;
-//import com.juny.spacestory.realestate.Address;
-//import com.juny.spacestory.realestate.RealEstate;
+//import com.juny.spacestory.space.realestate.Address;
+//import com.juny.spacestory.space.realestate.RealEstate;
 //import com.juny.spacestory.reservation.service.ReservationService;
 //import com.juny.spacestory.reservation.entity.SpaceReservation;
 //import com.juny.spacestory.space.domain.DetailedType;
