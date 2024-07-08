@@ -2,12 +2,14 @@ package com.juny.spacestory.space.domain.realestate;
 
 import com.juny.spacestory.host.Host;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Table(name = "real_estates")
 public class RealEstate {
 
   @Id
@@ -25,8 +27,7 @@ public class RealEstate {
   @Column(nullable = false)
   private Boolean hasElevator;
 
-  @Column(nullable = false)
-  private Boolean isDeleted;
+  private LocalDateTime deletedAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "host_id")
@@ -42,5 +43,12 @@ public class RealEstate {
   // 연관관계 편의 메서드
   public void setHost(Host host) {
     this.host = host;
+  }
+
+  public void updateRealEstateForm(ReqRealEstate req) {
+    this.address = req.address();
+    this.floor = req.floor();
+    this.hasParking = req.hasParking();
+    this.hasElevator = req.hasElevator();
   }
 }
