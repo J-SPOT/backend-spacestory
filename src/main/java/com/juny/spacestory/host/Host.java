@@ -22,7 +22,6 @@ public class Host {
   @Column(nullable = false)
   private Long point;
 
-  @Column(nullable = false)
   private LocalDateTime deletedAt;
 
   public Host(String userName, Long point, LocalDateTime deletedAt) {
