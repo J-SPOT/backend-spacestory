@@ -3,6 +3,7 @@ package com.juny.spacestory.user.domain;
 import com.juny.spacestory.host.Host;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.hierarchy.user.UserExceededPointBusinessException;
+import com.juny.spacestory.reservation.entity.Reservation;
 import com.juny.spacestory.user.dto.ReqModifyProfile;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -11,15 +12,12 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
 @Table(name = "users")
 public class User {
 
@@ -53,6 +51,9 @@ public class User {
   @CollectionTable(name = "user_ip_addresses", joinColumns = @JoinColumn(name = "user_id"))
   private List<String> ipAddresses = new ArrayList<>();
 
+  @OneToMany(mappedBy = "user")
+  private List<Reservation> reservations = new ArrayList<>();
+
   // 일반 로그인
   public User(String name, String email, String password, String ip) {
     this.name = name;
@@ -78,6 +79,22 @@ public class User {
   public User(UUID id, Role role) {
     this.id = id;
     this.role = role;
+  }
+
+  // 연관관계 편의 메서드
+  public void addReservation(Reservation reservation) {
+    this.reservations.add(reservation);
+    if (reservation.getUser() != this) {
+      reservation.setUser(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void removeReservation(Reservation reservation) {
+    this.reservations.remove(reservation);
+    if (reservation.getUser() == this) {
+      reservation.setUser(null);
+    }
   }
 
   public void rechargePoint(Long reqPoint) {

@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -33,9 +34,6 @@ public class Reservation {
   private Long id;
 
   @Column(nullable = false)
-  private UUID userId;
-
-  @Column(nullable = false)
   private LocalDate reservationDate;
 
   @Column(nullable = false)
@@ -48,32 +46,32 @@ public class Reservation {
   private Long fee;
 
   @Column(nullable = false)
-  private Boolean isUser;
+  private LocalDateTime deletedAt;
 
-  @Column(nullable = false)
-  private Boolean isDeleted;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "space_id")
   private Space space;
 
-  public Reservation(
-      UUID userId,
-      LocalDate reservationDate,
-      LocalTime startTime,
-      LocalTime endTime,
-      Long fee,
-      Boolean isUser,
-      Boolean isDeleted,
-      Space space) {
-    this.userId = userId;
+  public Reservation(LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Long fee) {
     this.reservationDate = reservationDate;
     this.startTime = startTime;
     this.endTime = endTime;
     this.fee = fee;
-    this.isUser = isUser;
-    this.isDeleted = isDeleted;
-    this.space = space;
+  }
+
+  // 연관관계 편의 메서드
+  public void setUser(User user) {
+    if (this.user != null) {
+      this.user.getReservations().remove(this);
+    }
+    this.user = user;
+    if (user != null && !user.getReservations().contains(this)) {
+      user.getReservations().add(this);
+    }
   }
 
   public void updateReservation(RequestUpdateReservation req, User user, Host host) {
@@ -81,15 +79,20 @@ public class Reservation {
     this.startTime = req.startTime();
     this.endTime = req.endTime();
     long differenceAmount =
-        getFee() - Duration.between(startTime, endTime).toHours() * this.space.getHourlyRate();
+      getFee() - Duration.between(startTime, endTime).toHours() * this.space.getHourlyRate();
     if (req.isUser()) {
-      if (differenceAmount < 0) user.payFee(-differenceAmount, host);
-      if (differenceAmount > 0) user.getRefund(differenceAmount, host);
+      if (differenceAmount < 0) {
+        user.payFee(-differenceAmount, host);
+      }
+      if (differenceAmount > 0) {
+        user.getRefund(differenceAmount, host);
+      }
     }
     this.fee -= differenceAmount;
   }
 
   public void softDelete(Reservation reservation) {
-    reservation.isDeleted = true;
+
+    reservation.deletedAt = LocalDateTime.now();
   }
 }
