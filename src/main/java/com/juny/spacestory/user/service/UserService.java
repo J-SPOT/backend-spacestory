@@ -236,6 +236,7 @@ public class UserService {
     user.setTotpDisable();
   }
 
+  @Transactional
   public void delete(String uuid) {
 
     User user = userRepository.findById(UUID.fromString(uuid)).orElseThrow(

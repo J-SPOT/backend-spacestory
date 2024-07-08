@@ -45,6 +45,8 @@ public class TotpVerificationService {
   @Transactional
   public String createTotpQrCode(String email) throws WriterException, IOException {
 
+    log.info("createTotpQrCode");
+
     validateEmail(email);
 
     userRepository.findByEmail(email).orElseThrow(

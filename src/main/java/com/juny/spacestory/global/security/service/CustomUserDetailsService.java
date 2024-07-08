@@ -28,6 +28,10 @@ public class CustomUserDetailsService implements UserDetailsService {
             .findByEmail(email)
             .orElseThrow(() -> new UserInvalidEmailException(ErrorCode.USER_INVALID_EMAIL));
 
+    if (user.getDeletedAt() != null) {
+      throw new UserInvalidEmailException(ErrorCode.USER_INVALID_EMAIL, "Already leaving at: " + user.getDeletedAt());
+    }
+
     if (loginAttemptService.isBlocked(email)) {
       log.error("loadUserByUsername, Email is blocked.");
 
