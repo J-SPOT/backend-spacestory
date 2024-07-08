@@ -1,4 +1,4 @@
-package com.juny.spacestory.realestate;
+package com.juny.spacestory.space.domain.realestate;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
