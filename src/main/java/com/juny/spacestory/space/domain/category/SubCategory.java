@@ -1,5 +1,6 @@
-package com.juny.spacestory.space.domain;
+package com.juny.spacestory.space.domain.category;
 
+import com.juny.spacestory.space.domain.Space;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

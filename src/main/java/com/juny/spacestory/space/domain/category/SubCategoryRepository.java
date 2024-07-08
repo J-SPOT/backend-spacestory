@@ -1,6 +1,5 @@
-package com.juny.spacestory.space.repository;
+package com.juny.spacestory.space.domain.category;
 
-import com.juny.spacestory.space.domain.SubCategory;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 

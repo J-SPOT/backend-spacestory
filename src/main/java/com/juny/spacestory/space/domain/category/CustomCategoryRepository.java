@@ -1,6 +1,5 @@
-package com.juny.spacestory.space.repository;
+package com.juny.spacestory.space.domain.category;
 
-import com.juny.spacestory.space.domain.MainCategory;
 import java.util.List;
 
 public interface CustomCategoryRepository {

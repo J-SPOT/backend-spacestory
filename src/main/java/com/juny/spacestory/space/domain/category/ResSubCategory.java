@@ -1,4 +1,4 @@
-package com.juny.spacestory.space.dto;
+package com.juny.spacestory.space.domain.category;
 
 public record ResSubCategory(Long id, String name) {
 

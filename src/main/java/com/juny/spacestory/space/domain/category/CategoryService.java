@@ -1,15 +1,7 @@
-package com.juny.spacestory.space.service;
+package com.juny.spacestory.space.domain.category;
 
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.common.BadRequestException;
-import com.juny.spacestory.space.domain.MainCategory;
-import com.juny.spacestory.space.domain.SubCategory;
-import com.juny.spacestory.space.dto.ResCategory;
-import com.juny.spacestory.space.dto.ResMainCategory;
-import com.juny.spacestory.space.dto.ResSubCategory;
-import com.juny.spacestory.space.mapper.CategoryMapper;
-import com.juny.spacestory.space.repository.MainCategoryRepository;
-import com.juny.spacestory.space.repository.SubCategoryRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
