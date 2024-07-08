@@ -6,6 +6,7 @@ import com.juny.spacestory.space.domain.option.Option;
 import com.juny.spacestory.space.domain.realestate.RealEstate;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,10 +44,17 @@ public class Space {
   @Column(nullable = false)
   private String spaceDescription;
 
-  @Column private Integer reviewCount;
+  @Column
+  private LocalDateTime deletedAt;
 
   @Column(nullable = false)
-  private LocalDateTime deletedAt;
+  private Integer likeCount;
+
+  @Column(nullable = false)
+  private Integer viewCount;
+
+  @Column(nullable = false)
+  private Integer reviewCount;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "realEstate_id")
@@ -58,7 +66,7 @@ public class Space {
     joinColumns = @JoinColumn(name = "space_id"),
     inverseJoinColumns = @JoinColumn(name = "sub_category_id")
   )
-  private List<SubCategory> subCategories;
+  private List<SubCategory> subCategories = new ArrayList<>();
 
   @ManyToMany
   @JoinTable(
@@ -66,7 +74,7 @@ public class Space {
     joinColumns = @JoinColumn(name = "space_id"),
     inverseJoinColumns = @JoinColumn(name = "option_id")
   )
-  private List<Option> options;
+  private List<Option> options = new ArrayList<>();
 
   @ManyToMany
   @JoinTable(
@@ -74,7 +82,7 @@ public class Space {
     joinColumns = @JoinColumn(name = "space_id"),
     inverseJoinColumns = @JoinColumn(name = "hashtag_id")
   )
-  private List<Hashtag> hashtags;
+  private List<Hashtag> hashtags = new ArrayList<>();
 
   public Space(String spaceName, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate,
     Integer spaceSize, Integer maxCapacity, String spaceDescription) {
@@ -85,6 +93,8 @@ public class Space {
     this.spaceSize = spaceSize;
     this.maxCapacity = maxCapacity;
     this.spaceDescription = spaceDescription;
+    this.likeCount = 0;
+    this.viewCount = 0;
     this.reviewCount = 0;
     this.deletedAt = null;
   }

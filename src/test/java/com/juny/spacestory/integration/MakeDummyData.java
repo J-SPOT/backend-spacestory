@@ -2,6 +2,10 @@ package com.juny.spacestory.integration;
 
 import com.juny.spacestory.host.Host;
 import com.juny.spacestory.host.HostRepository;
+import com.juny.spacestory.space.domain.hashtag.Hashtag;
+import com.juny.spacestory.space.domain.hashtag.HashtagRepository;
+import com.juny.spacestory.space.domain.option.Option;
+import com.juny.spacestory.space.domain.option.OptionRepository;
 import com.juny.spacestory.space.domain.realestate.Address;
 import com.juny.spacestory.space.domain.category.MainCategory;
 import com.juny.spacestory.space.domain.realestate.RealEstate;
@@ -17,12 +21,14 @@ import com.juny.spacestory.space.domain.category.SubCategoryRepository;
 import com.juny.spacestory.space.domain.category.CategoryService;
 import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import org.springframework.test.annotation.Rollback;
 
 @SpringBootTest
 public class MakeDummyData {
@@ -44,6 +50,10 @@ public class MakeDummyData {
     MainCategoryRepository mainCategoryRepository;
     @Autowired
     SubCategoryRepository subCategoryRepository;
+    @Autowired
+    OptionRepository optionRepository;
+  @Autowired
+  private HashtagRepository hashtagRepository;
 
     private MainCategory getRandomMainCategory() {
         Random random = new Random();
@@ -76,25 +86,9 @@ public class MakeDummyData {
         return list.get(random.nextInt(list.size()));
     }
 
-//    @Test
-    public void test() {
-        List<MainCategory> mainCategories = new ArrayList<>();
-        List<SubCategory> subCategories = new ArrayList<>();
-        for (int i = 0; i < 10; ++i) {
-            MainCategory randomMainCategory = getRandomMainCategory();
-            mainCategories.add(randomMainCategory);
-        }
-        for (var e : mainCategories) {
-            SubCategory randomSubCategory = getRandomSubCategory(e.getId());
-            subCategories.add(randomSubCategory);
-        }
-        for (int i = 0; i < 10; ++i) {
-            System.out.println("mainCategories.get(i).getName() = " + mainCategories.get(i).getName());
-            System.out.println("subCategories = " + subCategories.get(i).getName());
-        }
-    }
-
-//    @Test
+    @Test
+    @Transactional
+    @Rollback(false)
     void HostAndRealEstateAndSpace() {
         districtsAndDongs.put("강남구", Arrays.asList("역삼동", "개포동", "청담동", "삼성동", "대치동", "신사동", "논현동", "압구정동", "세곡동", "자곡동", "율현동", "일원동", "수서동", "도곡동"));
         districtsAndDongs.put("강동구", Arrays.asList("명일동", "고덕동", "상일동", "길동", "둔춘동", "암사동", "성내동", "천호동", "강일동"));
@@ -123,7 +117,7 @@ public class MakeDummyData {
         districtsAndDongs.put("중랑구", Arrays.asList("면목동", "상봉동", "중화동", "묵동", "망우동", "신내동"));
 
         int st = 1;
-        int n = 0;
+        int n = 1;
         LocalDate reservationDate = LocalDate.of(2024, 7, 31);
         for (int i = st; i <= n; ++i) {
             Random random = new Random();
@@ -146,12 +140,16 @@ public class MakeDummyData {
 
             // Category
             MainCategory randomMainCategory = getRandomMainCategory();
+            mainCategoryRepository.save(randomMainCategory);
             SubCategory randomSubCategory1 = getRandomSubCategory(randomMainCategory.getId());
             SubCategory randomSubCategory2 = getRandomSubCategory(randomMainCategory.getId());
 
             // SubCategory - MainCategory
             randomSubCategory1.setMainCategory(randomMainCategory);
             randomSubCategory2.setMainCategory(randomMainCategory);
+
+            subCategoryRepository.save(randomSubCategory1);
+            subCategoryRepository.save(randomSubCategory2);
 
             // Space
             LocalTime openingTime = LocalTime.of(random.nextInt(9) + 1, 0);
@@ -163,12 +161,32 @@ public class MakeDummyData {
               maxCapacity,
               "description" + i);
 
+            // Space - RealEstate
+            space.setRealEstate(realEstate);
+
             // Space - Subcategory
             space.addSubCategory(randomSubCategory1);
             space.addSubCategory(randomSubCategory2);
 
             // Space - Option
+            List<Option> randomOption = getRandomOption();
+            for (var option : randomOption) {
+                optionRepository.save(option);
+                space.addOption(option);
+            }
 
+            // Space - Hashtag
+            for (int idx = 0; idx < 2; ++idx) {
+                String id = "hashtag" + idx;
+                Hashtag hashtag = hashtagRepository.findByName("hashtag" + idx).orElseGet(
+                  () -> {
+                      Hashtag h = new Hashtag("hashtag" + id);
+                      return hashtagRepository.save(h);
+                  });
+                space.addHashtag(hashtag);
+            }
+
+            spaceRepository.save(space);
 //            Space space1 = new Space(selectedSpaceType, "spaceA" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i, false, Set.of(selectedDetailedType), realEstate);
 //            Space space2 = new Space(selectedSpaceType, "spaceB" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i + 1, false, Set.of(selectedDetailedType), realEstate);
 //            Space space3 = new Space(selectedSpaceType, "spaceC" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i + 2, false, Set.of(selectedDetailedType), realEstate);
@@ -176,10 +194,10 @@ public class MakeDummyData {
 //            spaceRepository.save(space2);
 //            spaceRepository.save(space3);
 
-            User user = new User("user" + i, "user email" + i, "1234", null);
-            userRepository.save(user);
-            LocalTime startTime = LocalTime.of(random.nextInt(3) + 9, 0);
-            LocalTime endTime = LocalTime.of(random.nextInt(2) + 12, 0);
+//            User user = new User("user" + i, "user email" + i, "1234", null);
+//            userRepository.save(user);
+//            LocalTime startTime = LocalTime.of(random.nextInt(3) + 9, 0);
+//            LocalTime endTime = LocalTime.of(random.nextInt(2) + 12, 0);
 //            long usageFee = Duration.between(startTime, endTime).toHours() * space1.getHourlyRate();
 //            SpaceReservation spaceReservation1 = new SpaceReservation(user.getId(), reservationDate, startTime, endTime, usageFee, true, false, space1);
 //            SpaceReservation spaceReservation2 = new SpaceReservation(user.getId(), reservationDate, startTime, endTime, usageFee, true, false, space2);
@@ -188,5 +206,16 @@ public class MakeDummyData {
 //            reservationRepository.save(spaceReservation2);
 //            reservationRepository.save(spaceReservation3);
         }
+    }
+
+    private List<Option> getRandomOption() {
+        Random random = new Random();
+        List<Option> options = optionRepository.findAll();
+        List<Option> selected = new ArrayList<>();
+        for (int i = 0; i < 2; ++i) {
+            Option option = options.get(random.nextInt(options.size()));
+            selected.add(option);
+        }
+        return selected;
     }
 }
