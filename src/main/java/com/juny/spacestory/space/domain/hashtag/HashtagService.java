@@ -3,9 +3,9 @@ package com.juny.spacestory.space.domain.hashtag;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.common.BadRequestException;
 import com.juny.spacestory.space.repository.SpaceRepository;
-import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
@@ -20,10 +20,11 @@ public class HashtagService {
 
   private final String InvalidHashtagMsg = "Hashtag Not found";
 
-  public List<ResHashtag> findHashtags() {
+  public Page<ResHashtag> findHashtags(int page, int size) {
 
-    List<Hashtag> hashtags = hashtagRepository.findAll(
-      Sort.by(Order.asc("id")));
+    PageRequest pageable = PageRequest.of(page, size, Sort.by(Order.asc("id")));
+
+    Page<Hashtag> hashtags = hashtagRepository.findAll(pageable);
 
     return mapper.toResHashtags(hashtags);
   }
