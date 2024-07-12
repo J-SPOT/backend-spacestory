@@ -1,13 +1,16 @@
 package com.juny.spacestory.space.domain.option;
 
 import com.juny.spacestory.space.domain.Space;
+import com.juny.spacestory.space.domain.space_option.SpaceOption;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,8 +28,8 @@ public class Option {
   @Column(nullable = false, unique = true)
   private String name;
 
-  @ManyToMany(mappedBy = "options")
-  private List<Space> spaces;
+  @OneToMany(mappedBy = "option", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<SpaceOption> spaceOptions = new ArrayList<>();
 
   public Option(String name) {
     this.name = name;
@@ -34,17 +37,20 @@ public class Option {
 
   // 연관관계 편의 메서드
   public void addSpace(Space space) {
-    if (!this.spaces.contains(space)) {
-      this.spaces.add(space);
-      space.addOption(this);
-    }
+    SpaceOption spaceOption = new SpaceOption(space, this);
+    spaceOptions.add(spaceOption);
+    space.getSpaceOptions().add(spaceOption);
   }
 
   // 연관관계 편의 메서드
   public void removeSpace(Space space) {
-    if (this.spaces.contains(space)) {
-      this.spaces.remove(space);
-      space.removeOption(this);
+    for (var spaceOption : new ArrayList<>(spaceOptions)) {
+      if (spaceOption.getSpace().equals(space) && spaceOption.getOption().equals(this)) {
+        spaceOptions.remove(spaceOption);
+        space.getSpaceOptions().remove(spaceOption);
+        spaceOption.setSpace(null);
+        spaceOption.setOption(null);
+      }
     }
   }
 

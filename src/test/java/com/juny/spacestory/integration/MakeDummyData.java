@@ -157,36 +157,36 @@ public class MakeDummyData {
             int hourlyRate = (random.nextInt(5) + 1) * 10_000;
             int spaceSize = random.nextInt(50) + 10;
             int maxCapacity = random.nextInt(20) + 1;
-            Space space = new Space("space" + i, openingTime, closingTime, hourlyRate, spaceSize,
-              maxCapacity,
-              "description" + i);
-
-            // Space - RealEstate
-            space.setRealEstate(realEstate);
-
-            // Space - Subcategory
-            space.addSubCategory(randomSubCategory1);
-            space.addSubCategory(randomSubCategory2);
-
-            // Space - Option
-            List<Option> randomOption = getRandomOption();
-            for (var option : randomOption) {
-                optionRepository.save(option);
-                space.addOption(option);
-            }
-
-            // Space - Hashtag
-            for (int idx = 0; idx < 2; ++idx) {
-                String id = "hashtag" + idx;
-                Hashtag hashtag = hashtagRepository.findByName("hashtag" + idx).orElseGet(
-                  () -> {
-                      Hashtag h = new Hashtag("hashtag" + id);
-                      return hashtagRepository.save(h);
-                  });
-                space.addHashtag(hashtag);
-            }
-
-            spaceRepository.save(space);
+//            Space space = new Space("space" + i, openingTime, closingTime, hourlyRate, spaceSize,
+//              maxCapacity,
+//              "description" + i);
+//
+//            // Space - RealEstate
+//            space.setRealEstate(realEstate);
+//
+//            // Space - Subcategory
+//            space.addSubCategory(randomSubCategory1);
+//            space.addSubCategory(randomSubCategory2);
+//
+//            // Space - Option
+//            List<Option> randomOption = getRandomOption();
+//            for (var option : randomOption) {
+//                optionRepository.save(option);
+//                space.addOption(option);
+//            }
+//
+//            // Space - Hashtag
+//            for (int idx = 0; idx < 2; ++idx) {
+//                String id = "hashtag" + idx;
+//                Hashtag hashtag = hashtagRepository.findByName("hashtag" + idx).orElseGet(
+//                  () -> {
+//                      Hashtag h = new Hashtag("hashtag" + id);
+//                      return hashtagRepository.save(h);
+//                  });
+//                space.addHashtag(hashtag);
+//            }
+//
+//            spaceRepository.save(space);
 //            Space space1 = new Space(selectedSpaceType, "spaceA" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i, false, Set.of(selectedDetailedType), realEstate);
 //            Space space2 = new Space(selectedSpaceType, "spaceB" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i + 1, false, Set.of(selectedDetailedType), realEstate);
 //            Space space3 = new Space(selectedSpaceType, "spaceC" + i, LocalTime.of(random.nextInt(9) + 1, 0), LocalTime.of(random.nextInt(5) + 18, 0), (random.nextInt(5) + 1) * 10_000, random.nextInt(50) + 10, random.nextInt(20) + 1, "상세설명" + i + 2, false, Set.of(selectedDetailedType), realEstate);

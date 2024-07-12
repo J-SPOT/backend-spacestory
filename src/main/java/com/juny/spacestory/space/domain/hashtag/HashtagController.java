@@ -9,8 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,9 +36,12 @@ public class HashtagController {
     })
 
   @GetMapping("/api/v1/hashtags")
-  public ResponseEntity<List<ResHashtag>> findAllHashtags() {
+  public ResponseEntity<Page<ResHashtag>> findAllHashtags(
+    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "10") int size) {
 
-    List<ResHashtag> hashtags = hashTagService.findHashtags();
+    Page<ResHashtag> hashtags = hashTagService.findHashtags(page, size);
+
     return new ResponseEntity<>(hashtags, HttpStatus.OK);
   }
 

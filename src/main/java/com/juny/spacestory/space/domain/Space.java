@@ -4,9 +4,12 @@ import com.juny.spacestory.space.domain.category.SubCategory;
 import com.juny.spacestory.space.domain.hashtag.Hashtag;
 import com.juny.spacestory.space.domain.option.Option;
 import com.juny.spacestory.space.domain.realestate.RealEstate;
+import com.juny.spacestory.space.domain.space_option.SpaceOption;
+import com.juny.spacestory.space.dto.ReqSpace;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +20,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Table(name = "spaces")
 public class Space {
 
   @Id
@@ -24,7 +28,13 @@ public class Space {
   private Long id;
 
   @Column(nullable = false)
-  private String spaceName;
+  private String name;
+
+  @Column(nullable = false)
+  private String description;
+
+  @Column(nullable = false)
+  private String reservationNotes;
 
   @Column(nullable = false)
   private LocalTime openingTime;
@@ -42,7 +52,7 @@ public class Space {
   private Integer maxCapacity;
 
   @Column(nullable = false)
-  private String spaceDescription;
+  private LocalDateTime createdAt;
 
   @Column
   private LocalDateTime deletedAt;
@@ -68,13 +78,8 @@ public class Space {
   )
   private List<SubCategory> subCategories = new ArrayList<>();
 
-  @ManyToMany
-  @JoinTable(
-    name = "space_options",
-    joinColumns = @JoinColumn(name = "space_id"),
-    inverseJoinColumns = @JoinColumn(name = "option_id")
-  )
-  private List<Option> options = new ArrayList<>();
+  @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<SpaceOption> spaceOptions = new ArrayList<>();
 
   @ManyToMany
   @JoinTable(
@@ -84,19 +89,21 @@ public class Space {
   )
   private List<Hashtag> hashtags = new ArrayList<>();
 
-  public Space(String spaceName, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate,
-    Integer spaceSize, Integer maxCapacity, String spaceDescription) {
-    this.spaceName = spaceName;
+  public Space(String name, String description, String reservationNotes, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate,
+    Integer spaceSize, Integer maxCapacity) {
+    this.name = name;
+    this.description = description;
+    this.reservationNotes = reservationNotes;
     this.openingTime = openingTime;
     this.closingTime = closingTime;
     this.hourlyRate = hourlyRate;
     this.spaceSize = spaceSize;
     this.maxCapacity = maxCapacity;
-    this.spaceDescription = spaceDescription;
     this.likeCount = 0;
     this.viewCount = 0;
     this.reviewCount = 0;
     this.deletedAt = null;
+    this.createdAt = LocalDateTime.now();
   }
 
   // 연관관계 편의 메서드
@@ -122,17 +129,21 @@ public class Space {
 
   // 연관관계 편의 메서드
   public void addOption(Option option) {
-    if (!this.options.contains(option)) {
-      this.options.add(option);
-      option.addSpace(this);
-    }
+    SpaceOption spaceOption = new SpaceOption(this, option);
+    spaceOptions.add(spaceOption);
+    option.getSpaceOptions().add(spaceOption);
   }
 
   // 연관관계 편의 메서드
   public void removeOption(Option option) {
-    if (this.options.contains(option)) {
-      this.options.remove(option);
-      option.removeSpace(this);
+    for (Iterator<SpaceOption> iterator = spaceOptions.iterator(); iterator.hasNext(); ) {
+      SpaceOption spaceOption = iterator.next();
+      if (spaceOption.getOption().equals(option)) {
+        iterator.remove();
+        option.getSpaceOptions().remove(spaceOption);
+        spaceOption.setSpace(null);
+        spaceOption.setOption(null);
+      }
     }
   }
 
@@ -152,7 +163,18 @@ public class Space {
     }
   }
 
-//  public void softDelete(Space space) {
-//    this.deletedAt = LocalDateTime.now();
-//  }
+  public void updateSpace(ReqSpace req) {
+    this.name = req.name();
+    this.description = req.description();
+    this.reservationNotes = req.reservationNotes();
+    this.openingTime = req.openingTime();
+    this.closingTime = req.closingTime();
+    this.hourlyRate = req.hourlyRate();
+    this.spaceSize = req.spaceSize();
+    this.maxCapacity = req.maxCapacity();
+  }
+
+  public void increaseViewCount() {
+    this.viewCount++;
+  }
 }
