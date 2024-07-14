@@ -1,12 +1,14 @@
 package com.juny.spacestory.space.domain.realestate;
 
-import java.util.List;
 import org.mapstruct.Mapper;
+import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = "spring")
 public interface RealEstateMapper {
 
   ResRealEstate toResRealEstate(RealEstate realEstate);
 
-  List<ResRealEstate> toResRealEstates(List<RealEstate> realEstates);
+  default Page<ResRealEstate> toResRealEstates(Page<RealEstate> realEstates) {
+    return realEstates.map(this::toResRealEstate);
+  }
 }
