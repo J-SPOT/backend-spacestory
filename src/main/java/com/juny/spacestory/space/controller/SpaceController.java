@@ -74,7 +74,7 @@ public class SpaceController {
         content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
 
-  @GetMapping("/api/v1/real_estates/{id}/spaces")
+  @GetMapping("/api/v1/real-estates/{id}/spaces")
   public ResponseEntity<Page<ResSpace>> findSpacesByRealEstateId(@PathVariable Long id,
     @RequestParam(required = false, defaultValue = "0") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
@@ -96,7 +96,7 @@ public class SpaceController {
         content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
 
-  @PostMapping("/api/v1/real_estates/{id}/spaces")
+  @PostMapping("/api/v1/real-estates/{id}/spaces")
   public ResponseEntity<ResSpace> createSpace(@PathVariable Long id, @RequestBody ReqSpace req) {
 
     ResSpace space = spaceService.createSpace(id, req);

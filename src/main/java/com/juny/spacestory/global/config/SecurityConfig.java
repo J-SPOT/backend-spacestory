@@ -82,7 +82,9 @@ public class SecurityConfig {
 
     http.authorizeHttpRequests(
       (auth) ->
-        auth.requestMatchers(
+        auth
+          .requestMatchers("/api/v1/spaces/*/reservations/**").authenticated()
+          .requestMatchers(
             "/login",
             "/api/v1/auth/login",
             "/api/v1/auth/logout",
@@ -94,6 +96,8 @@ public class SecurityConfig {
             "/api/v1/categories/**",
             "/api/v1/options/**",
             "/api/v1/hashtags/**",
+            "/api/v1/real-estates/**",
+            "/api/v1/spaces/**",
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/v3/api-docs/**",
@@ -123,10 +127,13 @@ public class SecurityConfig {
 
     http.addFilterAt(
       new LoginFilter(
-        authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository, loginAttemptService),
+        authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository,
+        loginAttemptService),
       UsernamePasswordAuthenticationFilter.class);
 
-    http.addFilterAfter(new TwoFactorAuthFilter(emailVerificationService, jwtUtil, refreshRepository, TOTP_REDIRECT_URL, EMAIL_REDIRECT_URL), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterAfter(
+      new TwoFactorAuthFilter(emailVerificationService, jwtUtil, refreshRepository,
+        TOTP_REDIRECT_URL, EMAIL_REDIRECT_URL), UsernamePasswordAuthenticationFilter.class);
 
     http.sessionManagement(
       (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -18,14 +18,13 @@ public interface SpaceMapper {
     @Mapping(source = "spaceOptions", target = "spaceOptions", qualifiedByName = "spaceOptionToResOptions")
     ResSpace toResSpace(Space space);
 
-    List<ResSpace> toResSpace(List<Space> spaces);
-
     default Page<ResSpace> toResSpace(Page<Space> spaces) {
         return spaces.map(this::toResSpace);
     }
 
     @Named("spaceOptionToResOptions")
     default List<ResOption> spaceOptionsToResOptions(List<SpaceOption> spaceOptions) {
+
         return spaceOptions.stream()
           .map(spaceOption -> {
               Option option = spaceOption.getOption();

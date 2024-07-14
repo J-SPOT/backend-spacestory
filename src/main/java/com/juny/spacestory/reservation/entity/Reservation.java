@@ -1,7 +1,6 @@
 package com.juny.spacestory.reservation.entity;
 
-import com.juny.spacestory.host.Host;
-import com.juny.spacestory.reservation.dto.RequestUpdateReservation;
+import com.juny.spacestory.reservation.dto.ReqReservation;
 import com.juny.spacestory.space.domain.Space;
 import com.juny.spacestory.user.domain.User;
 import jakarta.persistence.Column;
@@ -13,15 +12,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Entity
 @NoArgsConstructor
@@ -46,6 +41,9 @@ public class Reservation {
   private Long fee;
 
   @Column(nullable = false)
+  private LocalDateTime createdAt;
+
+  @Column
   private LocalDateTime deletedAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -61,6 +59,7 @@ public class Reservation {
     this.startTime = startTime;
     this.endTime = endTime;
     this.fee = fee;
+    this.createdAt = LocalDateTime.now();
   }
 
   // 연관관계 편의 메서드
@@ -74,25 +73,20 @@ public class Reservation {
     }
   }
 
-  public void updateReservation(RequestUpdateReservation req, User user, Host host) {
+  // 연관관계 편의 메서드
+  public void setSpace(Space space) {
+    this.space = space;
+  }
+
+  public void updateReservation(ReqReservation req, long usageFee) {
     this.reservationDate = req.reservationDate();
     this.startTime = req.startTime();
     this.endTime = req.endTime();
-    long differenceAmount =
-      getFee() - Duration.between(startTime, endTime).toHours() * this.space.getHourlyRate();
-    if (req.isUser()) {
-      if (differenceAmount < 0) {
-        user.payFee(-differenceAmount, host);
-      }
-      if (differenceAmount > 0) {
-        user.getRefund(differenceAmount, host);
-      }
-    }
-    this.fee -= differenceAmount;
+    this.fee = usageFee;
   }
-
-  public void softDelete(Reservation reservation) {
-
-    reservation.deletedAt = LocalDateTime.now();
-  }
+//
+//  public void softDelete(Reservation reservation) {
+//
+//    reservation.deletedAt = LocalDateTime.now();
+//  }
 }
