@@ -1,6 +1,5 @@
 package com.juny.spacestory.user.domain;
 
-import com.juny.spacestory.host.Host;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.hierarchy.user.UserExceededPointBusinessException;
 import com.juny.spacestory.reservation.entity.Reservation;
@@ -97,25 +96,6 @@ public class User {
     }
   }
 
-  public void rechargePoint(Long reqPoint) {
-    this.point += reqPoint;
-  }
-
-  public void payFee(long usageFee, Host host) {
-
-    if (this.point < usageFee) {
-      throw new UserExceededPointBusinessException(ErrorCode.USER_NOT_ENOUGH_POINT);
-    }
-
-    this.point -= usageFee;
-    host.receivedFee(usageFee);
-  }
-
-  public void getRefund(long differenceAmount, Host host) {
-    this.point += differenceAmount;
-    host.receivedFee(-differenceAmount);
-  }
-
   public void updateNameAndEmail(String name, String email) {
     this.name = name;
     this.email = email;
@@ -137,6 +117,24 @@ public class User {
 
   public void changePassword(String password) {
     this.password = password;
+  }
+
+  public void payFeeForHost(long usageFee) {
+
+    if (this.point < usageFee) {
+      throw new UserExceededPointBusinessException(ErrorCode.USER_NOT_ENOUGH_POINT);
+    }
+
+    this.point -= usageFee;
+  }
+
+  public void receivedFee(long usageFee) {
+
+    if (usageFee < 0 && this.getPoint() - usageFee < 0) {
+      throw new UserExceededPointBusinessException(ErrorCode.USER_NOT_ENOUGH_POINT);
+    }
+
+    this.point += usageFee;
   }
 
   public void softDelete() {

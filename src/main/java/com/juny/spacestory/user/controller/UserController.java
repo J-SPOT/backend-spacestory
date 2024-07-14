@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -89,7 +90,8 @@ public class UserController {
 
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-    ResLookUpUser resLookUpUser = userService.lookUpPrivacy(customUserDetails.getId());
+    ResLookUpUser resLookUpUser = userService.lookUpPrivacy(
+      UUID.fromString(customUserDetails.getId()));
 
     return new ResponseEntity<>(resLookUpUser, HttpStatus.OK);
   }
@@ -103,7 +105,7 @@ public class UserController {
   @GetMapping("/api/admin/v1/users/{id}")
   public ResponseEntity<ResLookUpUser> getUserByAdmin(@PathVariable String id) {
 
-    ResLookUpUser resLookUpUser = userService.lookUpPrivacy(id);
+    ResLookUpUser resLookUpUser = userService.lookUpPrivacy(UUID.fromString(id));
 
     return new ResponseEntity<>(resLookUpUser, HttpStatus.OK);
   }
@@ -152,7 +154,7 @@ public class UserController {
   public ResponseEntity<ResModifyUser> modifyUserProfile(@PathVariable String id,
     @RequestBody ReqModifyProfile req) {
 
-    ResModifyUser resModifyUser = userService.modifyPrivacy(req, id);
+    ResModifyUser resModifyUser = userService.modifyPrivacy(req, UUID.fromString(id));
 
     return new ResponseEntity<>(resModifyUser, HttpStatus.OK);
   }
@@ -182,13 +184,11 @@ public class UserController {
     })
 
   @PatchMapping("/api/admin/v1/users/{id}/profile")
-  public ResponseEntity<ResModifyUser> modifyUserProfileByAdmin(@RequestBody ReqModifyProfile req) {
+  public ResponseEntity<ResModifyUser> modifyUserProfileByAdmin(
+    @RequestBody ReqModifyProfile req,
+    @PathVariable String id) {
 
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
-    ResModifyUser resModifyUser = userService.modifyPrivacy(req, customUserDetails.getId());
+    ResModifyUser resModifyUser = userService.modifyPrivacy(req, UUID.fromString(id));
 
     return new ResponseEntity<>(resModifyUser, HttpStatus.OK);
   }
@@ -223,7 +223,7 @@ public class UserController {
 
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-    userService.modifyPassword(req, customUserDetails.getId());
+    userService.modifyPassword(req, UUID.fromString(customUserDetails.getId()));
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
@@ -251,7 +251,7 @@ public class UserController {
   public ResponseEntity<Void> modifyUserPasswordByAdmin(@PathVariable String id,
     @RequestBody ReqModifyPassword req) {
 
-    userService.modifyPassword(req, id);
+    userService.modifyPassword(req, UUID.fromString(id));
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
@@ -297,7 +297,7 @@ public class UserController {
 
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-    userService.delete(customUserDetails.getId());
+    userService.delete(UUID.fromString(customUserDetails.getId()));
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
@@ -311,7 +311,7 @@ public class UserController {
   @DeleteMapping("/api/admin/v1/users/{id}")
   public ResponseEntity<Void> deleteUserByAdmin(@PathVariable String id) {
 
-    userService.delete(id);
+    userService.delete(UUID.fromString(id));
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }

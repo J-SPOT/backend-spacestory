@@ -46,13 +46,11 @@ public class UserService {
   private final String PHONE_NUMBER_IS_NULL_OR_EMPTY = "PhoneNumber is null or empty";
   private final String PASSWORD_CHECK_IS_NULL_OR_EMPTY = "PasswordCheck is null or empty";
   private final String RECAPTCHA_IS_INVALID = "Recaptcha is invalid";
-  private final String TOTP_ENABLE_ANOTHER_ENDPOINT = "To request totp activation, proceed below. /api/v1/auth/totp-verification/qr";
   private final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
   private final String PHONE_NUMBER_PATTERN = "^010-\\d{4}-\\d{4}$";
   private final String NON_EXISTENT_USER = "User not found";
   private final Pattern emailPattern = Pattern.compile(EMAIL_PATTERN);
   private final Pattern phoneNumberPattern = Pattern.compile(PHONE_NUMBER_PATTERN);
-  private final TotpVerificationService totpVerificationService;
   private final TotpVerificationCodeRepository totpVerificationCodeRepository;
 
   public void register(ReqRegisterUser req, String remoteAddr) {
@@ -133,8 +131,8 @@ public class UserService {
     userRepository.save(user);
   }
 
-  public ResLookUpUser lookUpPrivacy(String uuid) {
-    User user = userRepository.findById(UUID.fromString(uuid)).orElseThrow(
+  public ResLookUpUser lookUpPrivacy(UUID uuid) {
+    User user = userRepository.findById(uuid).orElseThrow(
       () -> new BadRequestException(ErrorCode.BAD_REQUEST, NON_EXISTENT_USER));
 
     return mapper.toResLookUpUser(user);
@@ -148,11 +146,11 @@ public class UserService {
   }
 
   @Transactional
-  public ResModifyUser modifyPrivacy(ReqModifyProfile req, String uuid) {
+  public ResModifyUser modifyPrivacy(ReqModifyProfile req, UUID uuid) {
 
     validateProfile(req);
 
-    User user = userRepository.findById(UUID.fromString(uuid)).orElseThrow(
+    User user = userRepository.findById(uuid).orElseThrow(
       () -> new BadRequestException(ErrorCode.BAD_REQUEST, NON_EXISTENT_USER));
 
     if (!req.email().equals(user.getEmail())) {
@@ -200,11 +198,11 @@ public class UserService {
   }
 
   @Transactional
-  public void modifyPassword(ReqModifyPassword req, String uuid) {
+  public void modifyPassword(ReqModifyPassword req, UUID uuid) {
 
     validatePassword(req);
 
-    User user = userRepository.findById(UUID.fromString(uuid)).orElseThrow(
+    User user = userRepository.findById(uuid).orElseThrow(
       () -> new BadRequestException(ErrorCode.BAD_REQUEST, NON_EXISTENT_USER));
 
     if (!passwordEncoder.matches(req.oldPassword(), user.getPassword())) {
@@ -237,9 +235,9 @@ public class UserService {
   }
 
   @Transactional
-  public void delete(String uuid) {
+  public void delete(UUID uuid) {
 
-    User user = userRepository.findById(UUID.fromString(uuid)).orElseThrow(
+    User user = userRepository.findById(uuid).orElseThrow(
       () -> new BadRequestException(ErrorCode.BAD_REQUEST, NON_EXISTENT_USER));
 
     user.softDelete();
