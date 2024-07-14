@@ -25,9 +25,6 @@ public class MainCategory {
   @Column(nullable = false, unique = true)
   private String name;
 
-  @OneToMany(mappedBy = "mainCategory")
-  private List<SubCategory> subCategories = new ArrayList<>();
-
   public MainCategory(String name) {
     this.name = name;
   }
