@@ -57,7 +57,13 @@ public class SubCategory {
 
   // 연관관계 편의 메서드
   public void setMainCategory(MainCategory mainCategory) {
+    if (this.mainCategory != null) {
+      this.mainCategory.getSubCategories().remove(this);
+    }
     this.mainCategory = mainCategory;
+    if (mainCategory != null && !mainCategory.getSubCategories().contains(this)) {
+      mainCategory.getSubCategories().add(this);
+    }
   }
 
   public void changeCategoryName(String newName) {

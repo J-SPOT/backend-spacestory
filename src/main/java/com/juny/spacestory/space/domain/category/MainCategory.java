@@ -25,6 +25,25 @@ public class MainCategory {
   @Column(nullable = false, unique = true)
   private String name;
 
+  @OneToMany(mappedBy = "mainCategory")
+  private List<SubCategory> subCategories = new ArrayList<>();
+
+  // 연관관계 편의 메서드
+  public void addSubCategory(SubCategory subCategory) {
+    this.subCategories.add(subCategory);
+    if (subCategory.getMainCategory() != this) {
+      subCategory.setMainCategory(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void removeSubCategory(SubCategory subCategory) {
+    subCategories.remove(subCategory);
+    if (subCategory.getMainCategory() == this) {
+      subCategory.setMainCategory(null);
+    }
+  }
+
   public MainCategory(String name) {
     this.name = name;
   }
