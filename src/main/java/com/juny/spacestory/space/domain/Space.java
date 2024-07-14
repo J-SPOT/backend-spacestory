@@ -70,6 +70,9 @@ public class Space {
   @JoinColumn(name = "realEstate_id")
   private RealEstate realEstate;
 
+  @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<SpaceOption> spaceOptions = new ArrayList<>();
+
   @ManyToMany
   @JoinTable(
     name = "space_sub_categories",
@@ -77,9 +80,6 @@ public class Space {
     inverseJoinColumns = @JoinColumn(name = "sub_category_id")
   )
   private List<SubCategory> subCategories = new ArrayList<>();
-
-  @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<SpaceOption> spaceOptions = new ArrayList<>();
 
   @ManyToMany
   @JoinTable(
