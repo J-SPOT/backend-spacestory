@@ -50,4 +50,3 @@ jobs:
       
       - name: Deploy image
         run: ssh -i ~/.ssh/id_rsa ubuntu@43.203.182.220 "echo $DOCKER_REGISTRY_PASS | docker login --username $DOCKER_REGISTRY_USER --password-stdin && docker rm app -f || true && docker pull $IMAGE_NAME:$IMAGE_TAG && docker run -d -p 8080:8080 --name app --network juny $IMAGE_NAME:$IMAGE_TAG"
-
