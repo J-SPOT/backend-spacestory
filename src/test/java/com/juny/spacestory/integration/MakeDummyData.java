@@ -353,4 +353,12 @@ public class MakeDummyData {
 //    subCategory12.setMainCategory(mainCategory5);
 //    subCategoryRepository.save(subCategory12);
   }
+
+  @Test
+  public void SetupUser() {
+//    User host = new User("admin" + 1, "admin" + 1 + "@gmail.com", passwordEncoder.encode("1234"),
+//      "172.21.0.3");
+//    host.getIpAddresses().add("0:0:0:0:0:0:0:1");
+//    userRepository.save(host);
+  }
 }

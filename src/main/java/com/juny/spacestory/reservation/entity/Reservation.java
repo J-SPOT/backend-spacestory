@@ -1,10 +1,11 @@
 package com.juny.spacestory.reservation.entity;
 
-import com.juny.spacestory.reservation.dto.ReqReservation;
 import com.juny.spacestory.space.domain.Space;
 import com.juny.spacestory.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -46,6 +47,13 @@ public class Reservation {
   @Column
   private LocalDateTime deletedAt;
 
+  @Column
+  @Enumerated(EnumType.STRING)
+  private ReservationStatus status;
+
+  @Column
+  private Long originReservationId;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
@@ -60,6 +68,17 @@ public class Reservation {
     this.endTime = endTime;
     this.fee = fee;
     this.createdAt = LocalDateTime.now();
+    this.status = ReservationStatus.대기;
+  }
+
+  public Reservation(LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Long fee, Long originReservationId) {
+    this.reservationDate = reservationDate;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.fee = fee;
+    this.createdAt = LocalDateTime.now();
+    this.status = ReservationStatus.대기;
+    this.originReservationId = originReservationId;
   }
 
   // 연관관계 편의 메서드
@@ -78,15 +97,18 @@ public class Reservation {
     this.space = space;
   }
 
-  public void updateReservation(ReqReservation req, long usageFee) {
-    this.reservationDate = req.reservationDate();
-    this.startTime = req.startTime();
-    this.endTime = req.endTime();
-    this.fee = usageFee;
+  public void approveReservation() {
+
+    this.status = ReservationStatus.승인;
   }
-//
-//  public void softDelete(Reservation reservation) {
-//
-//    reservation.deletedAt = LocalDateTime.now();
-//  }
+
+  public void cancelReservation() {
+
+    this.status = ReservationStatus.취소;
+  }
+
+  public void softDelete() {
+
+    this.deletedAt = LocalDateTime.now();
+  }
 }

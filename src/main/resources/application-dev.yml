@@ -70,3 +70,6 @@ login:
     totp: "https://spacestory.duckdns.org/login/2fa/totp"
     email: "https://spacestory.duckdns.org/login/2fa/email"
     social_login: "https://spacestory.duckdns.org/social_login_handler?social_login=success"
+
+security:
+  debugger: false

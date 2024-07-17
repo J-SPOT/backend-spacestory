@@ -70,3 +70,6 @@ login:
     totp: "http://localhost:5173/login/2fa/totp"
     email: "http://localhost:5173/login/2fa/email"
     social_login: "http://localhost:5173/social_login_handler?social_login=success"
+
+security:
+  debugger: true

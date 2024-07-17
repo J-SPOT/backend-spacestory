@@ -3,6 +3,7 @@ package com.juny.spacestory.user.domain;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.hierarchy.user.UserExceededPointBusinessException;
 import com.juny.spacestory.reservation.entity.Reservation;
+import com.juny.spacestory.review.domain.Review;
 import com.juny.spacestory.user.dto.ReqModifyProfile;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -53,6 +54,9 @@ public class User {
   @OneToMany(mappedBy = "user")
   private List<Reservation> reservations = new ArrayList<>();
 
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Review> reviews;
+
   // 일반 로그인
   public User(String name, String email, String password, String ip) {
     this.name = name;
@@ -93,6 +97,22 @@ public class User {
     this.reservations.remove(reservation);
     if (reservation.getUser() == this) {
       reservation.setUser(null);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void addReview(Review review) {
+    this.reviews.add(review);
+    if (review.getUser() != this) {
+      review.setUser(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void removeReview(Review review) {
+    this.reviews.remove(review);
+    if (review.getUser() == this) {
+      review.setUser(null);
     }
   }
 
