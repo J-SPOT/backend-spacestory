@@ -1,29 +1,17 @@
 package com.juny.spacestory.review.domain;
 
-import com.juny.spacestory.global.exception.ErrorCode;
-import com.juny.spacestory.global.exception.hierarchy.review.ReviewInvalidIdBusinessException;
-import com.juny.spacestory.global.exception.hierarchy.user.UserInvalidIdBusinessException;
-import com.juny.spacestory.review.mapper.ReviewMapper;
-import com.juny.spacestory.review.repository.ReviewRepository;
-import com.juny.spacestory.review.dto.RequestCreateReview;
-import com.juny.spacestory.review.dto.RequestUpdateReview;
-import com.juny.spacestory.review.dto.ResponseReview;
+import com.juny.spacestory.reservation.entity.Reservation;
+import com.juny.spacestory.review.dto.ReqReview;
 import com.juny.spacestory.user.domain.User;
-import com.juny.spacestory.user.repository.UserRepository;
 import jakarta.persistence.*;
-import java.util.List;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Table(name = "reviews")
 public class Review {
 
   @Id
@@ -36,27 +24,51 @@ public class Review {
   @Column(nullable = false)
   private Double rating;
 
-  @Column(nullable = false)
-  private UUID userId;
+  @Column
+  private LocalDateTime createdAt;
 
-  @Column(nullable = false)
-  private Boolean isDeleted;
+  @Column
+  private LocalDateTime deletedAt;
 
-  private String imgPath;
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-  public Review(String content, Double rating, UUID userId, Boolean isDeleted) {
+  @OneToOne
+  @JoinColumn(name = "reservation_id", nullable = false, unique = true)
+  private Reservation reservation;
+
+  public Review(String content, Double rating) {
     this.content = content;
     this.rating = rating;
-    this.userId = userId;
-    this.isDeleted = isDeleted;
+    this.createdAt = LocalDateTime.now();
   }
 
-  public void update(RequestUpdateReview req) {
+  // 연관관계 편의 메서드
+  public void setUser(User user) {
+    if (this.user != null) {
+      this.user.getReviews().remove(this);
+    }
+    this.user = user;
+    if (user != null && !user.getReviews().contains(this)) {
+      user.getReviews().add(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void setReservation(Reservation reservation) {
+
+    this.reservation = reservation;
+  }
+
+  public void update(ReqReview req) {
+
     this.content = req.content();
     this.rating = req.rating();
   }
 
-  public void softDelete(Review review) {
-    this.isDeleted = true;
+  public void softDelete() {
+
+    this.deletedAt = LocalDateTime.now();
   }
 }
