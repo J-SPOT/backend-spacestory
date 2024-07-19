@@ -223,10 +223,6 @@ public class SpaceService {
   public Page<ResSpace> searchSpaces(String query, List<String> sigungu, Integer minCapacity,
     Integer minPrice, Integer maxPrice, List<String> options, String sort, Pageable pageable) {
 
-    if (sigungu.size() > 3) {
-      throw new BadRequestException(ErrorCode.BAD_REQUEST, EXCEEDED_MAXIMUM_THREE_SELECTION_SIGUNGU_MSG);
-    }
-
     Page<Space> spaces = spaceRepository.searchSpacesByFilter(query, sigungu, minCapacity, minPrice,
       maxPrice, options, sort, pageable);
 
