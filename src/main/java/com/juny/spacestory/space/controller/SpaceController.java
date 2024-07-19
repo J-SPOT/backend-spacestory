@@ -222,9 +222,10 @@ public class SpaceController {
     @RequestParam(required = false, value = "max_price") Integer maxPrice,
     @RequestParam(required = false) List<String> options,
     @RequestParam(required = false, defaultValue = "view_desc") String sort,
-    Pageable pageable) {
+    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResSpace> spaces = spaceService.searchSpaces(query, sigungu, minCapacity, minPrice, maxPrice, options, sort, pageable);
+    Page<ResSpace> spaces = spaceService.searchSpaces(query, sigungu, minCapacity, minPrice, maxPrice, options, sort, page, size);
 
     return ResponseEntity.ok(spaces);
   }

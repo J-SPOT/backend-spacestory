@@ -221,10 +221,10 @@ public class SpaceService {
   }
 
   public Page<ResSpace> searchSpaces(String query, List<String> sigungu, Integer minCapacity,
-    Integer minPrice, Integer maxPrice, List<String> options, String sort, Pageable pageable) {
+    Integer minPrice, Integer maxPrice, List<String> options, String sort, int page, int size) {
 
     Page<Space> spaces = spaceRepository.searchSpacesByFilter(query, sigungu, minCapacity, minPrice,
-      maxPrice, options, sort, pageable);
+      maxPrice, options, sort, page, size);
 
     return mapper.toResSpace(spaces);
   }
