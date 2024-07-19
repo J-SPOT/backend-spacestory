@@ -1,5 +1,6 @@
 package com.juny.spacestory.space.domain;
 
+import com.juny.spacestory.qna.domain.Question;
 import com.juny.spacestory.space.domain.category.SubCategory;
 import com.juny.spacestory.space.domain.hashtag.Hashtag;
 import com.juny.spacestory.space.domain.option.Option;
@@ -89,6 +90,9 @@ public class Space {
   )
   private List<Hashtag> hashtags = new ArrayList<>();
 
+  @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Question> questions = new ArrayList<>();
+
   public Space(String name, String description, String reservationNotes, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate,
     Integer spaceSize, Integer maxCapacity) {
     this.name = name;
@@ -160,6 +164,22 @@ public class Space {
     if (this.hashtags.contains(hashtag)) {
       this.hashtags.remove(hashtag);
       hashtag.removeSpace(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void addQuestion(Question question) {
+    this.questions.add(question);
+    if (question.getSpace() != this) {
+      question.setSpace(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void removeQuestion(Question question) {
+    this.questions.remove(question);
+    if (question.getSpace() == this) {
+      question.setSpace(null);
     }
   }
 

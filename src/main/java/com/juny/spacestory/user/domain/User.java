@@ -2,6 +2,8 @@ package com.juny.spacestory.user.domain;
 
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.hierarchy.user.UserExceededPointBusinessException;
+import com.juny.spacestory.qna.domain.Answer;
+import com.juny.spacestory.qna.domain.Question;
 import com.juny.spacestory.reservation.entity.Reservation;
 import com.juny.spacestory.review.domain.Review;
 import com.juny.spacestory.user.dto.ReqModifyProfile;
@@ -32,9 +34,11 @@ public class User {
   @Column(nullable = false, unique = true)
   private String email;
 
+  @Column
   private String phoneNumber;
 
-  @Column private String password;
+  @Column
+  private String password;
 
   private Long point;
 
@@ -56,6 +60,12 @@ public class User {
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Review> reviews;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Question> questions = new ArrayList<>();
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Answer> answers = new ArrayList<>();
 
   // 일반 로그인
   public User(String name, String email, String password, String ip) {
@@ -113,6 +123,38 @@ public class User {
     this.reviews.remove(review);
     if (review.getUser() == this) {
       review.setUser(null);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void addQuestion(Question question) {
+    this.questions.add(question);
+    if (question.getUser() != this) {
+      question.setUser(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void removeQuestion(Question question) {
+    this.questions.remove(question);
+    if (question.getUser() == this) {
+      question.setUser(null);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void addAnswer(Answer answer) {
+    this.answers.add(answer);
+    if (answer.getUser() != this) {
+      answer.setUser(this);
+    }
+  }
+
+  // 연관관계 편의 메서드
+  public void removeAnswer(Answer answer) {
+    this.answers.remove(answer);
+    if (answer.getUser() == this) {
+      answer.setUser(null);
     }
   }
 
