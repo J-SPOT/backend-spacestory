@@ -216,7 +216,7 @@ public class SpaceController {
   @GetMapping("/api/v1/spaces/search")
   public ResponseEntity<Page<ResSpace>> searchSpaces(
     @RequestParam(required = false) String query,
-    @RequestParam(required = false) List<String> sigungu,
+    @RequestParam(required = false, defaultValue = "강남구") List<String> sigungu,
     @RequestParam(required = false, value = "min_capacity") Integer minCapacity,
     @RequestParam(required = false, value = "min_price") Integer minPrice,
     @RequestParam(required = false, value = "max_price") Integer maxPrice,
