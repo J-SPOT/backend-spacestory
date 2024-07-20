@@ -20,9 +20,6 @@ public class RefreshService {
     this.refreshRepository = refreshRepository;
   }
 
-  // 1. 토큰 서명 유효성을 검증한다.
-  // 2. 토큰이 저장소에 있는지 검증한다.
-  // 3. 기존 리프레시 토큰을 제거하고, 새로 발급한다.
   public ResReissueTokens reissue(String refreshToken) {
 
     validateRefreshToken(refreshToken);
