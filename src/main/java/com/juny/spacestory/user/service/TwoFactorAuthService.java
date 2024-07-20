@@ -27,7 +27,7 @@ public class TwoFactorAuthService {
 
   private final String REFRESH_TOKEN_NULL_OR_EMPTY_MSG = "Refresh token is null or empty.";
 
-  public ResTokens verifyEmailCodeAndIssueTokens(String refreshToken, String code, String remoteAddr, boolean isRegister) {
+  public ResTokens verifyEmailCodeAndIssueTokens(String refreshToken, String code, String ip, boolean isRegister) {
 
     validateRefreshToken(refreshToken);
 
@@ -38,12 +38,12 @@ public class TwoFactorAuthService {
 
     emailVerificationService.verifyCode(user.getEmail(), code, isRegister);
 
-    userService.addIpAddress(user, remoteAddr);
+    userService.addIpAddress(user, ip);
 
     return getIssuedTokens(user);
   }
 
-  public ResTokens verifyTotpCodeAndIssueTokens(String refreshToken, Integer code, String remoteAddr) {
+  public ResTokens verifyTotpCodeAndIssueTokens(String refreshToken, Integer code, String ip) {
 
     validateRefreshToken(refreshToken);
 
@@ -54,7 +54,7 @@ public class TwoFactorAuthService {
 
     totpVerificationService.verifyTotpCode(user.getEmail(), code);
 
-    userService.addIpAddress(user, remoteAddr);
+    userService.addIpAddress(user, ip);
 
     return getIssuedTokens(user);
   }

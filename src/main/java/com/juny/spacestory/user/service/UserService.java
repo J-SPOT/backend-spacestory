@@ -53,11 +53,11 @@ public class UserService {
   private final Pattern phoneNumberPattern = Pattern.compile(PHONE_NUMBER_PATTERN);
   private final TotpVerificationCodeRepository totpVerificationCodeRepository;
 
-  public void register(ReqRegisterUser req, String remoteAddr) {
+  public void register(ReqRegisterUser req, String ip) {
 
     validateParams(req);
 
-    User user = new User(req.name(), req.email(), bCryptPasswordEncoder.encode(req.password()), remoteAddr);
+    User user = new User(req.name(), req.email(), bCryptPasswordEncoder.encode(req.password()), ip);
 
     userRepository.save(user);
   }
