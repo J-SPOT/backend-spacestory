@@ -88,9 +88,9 @@ public class MakeDummyData {
     return list.get(random.nextInt(list.size()));
   }
 
-  @Test
-  @Transactional
-  @Rollback(false)
+//  @Test
+//  @Transactional
+//  @Rollback(false)
   void HostAndRealEstateAndSpace() {
 
     int st = 101;
