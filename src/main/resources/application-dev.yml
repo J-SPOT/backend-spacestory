@@ -56,6 +56,7 @@ spring:
         format_sql: false
     hibernate:
       ddl-auto: validate
+    open-in-view: false
 
 springdoc:
   api-docs:
