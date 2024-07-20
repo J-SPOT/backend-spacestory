@@ -3,6 +3,7 @@ package com.juny.spacestory.user.controller;
 import com.juny.spacestory.global.exception.ErrorResponse;
 import com.juny.spacestory.user.dto.ResTokens;
 import com.juny.spacestory.user.service.TwoFactorAuthService;
+import com.juny.spacestory.util.IpUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -57,9 +58,8 @@ public class TwoFactorAuthController {
   @PostMapping("/api/v1/auth/login/email-verification/verify")
   public ResponseEntity<ResTokens> verifyEmailCodeAndAddIPAddress(HttpServletRequest request, HttpServletResponse response, @CookieValue String refresh, @RequestBody EmailCode reqCode) {
 
-    System.out.println("refresh = " + refresh);
     ResTokens resTokens = twoFactorAuthService.verifyEmailCodeAndIssueTokens(refresh, reqCode.code(),
-      request.getRemoteAddr(), false);
+      IpUtils.getClientIp(request), false);
 
     response.addHeader("Set-Cookie", deleteCookie("refresh", null, 0L).toString());
 
@@ -100,7 +100,7 @@ public class TwoFactorAuthController {
   public ResponseEntity<ResTokens> verifyTotpCodeAndAddIpAddress(HttpServletRequest request,  HttpServletResponse response,  @CookieValue String refresh, @RequestBody TotpCode code) {
 
     ResTokens resTokens = twoFactorAuthService.verifyTotpCodeAndIssueTokens(refresh, code.code(),
-      request.getRemoteAddr());
+      IpUtils.getClientIp(request));
 
     response.addHeader("Set-Cookie", deleteCookie("refresh", null, 0L).toString());
 

@@ -2,7 +2,6 @@ package com.juny.spacestory.reservation.dto;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalTime;
 
 public record TimeSlot(

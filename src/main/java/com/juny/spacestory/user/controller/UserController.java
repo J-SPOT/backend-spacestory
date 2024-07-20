@@ -9,6 +9,7 @@ import com.juny.spacestory.user.dto.ResLookUpUsers;
 import com.juny.spacestory.user.dto.ResModifyUser;
 import com.juny.spacestory.user.service.UserService;
 import com.juny.spacestory.user.dto.ReqRegisterUser;
+import com.juny.spacestory.util.IpUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -71,7 +72,7 @@ public class UserController {
   public ResponseEntity<Void> register(@RequestBody ReqRegisterUser req,
     HttpServletRequest httpServletRequest) {
 
-    userService.register(req, httpServletRequest.getRemoteAddr());
+    userService.register(req, IpUtils.getClientIp(httpServletRequest));
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }

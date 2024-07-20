@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -222,9 +221,10 @@ public class SpaceController {
     @RequestParam(required = false, value = "max_price") Integer maxPrice,
     @RequestParam(required = false) List<String> options,
     @RequestParam(required = false, defaultValue = "view_desc") String sort,
-    Pageable pageable) {
+    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResSpace> spaces = spaceService.searchSpaces(query, sigungu, minCapacity, minPrice, maxPrice, options, sort, pageable);
+    Page<ResSpace> spaces = spaceService.searchSpaces(query, sigungu, minCapacity, minPrice, maxPrice, options, sort, page, size);
 
     return ResponseEntity.ok(spaces);
   }

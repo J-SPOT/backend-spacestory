@@ -7,6 +7,7 @@ import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
 import com.juny.spacestory.global.security.service.CustomUserDetails;
 import com.juny.spacestory.user.dto.ResSecurityContextHolder;
 import com.juny.spacestory.user.service.EmailVerificationService;
+import com.juny.spacestory.util.IpUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -72,7 +73,7 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
       return;
     }
 
-    if (!sh.ipAddresses().contains(request.getRemoteAddr())) {
+    if (!sh.ipAddresses().contains(IpUtils.getClientIp(request))) {
 
       emailVerificationService.sendCode(sh.email(), false);
 

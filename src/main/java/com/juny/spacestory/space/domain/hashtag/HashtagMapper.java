@@ -1,6 +1,5 @@
 package com.juny.spacestory.space.domain.hashtag;
 
-import java.util.List;
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;
 

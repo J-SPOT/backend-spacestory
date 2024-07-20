@@ -12,6 +12,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -24,7 +25,7 @@ public class CustomSpaceRepositoryImpl implements CustomSpaceRepository {
 
   @Override
   public Page<Space> searchSpacesByFilter(String query, List<String> sigungu, Integer minCapacity,
-    Integer minPrice, Integer maxPrice, List<String> options, String sort, Pageable pageable) {
+    Integer minPrice, Integer maxPrice, List<String> options, String sort, int page, int size) {
 
     BooleanExpression predicate = allOf(
       containsQuery(query),
@@ -46,12 +47,14 @@ public class CustomSpaceRepositoryImpl implements CustomSpaceRepository {
 
     jpaQuery = applySorting(jpaQuery, sort);
 
+    int offset = page * size;
+
     List<Space> spaces = jpaQuery
-      .offset(pageable.getOffset())
-      .limit(pageable.getPageSize())
+      .offset(offset)
+      .limit(size)
       .fetch();
 
-    return new PageImpl<>(spaces, pageable, total);
+    return new PageImpl<>(spaces, PageRequest.of(page, size), total);
   }
 
   private BooleanExpression containsQuery(String query) {

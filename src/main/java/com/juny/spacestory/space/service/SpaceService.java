@@ -48,7 +48,6 @@ public class SpaceService {
   private final String INVALID_SUB_CATEGORY_NAME_MSG = "Invalid sub category name";
   private final String INVALID_OPTION_NAME_MSG = "Invalid option name";
   private final String SUBCATEGORY_DOES_NOT_FIT_MSG = "It doesn't fit into the hierarchy. Subcategory: %s MainCategory: %s";
-  private final String EXCEEDED_MAXIMUM_THREE_SELECTION_SIGUNGU_MSG = "Exceeded the maximum of 3 selections SIGUNGU";
 
 
   public Page<ResSpace> findAllSpaces(int page, int size) {
@@ -221,14 +220,10 @@ public class SpaceService {
   }
 
   public Page<ResSpace> searchSpaces(String query, List<String> sigungu, Integer minCapacity,
-    Integer minPrice, Integer maxPrice, List<String> options, String sort, Pageable pageable) {
-
-    if (sigungu.size() > 3) {
-      throw new BadRequestException(ErrorCode.BAD_REQUEST, EXCEEDED_MAXIMUM_THREE_SELECTION_SIGUNGU_MSG);
-    }
+    Integer minPrice, Integer maxPrice, List<String> options, String sort, int page, int size) {
 
     Page<Space> spaces = spaceRepository.searchSpacesByFilter(query, sigungu, minCapacity, minPrice,
-      maxPrice, options, sort, pageable);
+      maxPrice, options, sort, page, size);
 
     return mapper.toResSpace(spaces);
   }

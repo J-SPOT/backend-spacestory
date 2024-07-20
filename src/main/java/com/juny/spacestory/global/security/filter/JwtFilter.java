@@ -35,7 +35,6 @@ public class JwtFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
-    log.info("JwtFilter doFilterInternal, ip: {}", request.getRemoteAddr());
     String authorization = request.getHeader(AUTHORIZATION_HEADER);
     String requestURI = request.getRequestURI();
 

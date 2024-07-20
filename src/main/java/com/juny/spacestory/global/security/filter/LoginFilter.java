@@ -7,6 +7,7 @@ import com.juny.spacestory.global.security.jwt.refresh.RefreshRepository;
 import com.juny.spacestory.global.security.jwt.JwtUtil;
 import com.juny.spacestory.global.security.service.CustomUserDetails;
 import com.juny.spacestory.login.LoginAttemptService;
+import com.juny.spacestory.util.IpUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -119,7 +120,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    if (ipAddresses.contains(request.getRemoteAddr()) && !isTotpEnabled) {
+    String ip = IpUtils.getClientIp(request);
+
+    if (ipAddresses.contains(ip) && !isTotpEnabled) {
       issueTokens(response, id, role);
       return;
     }
