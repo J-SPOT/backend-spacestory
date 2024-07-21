@@ -60,7 +60,7 @@ public class ReviewController {
 
   @GetMapping("/api/v1/user/reviews")
   public ResponseEntity<Page<ResUserReview>> getReviewsByUser(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -68,7 +68,7 @@ public class ReviewController {
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
     Page<ResUserReview> reviews = reviewService.findAllReviewsByUser(
-      UUID.fromString(customUserDetails.getId()), page, size);
+      UUID.fromString(customUserDetails.getId()), page - 1, size);
 
     return new ResponseEntity<>(reviews, HttpStatus.OK);
   }
@@ -83,10 +83,10 @@ public class ReviewController {
   @GetMapping("/api/v1/spaces/{id}/reviews")
   public ResponseEntity<Page<ResReview>> getReviewsBySpace(
     @PathVariable Long id,
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResReview> reviews = reviewService.findAllReviewsBySpaceId(id, page, size);
+    Page<ResReview> reviews = reviewService.findAllReviewsBySpaceId(id, page - 1, size);
 
     return new ResponseEntity<>(reviews, HttpStatus.OK);
   }

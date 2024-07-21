@@ -43,11 +43,11 @@ public class QnaController {
 
   @GetMapping("/api/v1/spaces/{id}/qna")
   public ResponseEntity<Page<ResQuestion>> findQuestionsAndAnswers(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size,
-    @PathVariable("id") Long id) {
+    @PathVariable Long id) {
 
-    Page<ResQuestion> questions = qnaService.findQuestionsAndAnswers(id, page, size);
+    Page<ResQuestion> questions = qnaService.findQuestionsAndAnswers(id, page - 1, size);
 
     return new ResponseEntity<>(questions, HttpStatus.OK);
   }

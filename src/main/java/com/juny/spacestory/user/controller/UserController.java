@@ -119,10 +119,10 @@ public class UserController {
 
   @GetMapping("/api/admin/v1/users")
   public ResponseEntity<Page<ResLookUpUsers>> getAllUsers(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResLookUpUsers> resLookUpUsers = userService.lookUpUsers(page, size);
+    Page<ResLookUpUsers> resLookUpUsers = userService.lookUpUsers(page - 1, size);
 
     return new ResponseEntity<>(resLookUpUsers, HttpStatus.OK);
   }
