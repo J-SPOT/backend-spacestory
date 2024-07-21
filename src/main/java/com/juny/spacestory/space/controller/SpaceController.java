@@ -32,10 +32,10 @@ public class SpaceController {
 
   @GetMapping("/api/v1/spaces")
   public ResponseEntity<Page<ResSpace>> findAllSpaces(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResSpace> spaces = spaceService.findAllSpaces(page, size);
+    Page<ResSpace> spaces = spaceService.findAllSpaces(page - 1, size);
 
     return new ResponseEntity<>(spaces, HttpStatus.OK);
   }
@@ -75,7 +75,7 @@ public class SpaceController {
 
   @GetMapping("/api/v1/real-estates/{id}/spaces")
   public ResponseEntity<Page<ResSpace>> findSpacesByRealEstateId(@PathVariable Long id,
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
     Page<ResSpace> spaces = spaceService.findSpacesByRealEstateId(id, page, size);
@@ -155,7 +155,7 @@ public class SpaceController {
 
   @GetMapping("/api/v1/spaces/most-views")
   public ResponseEntity<Page<ResSpace>> findMostViewsSpaces(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
     Page<ResSpace> spaces = spaceService.findAllSpacesByMostViews(page, size);
@@ -173,10 +173,10 @@ public class SpaceController {
 
   @GetMapping("/api/v1/spaces/most-likes")
   public ResponseEntity<Page<ResSpace>> findMostLikesSpaces(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResSpace> spaces = spaceService.findAllSpacesByMostLikes(page, size);
+    Page<ResSpace> spaces = spaceService.findAllSpacesByMostLikes(page - 1, size);
 
     return new ResponseEntity<>(spaces, HttpStatus.OK);
   }
@@ -191,10 +191,10 @@ public class SpaceController {
 
   @GetMapping("/api/v1/spaces/recent")
   public ResponseEntity<Page<ResSpace>> findRecentlyCreatedSpaces(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResSpace> spaces = spaceService.findAllRecentlyCreatedSpaces(page, size);
+    Page<ResSpace> spaces = spaceService.findAllRecentlyCreatedSpaces(page - 1, size);
 
     return new ResponseEntity<>(spaces, HttpStatus.OK);
   }
@@ -221,10 +221,12 @@ public class SpaceController {
     @RequestParam(required = false, value = "max_price") Integer maxPrice,
     @RequestParam(required = false) List<String> options,
     @RequestParam(required = false, defaultValue = "view_desc") String sort,
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResSpace> spaces = spaceService.searchSpaces(query, sigungu, minCapacity, minPrice, maxPrice, options, sort, page, size);
+    Page<ResSpace> spaces = spaceService.searchSpaces(
+      query, sigungu, minCapacity, minPrice,
+      maxPrice, options, sort, page - 1, size);
 
     return ResponseEntity.ok(spaces);
   }

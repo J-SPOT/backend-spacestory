@@ -37,10 +37,10 @@ public class HashtagController {
 
   @GetMapping("/api/v1/hashtags")
   public ResponseEntity<Page<ResHashtag>> findAllHashtags(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResHashtag> hashtags = hashTagService.findHashtags(page, size);
+    Page<ResHashtag> hashtags = hashTagService.findHashtags(page - 1, size);
 
     return new ResponseEntity<>(hashtags, HttpStatus.OK);
   }

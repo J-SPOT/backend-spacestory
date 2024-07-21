@@ -60,7 +60,7 @@ public class ReservationController {
 
   @GetMapping("/api/v1/user/reservations")
   public ResponseEntity<Page<ResReservation>> findReservationsByUserId(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -68,7 +68,7 @@ public class ReservationController {
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
     Page<ResReservation> reservations = reservationService.findReservationsByUserId(
-      UUID.fromString(customUserDetails.getId()), page, size);
+      UUID.fromString(customUserDetails.getId()), page - 1, size);
 
     return new ResponseEntity<>(reservations, HttpStatus.OK);
   }
@@ -87,11 +87,11 @@ public class ReservationController {
   @GetMapping("/api/admin/v1/spaces/{id}/reservations")
   public ResponseEntity<Page<ResReservation>> getSpaceReservations(
     @PathVariable Long id, @RequestParam LocalDate reservationDate,
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
     Page<ResReservation> reservations =
-      reservationService.findReservationsBySpaceIdAndReservationDate(id, reservationDate, page, size);
+      reservationService.findReservationsBySpaceIdAndReservationDate(id, reservationDate, page - 1, size);
 
     return new ResponseEntity<>(reservations, HttpStatus.OK);
   }

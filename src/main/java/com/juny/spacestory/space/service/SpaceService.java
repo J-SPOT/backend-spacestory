@@ -49,7 +49,7 @@ public class SpaceService {
   private final String INVALID_OPTION_NAME_MSG = "Invalid option name";
   private final String SUBCATEGORY_DOES_NOT_FIT_MSG = "It doesn't fit into the hierarchy. Subcategory: %s MainCategory: %s";
 
-
+  @Transactional
   public Page<ResSpace> findAllSpaces(int page, int size) {
 
     Page<Space> spaces = spaceRepository.findAll(PageRequest.of(page, size));

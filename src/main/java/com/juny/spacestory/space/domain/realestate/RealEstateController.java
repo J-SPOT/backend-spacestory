@@ -41,10 +41,10 @@ public class RealEstateController {
 
   @GetMapping("/api/v1/real-estates")
   public ResponseEntity<Page<ResRealEstate>> findRealEstates(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResRealEstate> realEstates = realEstateService.findRealEstates(page, size);
+    Page<ResRealEstate> realEstates = realEstateService.findRealEstates(page - 1, size);
 
     return new ResponseEntity<>(realEstates, HttpStatus.OK);
   }
@@ -62,7 +62,7 @@ public class RealEstateController {
 
   @GetMapping("/api/v1/real-estates/host")
   public ResponseEntity<Page<ResRealEstate>> findRealEstatesByUserId(
-    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -70,7 +70,7 @@ public class RealEstateController {
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
     Page<ResRealEstate> realEstates = realEstateService.findRealEstatesByUserId(
-      UUID.fromString(customUserDetails.getId()), page, size);
+      UUID.fromString(customUserDetails.getId()), page - 1, size);
 
     return new ResponseEntity<>(realEstates, HttpStatus.OK);
   }
