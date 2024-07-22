@@ -67,6 +67,14 @@ public class Space {
   @Column(nullable = false)
   private Integer reviewCount;
 
+  @ElementCollection
+  @CollectionTable(name = "space_images", joinColumns = @JoinColumn(name = "space_id"))
+  @Column
+  private List<String> imagePaths = new ArrayList<>();
+
+  @Column
+  private String representImage;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "realEstate_id")
   private RealEstate realEstate;
@@ -196,5 +204,9 @@ public class Space {
 
   public void increaseViewCount() {
     this.viewCount++;
+  }
+
+  public void setRepresentImage(String representImage) {
+    this.representImage = representImage;
   }
 }

@@ -20,6 +20,8 @@ public record ResSpace(
   Integer likeCount,
   Integer viewCount,
   Integer reviewCount,
+  List<String> imagePaths,
+  String representativeImage,
   ResRealEstate realEstate,
   List<ResSubCategory> subCategories,
   List<ResOption> spaceOptions,

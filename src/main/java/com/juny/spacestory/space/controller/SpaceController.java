@@ -1,6 +1,7 @@
 package com.juny.spacestory.space.controller;
 
 import com.juny.spacestory.global.exception.ErrorResponse;
+import com.juny.spacestory.global.security.service.CustomUserDetails;
 import com.juny.spacestory.space.dto.ReqSpace;
 import com.juny.spacestory.space.dto.ResSpace;
 import com.juny.spacestory.space.service.SpaceService;
@@ -10,12 +11,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -228,6 +234,86 @@ public class SpaceController {
       query, sigungu, minCapacity, minPrice,
       maxPrice, options, sort, page - 1, size);
 
-    return ResponseEntity.ok(spaces);
+    return new ResponseEntity<>(spaces, HttpStatus.OK);
+  }
+
+  @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
+  @Operation(
+    summary = "공간 이미지 추가 API",
+    description = "공간마다 최대 10개의 이미지를 올릴 수 있습니다.<br>Content-Type: multipart/form-data<br>이미지 업로드, 삭제 API는 이미지 경로를 모두 요청 파라미터로 받습니다.")
+  @ApiResponses(
+    value = {
+      @ApiResponse(responseCode = "200", description = "공간 이미지 추가 성공"),
+      @ApiResponse(
+        responseCode = "E2",
+        description = "400, 유효한 인증 정보를 제공하지 않은 경우<br>400, 유효하지 않은 공간 아이디인 경우, <br>400, 이미지를 10개 초과해서 업로드 하려는 경우",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+
+  @PostMapping("/api/v1/spaces/{id}/images")
+  public ResponseEntity<ResSpace> uploadImages(
+    @PathVariable Long id,
+    @RequestParam List<MultipartFile> files) throws IOException {
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+    ResSpace space = spaceService.uploadImages(id, UUID.fromString(customUserDetails.getId()), files);
+
+    return new ResponseEntity<>(space, HttpStatus.OK);
+  }
+
+  @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
+  @Operation(
+    summary = "공간 이미지 단건 삭제 API")
+  @ApiResponses(
+    value = {
+      @ApiResponse(responseCode = "204", description = "공간 이미지 삭제 성공"),
+      @ApiResponse(
+        responseCode = "E2",
+        description = "400, 유효한 인증 정보를 제공하지 않은 경우<br>400, 유효하지 않은 공간 아이디인 경우, <br>400, 유효하지 않은 이미지 경로인 경우",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+
+  @DeleteMapping("/api/v1/spaces/{id}/image")
+  public ResponseEntity<Void> deleteImage(
+    @PathVariable Long id,
+    @RequestParam String imagePath) {
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+    spaceService.deleteImage(id, UUID.fromString(customUserDetails.getId()), imagePath);
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
+  @Operation(
+    summary = "공간 이미지 단건 삭제 API")
+  @ApiResponses(
+    value = {
+      @ApiResponse(responseCode = "204", description = "공간 이미지 삭제 성공"),
+      @ApiResponse(
+        responseCode = "E2",
+        description = "400, 유효한 인증 정보를 제공하지 않은 경우<br>400, 유효하지 않은 공간 아이디인 경우, <br>400, 유효하지 않은 이미지 경로인 경우",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+
+  @PatchMapping("/api/v1/spaces/{id}/images/represent")
+  public ResponseEntity<ResSpace> setRepresentImage(
+    @PathVariable Long id,
+    @RequestParam String imagePath) {
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+    ResSpace space = spaceService.setRepresentImage(id, UUID.fromString(customUserDetails.getId()),
+      imagePath);
+
+    return new ResponseEntity<>(space, HttpStatus.OK);
   }
 }
