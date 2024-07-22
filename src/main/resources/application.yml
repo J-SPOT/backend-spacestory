@@ -18,9 +18,17 @@ spring:
 jwt:
   secretKey: ${JWT_SECRET_KEY}
 
-
 springdoc:
   api-docs:
     enabled: true
   enable-spring-security: true
 
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_CREDENTIALS_ACCESS_KEY}
+      secretKey: ${AWS_CREDENTIALS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION_STATIC}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
