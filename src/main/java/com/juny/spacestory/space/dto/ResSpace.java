@@ -21,7 +21,7 @@ public record ResSpace(
   Integer viewCount,
   Integer reviewCount,
   List<String> imagePaths,
-  String representativeImage,
+  String representImage,
   ResRealEstate realEstate,
   List<ResSubCategory> subCategories,
   List<ResOption> spaceOptions,
