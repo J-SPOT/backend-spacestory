@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -219,6 +220,7 @@ public class SpaceController {
     })
 
   @GetMapping("/api/v1/spaces/search")
+  @Transactional
   public ResponseEntity<Page<ResSpace>> searchSpaces(
     @RequestParam(required = false) String query,
     @RequestParam(required = false) List<String> sigungu,
