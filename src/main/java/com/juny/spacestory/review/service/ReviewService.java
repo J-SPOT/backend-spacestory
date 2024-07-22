@@ -174,7 +174,7 @@ public class ReviewService {
     return mapper.toResReview(review);
   }
 
-  public void deleteImage(Long reviewId, UUID userId, String imagePath) {
+  public void deleteImage(Long reviewId, UUID userId, List<String> imagePath) {
 
     Review review = reviewRepository.findById(reviewId).orElseThrow(
       () -> new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_REVIEW_ID));
@@ -184,11 +184,12 @@ public class ReviewService {
       throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_USER_ID);
     }
 
-    if (!review.getImagePaths().contains(imagePath)) {
-      throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_IMAGE_PATH);
+    for (var image : imagePath) {
+      if (!review.getImagePaths().contains(image)) {
+        throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_IMAGE_PATH);
+      }
+      amazonS3.deleteObject(bucketName, image);
+      review.getImagePaths().remove(image);
     }
-
-    amazonS3.deleteObject(bucketName, imagePath);
-    review.getImagePaths().remove(imagePath);
   }
 }

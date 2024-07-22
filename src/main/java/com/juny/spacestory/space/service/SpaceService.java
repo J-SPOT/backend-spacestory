@@ -270,7 +270,7 @@ public class SpaceService {
   }
 
   @Transactional
-  public void deleteImage(Long spaceId, UUID userId, String imagePath) {
+  public void deleteImage(Long spaceId, UUID userId, List<String> imagePath) {
 
     Space space = spaceRepository.findById(spaceId).orElseThrow(
       () -> new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_SPACE_ID_MSG));
@@ -279,12 +279,13 @@ public class SpaceService {
       throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_USER_ID);
     }
 
-    if (!space.getImagePaths().contains(imagePath)) {
-      throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_IMAGE_PATH);
+    for (var image : imagePath) {
+      if (!space.getImagePaths().contains(imagePath)) {
+        throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_IMAGE_PATH);
+      }
+      amazonS3.deleteObject(bucketName, image);
+      space.getImagePaths().remove(image);
     }
-
-    amazonS3.deleteObject(bucketName, imagePath);
-    space.getImagePaths().remove(imagePath);
   }
 
   @Transactional
