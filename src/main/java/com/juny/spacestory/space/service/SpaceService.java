@@ -1,5 +1,7 @@
 package com.juny.spacestory.space.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.common.BadRequestException;
 import com.juny.spacestory.space.domain.Space;
@@ -21,13 +23,15 @@ import com.juny.spacestory.space.dto.ResSpace;
 import com.juny.spacestory.space.mapper.SpaceMapper;
 import com.juny.spacestory.space.repository.SpaceRepository;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +45,7 @@ public class SpaceService {
   private final HashtagRepository hashtagRepository;
   private final SpaceMapper mapper;
   private final CategoryService categoryService;
+  private final AmazonS3 amazonS3;
 
   private final String INVALID_SPACE_ID_MSG = "Invalid space id";
   private final String INVALID_REAL_ESTATE_ID_MSG = "Invalid real estate id";
@@ -48,6 +53,12 @@ public class SpaceService {
   private final String INVALID_SUB_CATEGORY_NAME_MSG = "Invalid sub category name";
   private final String INVALID_OPTION_NAME_MSG = "Invalid option name";
   private final String SUBCATEGORY_DOES_NOT_FIT_MSG = "It doesn't fit into the hierarchy. Subcategory: %s MainCategory: %s";
+  private final String INVALID_USER_ID = "Invalid user id";
+  private final String EXCEED_TEN_SPACE_IMAGES = "Exceed 10 space images";
+  private final String INVALID_IMAGE_PATH = "Invalid image path";
+
+  @Value("${cloud.aws.s3.bucket}")
+  private String bucketName;
 
   @Transactional
   public Page<ResSpace> findAllSpaces(int page, int size) {
@@ -99,11 +110,11 @@ public class SpaceService {
     List<Option> newOptions = optionNames.stream()
       .map(optionName -> optionRepository.findByName(optionName)
         .orElseThrow(() -> new BadRequestException(ErrorCode.BAD_REQUEST, "Invalid option name")))
-      .collect(Collectors.toList());
+      .toList();
 
     List<Option> currentOptions = space.getSpaceOptions().stream()
       .map(SpaceOption::getOption)
-      .collect(Collectors.toList());
+      .toList();
 
     for (Option option : newOptions) {
       if (!currentOptions.contains(option)) {
@@ -147,7 +158,7 @@ public class SpaceService {
     List<String> subCategories = categoryService.findSubCategoriesByMainCategoryId(mainCategory.getId())
       .stream()
       .map(ResSubCategory::name)
-      .collect(Collectors.toList());
+      .toList();
 
     for (var e : req.subCategories()) {
       if (!subCategories.contains(e)) {
@@ -226,5 +237,71 @@ public class SpaceService {
       maxPrice, options, sort, page, size);
 
     return mapper.toResSpace(spaces);
+  }
+
+  @Transactional
+  public ResSpace uploadImages(Long spaceId, UUID userId, List<MultipartFile> files)
+    throws IOException {
+
+    Space space = spaceRepository.findById(spaceId).orElseThrow(
+      () -> new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_SPACE_ID_MSG));
+
+    if (!space.getRealEstate().getUser().getId().equals(userId)) {
+
+      throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_USER_ID);
+    }
+
+    if (space.getImagePaths().size() + files.size() > 10) {
+      throw new BadRequestException(ErrorCode.BAD_REQUEST, EXCEED_TEN_SPACE_IMAGES);
+    }
+
+    for (var file : files) {
+      String original = file.getOriginalFilename();
+      String unique = UUID.randomUUID().toString() + "-" + original;
+
+      ObjectMetadata metadata = new ObjectMetadata();
+      metadata.setContentLength(file.getSize());
+      amazonS3.putObject(bucketName, unique, file.getInputStream(), metadata);
+
+      space.getImagePaths().add(unique);
+    }
+
+    return mapper.toResSpace(space);
+  }
+
+  @Transactional
+  public void deleteImage(Long spaceId, UUID userId, String imagePath) {
+
+    Space space = spaceRepository.findById(spaceId).orElseThrow(
+      () -> new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_SPACE_ID_MSG));
+
+    if (!space.getRealEstate().getUser().getId().equals(userId)) {
+      throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_USER_ID);
+    }
+
+    if (!space.getImagePaths().contains(imagePath)) {
+      throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_IMAGE_PATH);
+    }
+
+    amazonS3.deleteObject(bucketName, imagePath);
+    space.getImagePaths().remove(imagePath);
+  }
+
+  @Transactional
+  public ResSpace setRepresentImage(Long spaceId, UUID userId, String imagePath) {
+    Space space = spaceRepository.findById(spaceId).orElseThrow(
+      () -> new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_SPACE_ID_MSG));
+
+    if (!space.getRealEstate().getUser().getId().equals(userId)) {
+      throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_USER_ID);
+    }
+
+    if (!space.getImagePaths().contains(imagePath)) {
+      throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_IMAGE_PATH);
+    }
+
+    space.setRepresentImage(imagePath);
+
+    return mapper.toResSpace(space);
   }
 }

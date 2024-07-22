@@ -26,6 +26,8 @@ repositories {
 }
 
 dependencies {
+	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+	implementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
 	implementation("com.google.zxing:javase:3.5.3")
 	implementation("com.google.zxing:core:3.5.3")
 	implementation("com.warrenstrange:googleauth:1.5.0")

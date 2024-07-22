@@ -5,6 +5,8 @@ import com.juny.spacestory.review.dto.ReqReview;
 import com.juny.spacestory.user.domain.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +31,11 @@ public class Review {
 
   @Column
   private LocalDateTime deletedAt;
+
+  @ElementCollection
+  @CollectionTable(name = "review_images", joinColumns = @JoinColumn(name = "review_id"))
+  @Column
+  private List<String> imagePaths = new ArrayList<>();
 
   @ManyToOne
   @JoinColumn(name = "user_id", nullable = false)

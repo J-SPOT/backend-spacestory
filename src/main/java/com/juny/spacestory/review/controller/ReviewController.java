@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -134,6 +137,59 @@ public class ReviewController {
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
     reviewService.deleteReviewByUser(id, UUID.fromString(customUserDetails.getId()));
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  @Tag(name = "리뷰 API", description = "리뷰 조회, 리뷰 추가, 리뷰 수정, 리뷰 삭제")
+  @Operation(
+    summary = "리뷰 이미지 추가 API",
+    description = "리뷰마다 최대 3개의 이미지를 올릴 수 있습니다.<br>Content-Type: multipart/form-data<br>이미지 업로드, 삭제 API는 이미지 경로를 모두 요청 파라미터로 받습니다.")
+  @ApiResponses(
+    value = {
+      @ApiResponse(responseCode = "200", description = "리뷰 이미지 추가 성공"),
+      @ApiResponse(
+        responseCode = "E2",
+        description = "400, 유효한 인증 정보를 제공하지 않은 경우<br>400, 유효하지 않은 리뷰 아이디인 경우, <br>400, 이미지를 3개 초과해서 업로드 하려는 경우",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+
+  @PostMapping("/api/v1/user/reviews/{id}/images")
+  public ResponseEntity<ResReview> uploadImages(
+    @PathVariable Long id,
+    @RequestParam List<MultipartFile> files) throws IOException {
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+    ResReview review = reviewService.uploadImages(id, UUID.fromString(customUserDetails.getId()), files);
+
+    return new ResponseEntity<>(review, HttpStatus.OK);
+  }
+
+  @Tag(name = "리뷰 API", description = "리뷰 조회, 리뷰 추가, 리뷰 수정, 리뷰 삭제")
+  @Operation(
+    summary = "리뷰 이미지 단건 삭제 API")
+  @ApiResponses(
+    value = {
+      @ApiResponse(responseCode = "204", description = "리뷰 이미지 삭제 성공"),
+      @ApiResponse(
+        responseCode = "E2",
+        description = "400, 유효한 인증 정보를 제공하지 않은 경우<br>400, 유효하지 않은 리뷰 아이디인 경우, <br>400, 유효하지 않은 이미지 경로인 경우",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+
+  @DeleteMapping("/api/v1/user/reviews/{id}/image")
+  public ResponseEntity<Void> deleteImage(
+    @PathVariable Long id,
+    @RequestParam String imagePath) {
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+    reviewService.deleteImage(id, UUID.fromString(customUserDetails.getId()), imagePath);
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
