@@ -266,7 +266,7 @@ public class SpaceController {
 
   @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
   @Operation(
-    summary = "공간 이미지 단건 삭제 API")
+    summary = "공간 이미지 삭제 API")
   @ApiResponses(
     value = {
       @ApiResponse(responseCode = "204", description = "공간 이미지 삭제 성공"),
@@ -276,10 +276,10 @@ public class SpaceController {
         content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
 
-  @DeleteMapping("/api/v1/spaces/{id}/image")
+  @DeleteMapping("/api/v1/spaces/{id}/images")
   public ResponseEntity<Void> deleteImage(
     @PathVariable Long id,
-    @RequestParam String imagePath) {
+    @RequestParam List<String> imagePath) {
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -292,10 +292,10 @@ public class SpaceController {
 
   @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
   @Operation(
-    summary = "공간 이미지 단건 삭제 API")
+    summary = "공간 대표 이미지 설정 API")
   @ApiResponses(
     value = {
-      @ApiResponse(responseCode = "204", description = "공간 이미지 삭제 성공"),
+      @ApiResponse(responseCode = "200", description = "공간 대표 이미지 설정 성공"),
       @ApiResponse(
         responseCode = "E2",
         description = "400, 유효한 인증 정보를 제공하지 않은 경우<br>400, 유효하지 않은 공간 아이디인 경우, <br>400, 유효하지 않은 이미지 경로인 경우",

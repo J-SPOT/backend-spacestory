@@ -170,7 +170,7 @@ public class ReviewController {
 
   @Tag(name = "리뷰 API", description = "리뷰 조회, 리뷰 추가, 리뷰 수정, 리뷰 삭제")
   @Operation(
-    summary = "리뷰 이미지 단건 삭제 API")
+    summary = "리뷰 이미지 삭제 API")
   @ApiResponses(
     value = {
       @ApiResponse(responseCode = "204", description = "리뷰 이미지 삭제 성공"),
@@ -180,10 +180,10 @@ public class ReviewController {
         content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
 
-  @DeleteMapping("/api/v1/user/reviews/{id}/image")
+  @DeleteMapping("/api/v1/user/reviews/{id}/images")
   public ResponseEntity<Void> deleteImage(
     @PathVariable Long id,
-    @RequestParam String imagePath) {
+    @RequestParam List<String> imagePath) {
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

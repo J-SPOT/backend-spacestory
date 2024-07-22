@@ -20,6 +20,7 @@ public class CategoryService {
   private final String SUB_CATEGORY_NOT_FOUND_MSG = "Sub category not found";
   private final String CATEGORY_HIERARCHY_INVALID_MSG = "Sub category does not belong to the main category";
 
+  @Transactional
   public List<ResCategory> findCategories() {
 
     List<MainCategory> allCategories = mainCategoryRepository.findAllCategories();
