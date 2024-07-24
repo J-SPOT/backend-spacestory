@@ -47,7 +47,7 @@ public class Space {
   private Integer hourlyRate;
 
   @Column(nullable = false)
-  private Integer spaceSize;
+  private Integer size;
 
   @Column(nullable = false)
   private Integer maxCapacity;
@@ -67,13 +67,13 @@ public class Space {
   @Column(nullable = false)
   private Integer reviewCount;
 
+  @Column
+  private String representImage;
+
   @ElementCollection
   @CollectionTable(name = "space_images", joinColumns = @JoinColumn(name = "space_id"))
   @Column
   private List<String> imagePaths = new ArrayList<>();
-
-  @Column
-  private String representImage;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "realEstate_id")
@@ -102,14 +102,14 @@ public class Space {
   private List<Question> questions = new ArrayList<>();
 
   public Space(String name, String description, String reservationNotes, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate,
-    Integer spaceSize, Integer maxCapacity) {
+    Integer size, Integer maxCapacity) {
     this.name = name;
     this.description = description;
     this.reservationNotes = reservationNotes;
     this.openingTime = openingTime;
     this.closingTime = closingTime;
     this.hourlyRate = hourlyRate;
-    this.spaceSize = spaceSize;
+    this.size = size;
     this.maxCapacity = maxCapacity;
     this.likeCount = 0;
     this.viewCount = 0;
@@ -198,7 +198,7 @@ public class Space {
     this.openingTime = req.openingTime();
     this.closingTime = req.closingTime();
     this.hourlyRate = req.hourlyRate();
-    this.spaceSize = req.spaceSize();
+    this.size = req.spaceSize();
     this.maxCapacity = req.maxCapacity();
   }
 

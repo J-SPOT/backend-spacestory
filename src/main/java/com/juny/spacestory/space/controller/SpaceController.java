@@ -2,8 +2,10 @@ package com.juny.spacestory.space.controller;
 
 import com.juny.spacestory.global.exception.ErrorResponse;
 import com.juny.spacestory.global.security.service.CustomUserDetails;
+import com.juny.spacestory.space.domain.Space;
 import com.juny.spacestory.space.dto.ReqSpace;
 import com.juny.spacestory.space.dto.ResSpace;
+import com.juny.spacestory.space.repository.mybatis.SpaceMapper;
 import com.juny.spacestory.space.service.SpaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,6 +33,24 @@ import org.springframework.web.multipart.MultipartFile;
 public class SpaceController {
 
   private final SpaceService spaceService;
+
+  private final SpaceMapper mapper;
+
+  @GetMapping("/api/v1/spaces/mybatis")
+  public ResponseEntity<Page<Space>> findAllSpacesByMybatis(
+    @RequestParam(required = false, defaultValue = "1") int page,
+    @RequestParam(required = false, defaultValue = "10") int size) {
+
+    int totalCount = mapper.countAll();
+
+    int offset = (page - 1) * size;
+
+    List<Space> spaces = mapper.findAll(size, offset);
+
+    PageRequest pageRequest = PageRequest.of(page - 1, size);
+
+    return new ResponseEntity<>(new PageImpl<>(spaces, pageRequest, totalCount), HttpStatus.OK);
+  }
 
   @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
   @Operation(summary = "모든 공간 조회 API")

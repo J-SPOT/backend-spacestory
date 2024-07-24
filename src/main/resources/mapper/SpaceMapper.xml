@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.juny.spacestory.space.repository.mybatis.SpaceMapper">
+
+  <resultMap id="SpaceResultMap" type="com.juny.spacestory.space.domain.Space">
+    <id property="id" column="space_id"/>
+    <result property="name" column="space_name"/>
+    <result property="description" column="space_description"/>
+    <result property="reservationNotes" column="space_reservation_notes"/>
+    <result property="openingTime" column="space_opening_time"/>
+    <result property="closingTime" column="space_closing_time"/>
+    <result property="hourlyRate" column="space_hourly_rate"/>
+    <result property="size" column="space_size"/>
+    <result property="maxCapacity" column="space_max_capacity"/>
+    <result property="createdAt" column="space_created_at"/>
+    <result property="deletedAt" column="space_deleted_at"/>
+    <result property="likeCount" column="space_like_count"/>
+    <result property="viewCount" column="space_view_count"/>
+    <result property="reviewCount" column="space_review_count"/>
+    <result property="representImage" column="space_represent_image"/>
+
+    <association property="realEstate"
+      javaType="com.juny.spacestory.space.domain.realestate.RealEstate">
+      <id property="id" column="real_estate_id"/>
+      <result property="floor" column="real_estate_floor"/>
+      <result property="hasParking" column="real_estate_has_parking"/>
+      <result property="hasElevator" column="real_estate_has_elevator"/>
+    </association>
+
+    <collection property="imagePaths" ofType="string">
+      <result column="space_image_paths"/>
+    </collection>
+
+    <collection property="spaceOptions" ofType="com.juny.spacestory.space.domain.option.ResOption">
+      <constructor>
+        <arg column="option_id" javaType="Long"/>
+        <arg column="option_name" javaType="String"/>
+      </constructor>
+    </collection>
+
+    <collection property="subCategories" ofType="com.juny.spacestory.space.domain.category.SubCategory">
+      <id property="id" column="sub_category_id"/>
+      <result property="name" column="sub_category_name"/>
+    </collection>
+
+<!--    <collection property="mainCategories" javaType="com.juny.spacestory.space.domain.category.ResMainCategory">-->
+<!--      <id property="id" column="main_category_id"/>-->
+<!--      <result property="name" column="main_category_name"/>-->
+<!--    </collection>-->
+
+  </resultMap>
+
+  <select id="findAll" resultMap="SpaceResultMap">
+    SELECT s.id                AS space_id,
+           s.name              AS space_name,
+           s.description       AS space_description,
+           s.reservation_notes AS space_reservation_notes,
+           s.opening_time      AS space_opening_time,
+           s.closing_time      AS space_closing_time,
+           s.hourly_rate       AS space_hourly_rate,
+           s.size              AS space_size,
+           s.max_capacity      AS space_max_capacity,
+           s.created_at        AS space_created_at,
+           s.deleted_at        AS space_deleted_at,
+           s.like_count        AS space_like_count,
+           s.view_count        AS space_view_count,
+           s.review_count      AS space_review_count,
+           s.represent_image   AS space_represent_image,
+           r.id                AS real_estate_id,
+           r.floor             AS real_estate_floor,
+           r.has_parking       AS real_estate_has_parking,
+           r.has_elevator      AS real_estate_has_elevator,
+           i.image_paths       AS space_image_paths,
+           o.id                AS option_id,
+           o.name              AS option_name,
+           sc.id               AS sub_category_id,
+           sc.name             AS sub_category_name,
+           mc.id               AS main_category_id,
+           mc.name             AS main_category_name
+    FROM spaces s
+           LEFT JOIN real_estates r ON s.real_estate_id = r.id
+           LEFT JOIN space_images i ON s.id = i.space_id
+           LEFT JOIN space_options so ON s.id = so.space_id
+           LEFT JOIN options o ON so.option_id = o.id
+           LEFT JOIN space_sub_categories ssc ON s.id = ssc.space_id
+           LEFT JOIN sub_categories sc ON ssc.sub_category_id = sc.id
+           LEFT JOIN main_categories mc ON sc.main_category_id = mc.id
+      LIMIT #{size}
+    OFFSET #{offset};
+  </select>
+
+  <select id="countAll" resultType="int">
+    SELECT COUNT(*)
+    FROM spaces;
+  </select>
+</mapper>

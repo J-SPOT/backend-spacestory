@@ -13,7 +13,7 @@ import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = "spring")
-public interface SpaceMapper {
+public interface SpaceMapstruct {
 
     @Mapping(source = "spaceOptions", target = "spaceOptions", qualifiedByName = "spaceOptionToResOptions")
     ResSpace toResSpace(Space space);
