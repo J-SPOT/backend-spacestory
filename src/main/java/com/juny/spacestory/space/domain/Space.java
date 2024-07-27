@@ -16,12 +16,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalTime;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Table(name = "spaces")
+@NamedEntityGraph(name = "Space.withRelations", attributeNodes = {
+  @NamedAttributeNode("realEstate"),
+})
 public class Space {
 
   @Id
@@ -70,17 +74,23 @@ public class Space {
   @Column
   private String representImage;
 
-  @ElementCollection
-  @CollectionTable(name = "space_images", joinColumns = @JoinColumn(name = "space_id"))
-  @Column
-  private List<String> imagePaths = new ArrayList<>();
-
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "realEstate_id")
   private RealEstate realEstate;
 
+  @ElementCollection(fetch = FetchType.LAZY)
+  @CollectionTable(name = "space_images", joinColumns = @JoinColumn(name = "space_id"))
+  @Column
+  @BatchSize(size = 10)
+  private List<String> imagePaths = new ArrayList<>();
+
   @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+  @BatchSize(size = 10)
   private List<SpaceOption> spaceOptions = new ArrayList<>();
+
+  @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+  @BatchSize(size = 10)
+  private List<Question> questions = new ArrayList<>();
 
   @ManyToMany
   @JoinTable(
@@ -88,6 +98,7 @@ public class Space {
     joinColumns = @JoinColumn(name = "space_id"),
     inverseJoinColumns = @JoinColumn(name = "sub_category_id")
   )
+  @BatchSize(size = 10)
   private List<SubCategory> subCategories = new ArrayList<>();
 
   @ManyToMany
@@ -96,10 +107,8 @@ public class Space {
     joinColumns = @JoinColumn(name = "space_id"),
     inverseJoinColumns = @JoinColumn(name = "hashtag_id")
   )
+  @BatchSize(size = 10)
   private List<Hashtag> hashtags = new ArrayList<>();
-
-  @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Question> questions = new ArrayList<>();
 
   public Space(String name, String description, String reservationNotes, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate,
     Integer size, Integer maxCapacity) {
