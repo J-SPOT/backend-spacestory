@@ -8,7 +8,9 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface SpaceMapper {
 
-  List<Space> findAll(@Param("size") int size, @Param("offset") int offset);
+  List<Long> findSpaceIds(@Param("size") int offset, @Param("offset") int limit);
+
+  List<Space> selectSpacesWithOptions(@Param("spaceIds") List<Long> spaceIds);
 
   int countAll();
 }

@@ -6,6 +6,21 @@
 
 <mapper namespace="com.juny.spacestory.space.repository.mybatis.SpaceMapper">
 
+  <resultMap id="RealEstateResultMap" type="com.juny.spacestory.space.domain.realestate.RealEstate">
+    <id property="id" column="real_estate_id"/>
+    <result property="floor" column="real_estate_floor"/>
+    <result property="hasParking" column="real_estate_has_parking"/>
+    <result property="hasElevator" column="real_estate_has_elevator"/>
+    <result property="deletedAt" column="real_estate_deleted_at"/>
+    <association property="address" javaType="com.juny.spacestory.space.domain.realestate.Address">
+      <result property="roadAddress" column="real_estate_road_address"/>
+      <result property="jibunAddress" column="real_estate_jibun_address"/>
+      <result property="sido" column="real_estate_sido"/>
+      <result property="sigungu" column="real_estate_sigungu"/>
+      <result property="dong" column="real_estate_dong"/>
+    </association>
+  </resultMap>
+
   <resultMap id="SpaceResultMap" type="com.juny.spacestory.space.domain.Space">
     <id property="id" column="space_id"/>
     <result property="name" column="space_name"/>
@@ -24,15 +39,11 @@
     <result property="representImage" column="space_represent_image"/>
 
     <association property="realEstate"
-      javaType="com.juny.spacestory.space.domain.realestate.RealEstate">
-      <id property="id" column="real_estate_id"/>
-      <result property="floor" column="real_estate_floor"/>
-      <result property="hasParking" column="real_estate_has_parking"/>
-      <result property="hasElevator" column="real_estate_has_elevator"/>
-    </association>
+      javaType="com.juny.spacestory.space.domain.realestate.RealEstate"
+      resultMap="RealEstateResultMap"/>
 
-    <collection property="imagePaths" ofType="string">
-      <result column="space_image_paths"/>
+    <collection property="imagePaths" ofType="String">
+      <result column="image_paths"/>
     </collection>
 
     <collection property="spaceOptions" ofType="com.juny.spacestory.space.domain.option.ResOption">
@@ -42,55 +53,92 @@
       </constructor>
     </collection>
 
-    <collection property="subCategories" ofType="com.juny.spacestory.space.domain.category.SubCategory">
-      <id property="id" column="sub_category_id"/>
-      <result property="name" column="sub_category_name"/>
+    <collection property="subCategories"
+      ofType="com.juny.spacestory.space.domain.category.ResSubCategory">
+      <constructor>
+        <arg column="sub_category_id" javaType="Long"/>
+        <arg column="sub_category_name" javaType="String"/>
+        <arg column="main_category_id" javaType="Long"/>
+        <arg column="main_category_name" javaType="String"/>
+      </constructor>
     </collection>
 
-<!--    <collection property="mainCategories" javaType="com.juny.spacestory.space.domain.category.ResMainCategory">-->
-<!--      <id property="id" column="main_category_id"/>-->
-<!--      <result property="name" column="main_category_name"/>-->
-<!--    </collection>-->
+    <collection property="hashtags"
+      ofType="com.juny.spacestory.space.domain.hashtag.ResHashtag">
+      <constructor>
+        <arg column="hashtag_id" javaType="Long"/>
+        <arg column="hashtag_name" javaType="String"/>
+      </constructor>
+    </collection>
 
   </resultMap>
 
-  <select id="findAll" resultMap="SpaceResultMap">
-    SELECT s.id                AS space_id,
-           s.name              AS space_name,
-           s.description       AS space_description,
-           s.reservation_notes AS space_reservation_notes,
-           s.opening_time      AS space_opening_time,
-           s.closing_time      AS space_closing_time,
-           s.hourly_rate       AS space_hourly_rate,
-           s.size              AS space_size,
-           s.max_capacity      AS space_max_capacity,
-           s.created_at        AS space_created_at,
-           s.deleted_at        AS space_deleted_at,
-           s.like_count        AS space_like_count,
-           s.view_count        AS space_view_count,
-           s.review_count      AS space_review_count,
-           s.represent_image   AS space_represent_image,
-           r.id                AS real_estate_id,
-           r.floor             AS real_estate_floor,
-           r.has_parking       AS real_estate_has_parking,
-           r.has_elevator      AS real_estate_has_elevator,
-           i.image_paths       AS space_image_paths,
-           o.id                AS option_id,
-           o.name              AS option_name,
-           sc.id               AS sub_category_id,
-           sc.name             AS sub_category_name,
-           mc.id               AS main_category_id,
-           mc.name             AS main_category_name
-    FROM spaces s
-           LEFT JOIN real_estates r ON s.real_estate_id = r.id
-           LEFT JOIN space_images i ON s.id = i.space_id
-           LEFT JOIN space_options so ON s.id = so.space_id
-           LEFT JOIN options o ON so.option_id = o.id
-           LEFT JOIN space_sub_categories ssc ON s.id = ssc.space_id
-           LEFT JOIN sub_categories sc ON ssc.sub_category_id = sc.id
-           LEFT JOIN main_categories mc ON sc.main_category_id = mc.id
-      LIMIT #{size}
-    OFFSET #{offset};
+  <select id="findSpaceIds" resultType="long">
+    SELECT id
+    FROM spaces
+    ORDER BY id LIMIT #{size}
+    OFFSET #{offset}
+  </select>
+
+  <select id="selectSpacesWithOptions" resultMap="SpaceResultMap">
+    SELECT
+    s.id AS space_id,
+    s.name AS space_name,
+    s.description AS space_description,
+    s.reservation_notes AS space_reservation_notes,
+    s.opening_time AS space_opening_time,
+    s.closing_time AS space_closing_time,
+    s.hourly_rate AS space_hourly_rate,
+    s.size AS space_size,
+    s.max_capacity AS space_max_capacity,
+    s.created_at AS space_created_at,
+    s.deleted_at AS space_deleted_at,
+    s.like_count AS space_like_count,
+    s.view_count AS space_view_count,
+    s.review_count AS space_review_count,
+    s.represent_image AS space_represent_image,
+    r.id AS real_estate_id,
+    r.deleted_at AS real_estate_deleted_at,
+    r.road_address AS real_estate_road_address,
+    r.jibun_address AS real_estate_jibun_address,
+    r.sido AS real_estate_sido,
+    r.sigungu AS real_estate_sigungu,
+    r.dong AS real_estate_dong,
+    r.floor AS real_estate_floor,
+    r.has_parking AS real_estate_has_parking,
+    r.has_elevator AS real_estate_has_elevator,
+    si.image_paths AS image_paths,
+    o.id AS option_id,
+    o.name AS option_name,
+    so.space_id AS space_option_space_id,
+    sc.id AS sub_category_id,
+    sc.name AS sub_category_name,
+    mc.id AS main_category_id,
+    mc.name AS main_category_name,
+    h.id AS hashtag_id,
+    h.name AS hashtag_name
+    FROM
+        spaces s
+    LEFT JOIN
+        real_estates r ON s.real_estate_id = r.id
+    LEFT JOIN
+        space_images si ON s.id = si.space_id
+    LEFT JOIN
+        space_options so ON s.id = so.space_id
+    LEFT JOIN
+        options o ON so.option_id = o.id
+    LEFT JOIN
+        space_sub_categories ssc ON s.id = ssc.space_id
+    LEFT JOIN
+        sub_categories sc ON ssc.sub_category_id = sc.id
+    LEFT JOIN
+        main_categories mc ON sc.main_category_id = mc.id
+    LEFT JOIN
+        space_hashtags sh ON s.id = sh.space_id
+    LEFT JOIN
+        hashtags h ON sh.hashtag_id = h.id
+    WHERE
+        s.id IN (<foreach item="id" collection="spaceIds" separator=",">#{id}</foreach>)
   </select>
 
   <select id="countAll" resultType="int">

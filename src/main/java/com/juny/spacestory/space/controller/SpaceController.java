@@ -45,7 +45,9 @@ public class SpaceController {
 
     int offset = (page - 1) * size;
 
-    List<Space> spaces = mapper.findAll(size, offset);
+    List<Long> spaceIds = mapper.findSpaceIds(size, offset);
+
+    List<Space> spaces = mapper.selectSpacesWithOptions(spaceIds);
 
     PageRequest pageRequest = PageRequest.of(page - 1, size);
 
