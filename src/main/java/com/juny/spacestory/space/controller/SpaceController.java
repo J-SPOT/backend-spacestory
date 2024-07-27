@@ -109,7 +109,7 @@ public class SpaceController {
     @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResSpace> spaces = spaceService.findSpacesByRealEstateId(id, page, size);
+    Page<ResSpace> spaces = spaceService.findSpacesByRealEstateId(id, page - 1, size);
 
     return new ResponseEntity<>(spaces, HttpStatus.OK);
   }
