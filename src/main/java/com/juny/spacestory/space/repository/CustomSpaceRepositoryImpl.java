@@ -2,6 +2,7 @@ package com.juny.spacestory.space.repository;
 
 import static com.juny.spacestory.space.domain.QSpace.space;
 import static com.juny.spacestory.space.domain.option.QOption.option;
+import static com.juny.spacestory.space.domain.realestate.QRealEstate.realEstate;
 import static com.juny.spacestory.space.domain.space_option.QSpaceOption.spaceOption;
 import static com.querydsl.core.types.dsl.Expressions.allOf;
 import com.juny.spacestory.space.domain.Space;
@@ -42,6 +43,7 @@ public class CustomSpaceRepositoryImpl implements CustomSpaceRepository {
       .fetchOne();
 
     JPAQuery<Space> jpaQuery = queryFactory.selectFrom(space)
+      .join(space.realEstate, realEstate).fetchJoin()
       .where(predicate);
 
     jpaQuery = applySorting(jpaQuery, sort);
