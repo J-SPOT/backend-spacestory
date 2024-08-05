@@ -76,14 +76,14 @@ public class HashtagController {
     throw new BadRequestException(ErrorCode.BAD_REQUEST, REQUEST_SEARCH_HASHTAG_PARAMETER_INVALID);
   }
 
-  @Tag(name = "해시태그 API", description = "해시태그 조회, 해시태그 추가, 해시태그 삭제")
-  @Operation(summary = "해시태그 추가 API")
+  @Tag(name = "[관리자] 해시태그 API", description = "해시태그 조회, 해시태그 추가, 해시태그 삭제")
+  @Operation(summary = "해시태그 추가 API", description = "기존에 없는 해시태그 이름이라면 새로 추가, 있다면 기존에 있는 해시태그 반환")
   @ApiResponses(
     value = {
       @ApiResponse(responseCode = "200", description = "해시태그 추가 성공")
     })
 
-  @PostMapping("/api/v1/hashtags")
+  @PostMapping("/api/admin/v1/hashtags")
   public ResponseEntity<ResHashtag> createHashtag(@RequestBody ReqHashtag req) {
 
     ResHashtag hashtag = hashTagService.createHashtag(req.name());
@@ -91,11 +91,11 @@ public class HashtagController {
     return new ResponseEntity<>(hashtag, HttpStatus.OK);
   }
 
-  @Tag(name = "해시태그 API", description = "해시태그 조회, 해시태그 추가, 해시태그 삭제")
-  @Operation(summary = "해시태그 조회 API")
+  @Tag(name = "[관리자] 해시태그 API", description = "해시태그 조회, 해시태그 추가, 해시태그 삭제")
+  @Operation(summary = "해시태그 삭제 API", description = "이미 공간에서 참조 중인 해시태그는 삭제할 수 없습니다. 이 경우 공간 수정 API를 이용하세요.")
   @ApiResponses(
     value = {
-      @ApiResponse(responseCode = "200", description = "해시태그 조회 성공"),
+      @ApiResponse(responseCode = "204", description = "해시태그 삭제 성공"),
       @ApiResponse(
         responseCode = "E2",
         description = "400, 요청 인자가 잘못된 경우 또는 해시태그가 존재하지 않는 경우",
