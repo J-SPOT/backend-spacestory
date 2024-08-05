@@ -8,6 +8,7 @@ import com.juny.spacestory.space.domain.Space;
 import com.juny.spacestory.space.domain.category.CategoryService;
 import com.juny.spacestory.space.domain.category.MainCategory;
 import com.juny.spacestory.space.domain.category.MainCategoryRepository;
+import com.juny.spacestory.space.domain.category.ResOnlySubCategory;
 import com.juny.spacestory.space.domain.category.ResSubCategory;
 import com.juny.spacestory.space.domain.category.SubCategory;
 import com.juny.spacestory.space.domain.category.SubCategoryRepository;
@@ -17,6 +18,7 @@ import com.juny.spacestory.space.domain.option.Option;
 import com.juny.spacestory.space.domain.option.OptionRepository;
 import com.juny.spacestory.space.domain.realestate.RealEstate;
 import com.juny.spacestory.space.domain.realestate.RealEstateRepository;
+import com.juny.spacestory.space.domain.realestate.RealEstateStatus;
 import com.juny.spacestory.space.domain.space_option.SpaceOption;
 import com.juny.spacestory.space.dto.ReqSpace;
 import com.juny.spacestory.space.dto.ResSpace;
@@ -56,6 +58,7 @@ public class SpaceService {
   private final String INVALID_USER_ID = "Invalid user id";
   private final String EXCEED_TEN_SPACE_IMAGES = "Exceed 10 space images";
   private final String INVALID_IMAGE_PATH = "Invalid image path";
+  private final String INVALID_REAL_ESTATE_STATUS_MSG = "Invalid real estate status";
 
   @Value("${cloud.aws.s3.bucket}")
   private String bucketName;
@@ -68,6 +71,7 @@ public class SpaceService {
     return mapstruct.toResSpace(spaces);
   }
 
+  @Transactional
   public ResSpace findSpaceById(Long spaceId) {
 
     Space space = spaceRepository.findById(spaceId).orElseThrow(
@@ -78,6 +82,7 @@ public class SpaceService {
     return mapstruct.toResSpace(space);
   }
 
+  @Transactional
   public Page<ResSpace> findSpacesByRealEstateId(Long realEstateId, int page, int size) {
 
     Page<Space> spaces = spaceRepository.findByRealEstateId(realEstateId,
@@ -157,7 +162,7 @@ public class SpaceService {
 
     List<String> subCategories = categoryService.findSubCategoriesByMainCategoryId(mainCategory.getId())
       .stream()
-      .map(ResSubCategory::name)
+      .map(ResOnlySubCategory::name)
       .toList();
 
     for (var e : req.subCategories()) {
@@ -206,6 +211,7 @@ public class SpaceService {
     spaceRepository.delete(space);
   }
 
+  @Transactional
   public Page<ResSpace> findAllSpacesByMostViews(int page, int size) {
 
     Page<Space> spaces = spaceRepository.findAllByOrderByViewCountDesc(
@@ -214,6 +220,7 @@ public class SpaceService {
     return mapstruct.toResSpace(spaces);
   }
 
+  @Transactional
   public Page<ResSpace> findAllSpacesByMostLikes(int page, int size) {
 
     Page<Space> spaces = spaceRepository.findAllByOrderByLikeCountDesc(
@@ -222,6 +229,7 @@ public class SpaceService {
     return mapstruct.toResSpace(spaces);
   }
 
+  @Transactional
   public Page<ResSpace> findAllRecentlyCreatedSpaces(int page, int size) {
 
     Page<Space> spaces = spaceRepository.findAllByOrderByCreatedAtDesc(

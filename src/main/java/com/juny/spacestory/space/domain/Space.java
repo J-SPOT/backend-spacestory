@@ -23,8 +23,8 @@ import org.hibernate.annotations.BatchSize;
 @NoArgsConstructor
 @Getter
 @Table(name = "spaces")
-@NamedEntityGraph(name = "Space.withRelations", attributeNodes = {
-  @NamedAttributeNode("realEstate"),
+@NamedEntityGraph(name = "Space.withRealEstate", attributeNodes = {
+  @NamedAttributeNode("realEstate")
 })
 public class Space {
 
