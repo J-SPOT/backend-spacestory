@@ -25,7 +25,7 @@ public class OptionController {
 
   private final OptionService optionService;
 
-  @Tag(name = "옵션 API", description = "옵션 조회, 옵션 추가, 옵션 수정, 옵션 삭제")
+  @Tag(name = "️옵션 API", description = "옵션 조회")
   @Operation(summary = "옵션 조회 API")
   @ApiResponses(
     value = {
@@ -40,7 +40,7 @@ public class OptionController {
     return new ResponseEntity<>(options, HttpStatus.OK);
   }
 
-  @Tag(name = "옵션 관리자 API", description = "옵션 조회, 옵션 추가, 옵션 수정, 옵션 삭제")
+  @Tag(name = "[관리자] 옵션 API", description = "옵션 추가, 옵션 수정, 옵션 삭제")
   @Operation(summary = "옵션 추가 API")
   @ApiResponses(
     value = {
@@ -55,7 +55,7 @@ public class OptionController {
     return new ResponseEntity<>(option, HttpStatus.OK);
   }
 
-  @Tag(name = "옵션 관리자 API", description = "옵션 조회, 옵션 추가, 옵션 수정, 옵션 삭제")
+  @Tag(name = "[관리자] 옵션 API", description = "옵션 추가, 옵션 수정, 옵션 삭제")
   @Operation(summary = "옵션 수정 API")
   @ApiResponses(
     value = {
@@ -74,7 +74,7 @@ public class OptionController {
     return new ResponseEntity<>(option, HttpStatus.OK);
   }
 
-  @Tag(name = "옵션 관리자 API", description = "옵션 조회, 옵션 추가, 옵션 수정, 옵션 삭제")
+  @Tag(name = "[관리자] 옵션 API", description = "옵션 추가, 옵션 수정, 옵션 삭제")
   @Operation(summary = "옵션 삭제 API")
   @ApiResponses(
     value = {
