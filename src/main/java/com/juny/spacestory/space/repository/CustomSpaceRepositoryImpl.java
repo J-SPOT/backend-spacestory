@@ -1,15 +1,21 @@
 package com.juny.spacestory.space.repository;
 
 import static com.juny.spacestory.space.domain.QSpace.space;
+import static com.juny.spacestory.space.domain.hashtag.QHashtag.hashtag;
 import static com.juny.spacestory.space.domain.option.QOption.option;
 import static com.juny.spacestory.space.domain.realestate.QRealEstate.realEstate;
 import static com.juny.spacestory.space.domain.space_option.QSpaceOption.spaceOption;
 import static com.querydsl.core.types.dsl.Expressions.allOf;
-import com.juny.spacestory.space.domain.Space;
+import com.juny.spacestory.space.domain.hashtag.ResHashtag;
+import com.juny.spacestory.space.dto.ResSummarySpace;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,7 +30,7 @@ public class CustomSpaceRepositoryImpl implements CustomSpaceRepository {
   private final JPAQueryFactory queryFactory;
 
   @Override
-  public Page<Space> searchSpacesByFilter(String query, List<String> sigungu, Integer minCapacity,
+  public Page<ResSummarySpace> searchSpacesByFilter(String query, List<String> sigungu, Integer minCapacity,
     Integer minPrice, Integer maxPrice, List<String> options, String sort, int page, int size) {
 
     BooleanExpression predicate = allOf(
@@ -42,20 +48,53 @@ public class CustomSpaceRepositoryImpl implements CustomSpaceRepository {
       .where(predicate)
       .fetchOne();
 
-    JPAQuery<Space> jpaQuery = queryFactory.selectFrom(space)
-      .join(space.realEstate, realEstate).fetchJoin()
+    JPAQuery<Tuple> jpaQuery = queryFactory
+      .select(space.id, space.name, space.representImage, space.hourlyRate, space.maxCapacity, space.reviewCount, space.likeCount, realEstate.address.dong)
+      .from(space)
+      .join(space.realEstate, realEstate)
       .where(predicate);
 
     jpaQuery = applySorting(jpaQuery, sort);
 
     int offset = page * size;
 
-    List<Space> spaces = jpaQuery
+    List<Tuple> spaces = jpaQuery
       .offset(offset)
       .limit(size)
       .fetch();
 
-    return new PageImpl<>(spaces, PageRequest.of(page, size), total);
+    List<Long> spaceIds = spaces.stream()
+      .map(tuple -> tuple.get(space.id))
+      .collect(Collectors.toList());
+
+    List<Tuple> hashtags = queryFactory
+      .select(space.id, hashtag.id, hashtag.name)
+      .from(space)
+      .join(space.hashtags, hashtag)
+      .where(space.id.in(spaceIds))
+      .fetch();
+
+    Map<Long, List<ResHashtag>> hashtagMap = hashtags.stream()
+      .collect(Collectors.groupingBy(
+        tuple -> tuple.get(space.id),
+        Collectors.mapping(tuple -> new ResHashtag(tuple.get(hashtag.id), tuple.get(hashtag.name)), Collectors.toList())
+      ));
+
+    List<ResSummarySpace> spacesWithHashtags = spaces.stream()
+      .map(spaceTuple -> new ResSummarySpace(
+        spaceTuple.get(space.id),
+        spaceTuple.get(space.name),
+        spaceTuple.get(space.representImage),
+        spaceTuple.get(space.hourlyRate),
+        spaceTuple.get(space.maxCapacity),
+        spaceTuple.get(space.reviewCount),
+        spaceTuple.get(space.likeCount),
+        spaceTuple.get(realEstate.address.dong),
+        hashtagMap.getOrDefault(spaceTuple.get(space.id), Collections.emptyList())
+      ))
+      .collect(Collectors.toList());
+
+    return new PageImpl<>(spacesWithHashtags, PageRequest.of(page, size), total);
   }
 
   private BooleanExpression containsQuery(String query) {
@@ -113,16 +152,16 @@ public class CustomSpaceRepositoryImpl implements CustomSpaceRepository {
   }
 
 
-  private JPAQuery<Space> applySorting(JPAQuery<Space> query, String sort) {
+  private JPAQuery<Tuple> applySorting(JPAQuery<Tuple> query, String sort) {
 
     switch (sort) {
-      case "price_asc":
+      case "price-asc":
         return query.orderBy(space.hourlyRate.asc());
-      case "price_desc":
+      case "price-desc":
         return query.orderBy(space.hourlyRate.desc());
-      case "review_desc":
+      case "review-desc":
         return query.orderBy(space.reviewCount.desc());
-      case "like_desc":
+      case "like-desc":
         return query.orderBy(space.likeCount.desc());
       default:
         return query.orderBy(space.viewCount.desc());

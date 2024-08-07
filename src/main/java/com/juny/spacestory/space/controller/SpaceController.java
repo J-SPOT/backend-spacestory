@@ -5,6 +5,7 @@ import com.juny.spacestory.global.security.service.CustomUserDetails;
 import com.juny.spacestory.space.domain.Space;
 import com.juny.spacestory.space.dto.ReqSpace;
 import com.juny.spacestory.space.dto.ResSpace;
+import com.juny.spacestory.space.dto.ResSummarySpace;
 import com.juny.spacestory.space.repository.mybatis.SpaceMapper;
 import com.juny.spacestory.space.service.SpaceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -245,18 +246,18 @@ public class SpaceController {
 
   @GetMapping("/api/v1/spaces/search")
   @Transactional
-  public ResponseEntity<Page<ResSpace>> searchSpaces(
+  public ResponseEntity<Page<ResSummarySpace>> searchSpaces(
     @RequestParam(required = false) String query,
     @RequestParam(required = false) List<String> sigungu,
-    @RequestParam(required = false, value = "min_capacity") Integer minCapacity,
-    @RequestParam(required = false, value = "min_price") Integer minPrice,
-    @RequestParam(required = false, value = "max_price") Integer maxPrice,
+    @RequestParam(required = false, value = "min-capacity") Integer minCapacity,
+    @RequestParam(required = false, value = "min-price") Integer minPrice,
+    @RequestParam(required = false, value = "max-price") Integer maxPrice,
     @RequestParam(required = false) List<String> options,
-    @RequestParam(required = false, defaultValue = "view_desc") String sort,
+    @RequestParam(required = false, defaultValue = "view-desc") String sort,
     @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResSpace> spaces = spaceService.searchSpaces(
+    Page<ResSummarySpace> spaces = spaceService.searchSpaces(
       query, sigungu, minCapacity, minPrice,
       maxPrice, options, sort, page - 1, size);
 

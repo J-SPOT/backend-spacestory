@@ -9,7 +9,6 @@ import com.juny.spacestory.space.domain.category.CategoryService;
 import com.juny.spacestory.space.domain.category.MainCategory;
 import com.juny.spacestory.space.domain.category.MainCategoryRepository;
 import com.juny.spacestory.space.domain.category.ResOnlySubCategory;
-import com.juny.spacestory.space.domain.category.ResSubCategory;
 import com.juny.spacestory.space.domain.category.SubCategory;
 import com.juny.spacestory.space.domain.category.SubCategoryRepository;
 import com.juny.spacestory.space.domain.hashtag.Hashtag;
@@ -18,10 +17,10 @@ import com.juny.spacestory.space.domain.option.Option;
 import com.juny.spacestory.space.domain.option.OptionRepository;
 import com.juny.spacestory.space.domain.realestate.RealEstate;
 import com.juny.spacestory.space.domain.realestate.RealEstateRepository;
-import com.juny.spacestory.space.domain.realestate.RealEstateStatus;
 import com.juny.spacestory.space.domain.space_option.SpaceOption;
 import com.juny.spacestory.space.dto.ReqSpace;
 import com.juny.spacestory.space.dto.ResSpace;
+import com.juny.spacestory.space.dto.ResSummarySpace;
 import com.juny.spacestory.space.mapper.SpaceMapstruct;
 import com.juny.spacestory.space.repository.SpaceRepository;
 import jakarta.transaction.Transactional;
@@ -238,13 +237,11 @@ public class SpaceService {
     return mapstruct.toResSpace(spaces);
   }
 
-  public Page<ResSpace> searchSpaces(String query, List<String> sigungu, Integer minCapacity,
+  public Page<ResSummarySpace> searchSpaces(String query, List<String> sigungu, Integer minCapacity,
     Integer minPrice, Integer maxPrice, List<String> options, String sort, int page, int size) {
 
-    Page<Space> spaces = spaceRepository.searchSpacesByFilter(query, sigungu, minCapacity, minPrice,
+    return spaceRepository.searchSpacesByFilter(query, sigungu, minCapacity, minPrice,
       maxPrice, options, sort, page, size);
-
-    return mapstruct.toResSpace(spaces);
   }
 
   @Transactional
