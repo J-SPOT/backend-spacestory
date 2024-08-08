@@ -57,17 +57,14 @@ public class SpaceService {
   private final String INVALID_USER_ID = "Invalid user id";
   private final String EXCEED_TEN_SPACE_IMAGES = "Exceed 10 space images";
   private final String INVALID_IMAGE_PATH = "Invalid image path";
-  private final String INVALID_REAL_ESTATE_STATUS_MSG = "Invalid real estate status";
 
   @Value("${cloud.aws.s3.bucket}")
   private String bucketName;
 
   @Transactional
-  public Page<ResSpace> findAllSpaces(int page, int size) {
+  public Page<ResSummarySpace> findSortedSpacesForMainPage(int page, int size, String sort) {
 
-    Page<Space> spaces = spaceRepository.findAll(PageRequest.of(page, size));
-
-    return mapstruct.toResSpace(spaces);
+    return spaceRepository.findSortedSpacesForMainPage(page, size, sort);
   }
 
   @Transactional
@@ -208,33 +205,6 @@ public class SpaceService {
       () -> new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_SPACE_ID_MSG));
 
     spaceRepository.delete(space);
-  }
-
-  @Transactional
-  public Page<ResSpace> findAllSpacesByMostViews(int page, int size) {
-
-    Page<Space> spaces = spaceRepository.findAllByOrderByViewCountDesc(
-      PageRequest.of(page, size));
-
-    return mapstruct.toResSpace(spaces);
-  }
-
-  @Transactional
-  public Page<ResSpace> findAllSpacesByMostLikes(int page, int size) {
-
-    Page<Space> spaces = spaceRepository.findAllByOrderByLikeCountDesc(
-      PageRequest.of(page, size));
-
-    return mapstruct.toResSpace(spaces);
-  }
-
-  @Transactional
-  public Page<ResSpace> findAllRecentlyCreatedSpaces(int page, int size) {
-
-    Page<Space> spaces = spaceRepository.findAllByOrderByCreatedAtDesc(
-      PageRequest.of(page, size));
-
-    return mapstruct.toResSpace(spaces);
   }
 
   public Page<ResSummarySpace> searchSpaces(String query, List<String> sigungu, Integer minCapacity,

@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 
 public interface CustomSpaceRepository {
 
+  Page<ResSummarySpace> findSortedSpacesForMainPage(int page, int size, String sort);
+
   Page<ResSummarySpace> searchSpacesByFilter(
     String query,
     List<String> sigungu,

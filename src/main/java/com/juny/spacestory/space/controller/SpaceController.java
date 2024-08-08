@@ -56,18 +56,19 @@ public class SpaceController {
   }
 
   @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
-  @Operation(summary = "모든 공간 조회 API")
+  @Operation(summary = "메인 페이지 공간 요약 정보 조회 API", description = "정렬 조건을 쿼리 파라미터로 제공합니다. <br>1. created-desc(최근 생성 기준, 기본값)<br>2. view-desc(가장 많은 조회수 기준)<br>3. like-desc(가장 많은 좋아요 기준)")
   @ApiResponses(
     value = {
       @ApiResponse(responseCode = "200", description = "공간 조회 성공"),
     })
 
   @GetMapping("/api/v1/spaces")
-  public ResponseEntity<Page<ResSpace>> findAllSpaces(
+  public ResponseEntity<Page<ResSummarySpace>> findSortedSpacesForMainPage(
     @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size) {
-
-    Page<ResSpace> spaces = spaceService.findAllSpaces(page - 1, size);
+    @RequestParam(required = false, defaultValue = "10") int size,
+    @RequestParam(required = false, defaultValue = "created-desc") String sort) {
+    
+    Page<ResSummarySpace> spaces = spaceService.findSortedSpacesForMainPage(page - 1, size, sort);
 
     return new ResponseEntity<>(spaces, HttpStatus.OK);
   }
@@ -175,60 +176,6 @@ public class SpaceController {
     spaceService.deleteSpace(id);
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
-
-  @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
-  @Operation(
-    summary = "공간 조회 API, 조회수 내림차순 정렬")
-  @ApiResponses(
-    value = {
-      @ApiResponse(responseCode = "200", description = "공간 조회 성공"),
-    })
-
-  @GetMapping("/api/v1/spaces/most-views")
-  public ResponseEntity<Page<ResSpace>> findMostViewsSpaces(
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size) {
-
-    Page<ResSpace> spaces = spaceService.findAllSpacesByMostViews(page, size);
-
-    return new ResponseEntity<>(spaces, HttpStatus.OK);
-  }
-
-  @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
-  @Operation(
-    summary = "공간 조회 API, 좋아요 내림차순 정렬")
-  @ApiResponses(
-    value = {
-      @ApiResponse(responseCode = "200", description = "공간 조회 성공"),
-    })
-
-  @GetMapping("/api/v1/spaces/most-likes")
-  public ResponseEntity<Page<ResSpace>> findMostLikesSpaces(
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size) {
-
-    Page<ResSpace> spaces = spaceService.findAllSpacesByMostLikes(page - 1, size);
-
-    return new ResponseEntity<>(spaces, HttpStatus.OK);
-  }
-
-  @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
-  @Operation(
-    summary = "공간 조회 API, 최근에 등록된 순서로 정렬")
-  @ApiResponses(
-    value = {
-      @ApiResponse(responseCode = "200", description = "공간 조회 성공"),
-    })
-
-  @GetMapping("/api/v1/spaces/recent")
-  public ResponseEntity<Page<ResSpace>> findRecentlyCreatedSpaces(
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size) {
-
-    Page<ResSpace> spaces = spaceService.findAllRecentlyCreatedSpaces(page - 1, size);
-
-    return new ResponseEntity<>(spaces, HttpStatus.OK);
   }
 
   @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
