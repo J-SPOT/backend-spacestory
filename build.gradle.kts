@@ -26,6 +26,7 @@ repositories {
 }
 
 dependencies {
+	implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
 	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
 	implementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
 	implementation("com.google.zxing:javase:3.5.3")

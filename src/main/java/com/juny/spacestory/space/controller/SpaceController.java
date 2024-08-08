@@ -2,8 +2,11 @@ package com.juny.spacestory.space.controller;
 
 import com.juny.spacestory.global.exception.ErrorResponse;
 import com.juny.spacestory.global.security.service.CustomUserDetails;
+import com.juny.spacestory.space.domain.Space;
 import com.juny.spacestory.space.dto.ReqSpace;
 import com.juny.spacestory.space.dto.ResSpace;
+import com.juny.spacestory.space.dto.ResSummarySpace;
+import com.juny.spacestory.space.repository.mybatis.SpaceMapper;
 import com.juny.spacestory.space.service.SpaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +20,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,19 +35,40 @@ public class SpaceController {
 
   private final SpaceService spaceService;
 
+  private final SpaceMapper mapper;
+
+  @GetMapping("/api/v1/spaces/mybatis")
+  public ResponseEntity<Page<Space>> findAllSpacesByMybatis(
+    @RequestParam(required = false, defaultValue = "1") int page,
+    @RequestParam(required = false, defaultValue = "10") int size) {
+
+    int totalCount = mapper.countAll();
+
+    int offset = (page - 1) * size;
+
+    List<Long> spaceIds = mapper.findSpaceIds(size, offset);
+
+    List<Space> spaces = mapper.selectSpacesWithOptions(spaceIds);
+
+    PageRequest pageRequest = PageRequest.of(page - 1, size);
+
+    return new ResponseEntity<>(new PageImpl<>(spaces, pageRequest, totalCount), HttpStatus.OK);
+  }
+
   @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
-  @Operation(summary = "모든 공간 조회 API")
+  @Operation(summary = "메인 페이지 공간 요약 정보 조회 API", description = "정렬 조건을 쿼리 파라미터로 제공합니다. <br>1. created-desc(최근 생성 기준, 기본값)<br>2. view-desc(가장 많은 조회수 기준)<br>3. like-desc(가장 많은 좋아요 기준)")
   @ApiResponses(
     value = {
       @ApiResponse(responseCode = "200", description = "공간 조회 성공"),
     })
 
   @GetMapping("/api/v1/spaces")
-  public ResponseEntity<Page<ResSpace>> findAllSpaces(
+  public ResponseEntity<Page<ResSummarySpace>> findSortedSpacesForMainPage(
     @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size) {
-
-    Page<ResSpace> spaces = spaceService.findAllSpaces(page - 1, size);
+    @RequestParam(required = false, defaultValue = "10") int size,
+    @RequestParam(required = false, defaultValue = "created-desc") String sort) {
+    
+    Page<ResSummarySpace> spaces = spaceService.findSortedSpacesForMainPage(page - 1, size, sort);
 
     return new ResponseEntity<>(spaces, HttpStatus.OK);
   }
@@ -85,7 +111,7 @@ public class SpaceController {
     @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResSpace> spaces = spaceService.findSpacesByRealEstateId(id, page, size);
+    Page<ResSpace> spaces = spaceService.findSpacesByRealEstateId(id, page - 1, size);
 
     return new ResponseEntity<>(spaces, HttpStatus.OK);
   }
@@ -154,60 +180,6 @@ public class SpaceController {
 
   @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
   @Operation(
-    summary = "공간 조회 API, 조회수 내림차순 정렬")
-  @ApiResponses(
-    value = {
-      @ApiResponse(responseCode = "200", description = "공간 조회 성공"),
-    })
-
-  @GetMapping("/api/v1/spaces/most-views")
-  public ResponseEntity<Page<ResSpace>> findMostViewsSpaces(
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size) {
-
-    Page<ResSpace> spaces = spaceService.findAllSpacesByMostViews(page, size);
-
-    return new ResponseEntity<>(spaces, HttpStatus.OK);
-  }
-
-  @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
-  @Operation(
-    summary = "공간 조회 API, 좋아요 내림차순 정렬")
-  @ApiResponses(
-    value = {
-      @ApiResponse(responseCode = "200", description = "공간 조회 성공"),
-    })
-
-  @GetMapping("/api/v1/spaces/most-likes")
-  public ResponseEntity<Page<ResSpace>> findMostLikesSpaces(
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size) {
-
-    Page<ResSpace> spaces = spaceService.findAllSpacesByMostLikes(page - 1, size);
-
-    return new ResponseEntity<>(spaces, HttpStatus.OK);
-  }
-
-  @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
-  @Operation(
-    summary = "공간 조회 API, 최근에 등록된 순서로 정렬")
-  @ApiResponses(
-    value = {
-      @ApiResponse(responseCode = "200", description = "공간 조회 성공"),
-    })
-
-  @GetMapping("/api/v1/spaces/recent")
-  public ResponseEntity<Page<ResSpace>> findRecentlyCreatedSpaces(
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size) {
-
-    Page<ResSpace> spaces = spaceService.findAllRecentlyCreatedSpaces(page - 1, size);
-
-    return new ResponseEntity<>(spaces, HttpStatus.OK);
-  }
-
-  @Tag(name = "공간 API", description = "공간 조회, 공간 추가, 공간 수정, 공간 삭제")
-  @Operation(
     summary = "공간 조회 API 상세 검색 필터",
     description = "query는 공간 이름과 공간 타입을 검색한다.<br>sort 인자로 view_desc(조회수 내림차순), price_asc(가격 오름차순), price_desc(가격 내림차순), review_desc(리뷰 내림차순), like_desc(좋아요 내림차순)")
   @ApiResponses(
@@ -221,18 +193,18 @@ public class SpaceController {
 
   @GetMapping("/api/v1/spaces/search")
   @Transactional
-  public ResponseEntity<Page<ResSpace>> searchSpaces(
+  public ResponseEntity<Page<ResSummarySpace>> searchSpaces(
     @RequestParam(required = false) String query,
     @RequestParam(required = false) List<String> sigungu,
-    @RequestParam(required = false, value = "min_capacity") Integer minCapacity,
-    @RequestParam(required = false, value = "min_price") Integer minPrice,
-    @RequestParam(required = false, value = "max_price") Integer maxPrice,
+    @RequestParam(required = false, value = "min-capacity") Integer minCapacity,
+    @RequestParam(required = false, value = "min-price") Integer minPrice,
+    @RequestParam(required = false, value = "max-price") Integer maxPrice,
     @RequestParam(required = false) List<String> options,
-    @RequestParam(required = false, defaultValue = "view_desc") String sort,
+    @RequestParam(required = false, defaultValue = "view-desc") String sort,
     @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size) {
 
-    Page<ResSpace> spaces = spaceService.searchSpaces(
+    Page<ResSummarySpace> spaces = spaceService.searchSpaces(
       query, sigungu, minCapacity, minPrice,
       maxPrice, options, sort, page - 1, size);
 

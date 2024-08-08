@@ -22,6 +22,8 @@ springdoc:
   api-docs:
     enabled: true
   enable-spring-security: true
+  swagger-ui:
+    tags-sorter: alpha
 
 cloud:
   aws:

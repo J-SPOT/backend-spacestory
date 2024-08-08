@@ -4,7 +4,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface OptionMapper {
+public interface OptionMapstruct {
 
   ResOption toResOption(Option option);
 

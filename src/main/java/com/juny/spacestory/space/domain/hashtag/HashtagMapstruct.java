@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = "spring")
-public interface HashtagMapper {
+public interface HashtagMapstruct {
 
   ResHashtag toResHashtag(Hashtag hashtag);
 

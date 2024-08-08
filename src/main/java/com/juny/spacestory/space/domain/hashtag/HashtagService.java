@@ -2,7 +2,7 @@ package com.juny.spacestory.space.domain.hashtag;
 
 import com.juny.spacestory.global.exception.ErrorCode;
 import com.juny.spacestory.global.exception.common.BadRequestException;
-import com.juny.spacestory.space.repository.SpaceRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,8 +15,7 @@ import org.springframework.stereotype.Service;
 public class HashtagService {
 
   private final HashtagRepository hashtagRepository;
-  private final SpaceRepository spaceRepository;
-  private final HashtagMapper mapper;
+  private final HashtagMapstruct mapstruct;
 
   private final String InvalidHashtagMsg = "Hashtag Not found";
 
@@ -26,7 +25,7 @@ public class HashtagService {
 
     Page<Hashtag> hashtags = hashtagRepository.findAll(pageable);
 
-    return mapper.toResHashtags(hashtags);
+    return mapstruct.toResHashtags(hashtags);
   }
 
   public ResHashtag findHashtagById(Long id) {
@@ -34,7 +33,7 @@ public class HashtagService {
     Hashtag hashtag = hashtagRepository.findById(id).orElseThrow(
       () -> new BadRequestException(ErrorCode.BAD_REQUEST, InvalidHashtagMsg));
 
-    return mapper.toResHashtag(hashtag);
+    return mapstruct.toResHashtag(hashtag);
   }
 
   public ResHashtag findHashtagByName(String name) {
@@ -42,14 +41,19 @@ public class HashtagService {
     Hashtag hashtag = hashtagRepository.findByName(name).orElseThrow(
       () -> new BadRequestException(ErrorCode.BAD_REQUEST, InvalidHashtagMsg));
 
-    return mapper.toResHashtag(hashtag);
+    return mapstruct.toResHashtag(hashtag);
   }
 
   public ResHashtag createHashtag(String name) {
 
-    Hashtag savedHashtag = hashtagRepository.save(new Hashtag(name));
+    Optional<Hashtag> hashtag = hashtagRepository.findByName(name);
 
-    return mapper.toResHashtag(savedHashtag);
+    Hashtag savedhashtag = hashtag.orElseGet(() -> {
+      Hashtag newHashtag = new Hashtag(name);
+      return hashtagRepository.save(newHashtag);
+    });
+
+    return mapstruct.toResHashtag(savedhashtag);
   }
 
   public void deleteHashtagById(Long id) {

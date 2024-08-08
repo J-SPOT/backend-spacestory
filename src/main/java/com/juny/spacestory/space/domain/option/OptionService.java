@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class OptionService {
 
   private final OptionRepository optionRepository;
-  private final OptionMapper mapper;
+  private final OptionMapstruct mapstruct;
 
   private final String OPTION_NOT_FOUND_MSG = "Option not found";
 
@@ -23,7 +23,7 @@ public class OptionService {
     List<Option> options = optionRepository.findAll(
       Sort.by(Order.asc("id")));
 
-    return mapper.toResOptions(options);
+    return mapstruct.toResOptions(options);
   }
 
 
@@ -31,7 +31,7 @@ public class OptionService {
 
     Option savedOption = optionRepository.save(new Option(name));
 
-    return mapper.toResOption(savedOption);
+    return mapstruct.toResOption(savedOption);
   }
 
   @Transactional
@@ -41,7 +41,7 @@ public class OptionService {
 
     option.changeOptionName(name);
 
-    return mapper.toResOption(option);
+    return mapstruct.toResOption(option);
   }
 
   public void deleteOption(Long id) {

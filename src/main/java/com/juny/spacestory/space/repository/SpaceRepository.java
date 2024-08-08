@@ -7,13 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SpaceRepository extends JpaRepository<Space, Long>, CustomSpaceRepository {
 
-  Page<Space> findAll(Pageable pageable);
-
   Page<Space> findByRealEstateId(Long id, Pageable pageable);
-
-  Page<Space> findAllByOrderByViewCountDesc(Pageable pageable);
-
-  Page<Space> findAllByOrderByLikeCountDesc(Pageable pageable);
-
-  Page<Space> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }

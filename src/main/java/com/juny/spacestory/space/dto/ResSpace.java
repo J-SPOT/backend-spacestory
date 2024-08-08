@@ -15,7 +15,7 @@ public record ResSpace(
   LocalTime openingTime,
   LocalTime closingTime,
   Integer hourlyRate,
-  Integer spaceSize,
+  Integer size,
   Integer maxCapacity,
   Integer likeCount,
   Integer viewCount,

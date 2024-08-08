@@ -25,7 +25,7 @@ public class OptionController {
 
   private final OptionService optionService;
 
-  @Tag(name = "옵션 API", description = "옵션 조회, 옵션 추가, 옵션 수정, 옵션 삭제")
+  @Tag(name = "️옵션 API", description = "옵션 조회")
   @Operation(summary = "옵션 조회 API")
   @ApiResponses(
     value = {
@@ -40,22 +40,22 @@ public class OptionController {
     return new ResponseEntity<>(options, HttpStatus.OK);
   }
 
-  @Tag(name = "옵션 API", description = "옵션 조회, 옵션 추가, 옵션 수정, 옵션 삭제")
+  @Tag(name = "[관리자] 옵션 API", description = "옵션 추가, 옵션 수정, 옵션 삭제")
   @Operation(summary = "옵션 추가 API")
   @ApiResponses(
     value = {
       @ApiResponse(responseCode = "200", description = "옵션 추가 성공"),
     })
 
-  @PostMapping("/api/v1/options")
-  public ResponseEntity<ResOption> createOption(@RequestBody  ReqOption req) {
+  @PostMapping("/api/admin/v1/options")
+  public ResponseEntity<ResOption> createOption(@RequestBody ReqOption req) {
 
     ResOption option = optionService.createOption(req.name());
 
     return new ResponseEntity<>(option, HttpStatus.OK);
   }
 
-  @Tag(name = "옵션 API", description = "옵션 조회, 옵션 추가, 옵션 수정, 옵션 삭제")
+  @Tag(name = "[관리자] 옵션 API", description = "옵션 추가, 옵션 수정, 옵션 삭제")
   @Operation(summary = "옵션 수정 API")
   @ApiResponses(
     value = {
@@ -66,7 +66,7 @@ public class OptionController {
         content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
 
-  @PatchMapping("/api/v1/options/{id}")
+  @PatchMapping("/api/admin/v1/options/{id}")
   public ResponseEntity<ResOption> modifyOption(@PathVariable Long id, @RequestBody ReqOption req) {
 
     ResOption option = optionService.modifyOption(id, req.name());
@@ -74,7 +74,7 @@ public class OptionController {
     return new ResponseEntity<>(option, HttpStatus.OK);
   }
 
-  @Tag(name = "옵션 API", description = "옵션 조회, 옵션 추가, 옵션 수정, 옵션 삭제")
+  @Tag(name = "[관리자] 옵션 API", description = "옵션 추가, 옵션 수정, 옵션 삭제")
   @Operation(summary = "옵션 삭제 API")
   @ApiResponses(
     value = {
@@ -84,7 +84,7 @@ public class OptionController {
         description = "400, 옵션 번호가 잘못된 경우",
         content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
-  @DeleteMapping("/api/v1/options/{id}")
+  @DeleteMapping("/api/admin/v1/options/{id}")
   public ResponseEntity<Void> deleteOption(@PathVariable Long id) {
 
     optionService.deleteOption(id);

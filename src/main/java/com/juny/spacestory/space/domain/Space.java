@@ -16,12 +16,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalTime;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Table(name = "spaces")
+@NamedEntityGraph(name = "Space.withRealEstate", attributeNodes = {
+  @NamedAttributeNode("realEstate")
+})
 public class Space {
 
   @Id
@@ -47,7 +51,7 @@ public class Space {
   private Integer hourlyRate;
 
   @Column(nullable = false)
-  private Integer spaceSize;
+  private Integer size;
 
   @Column(nullable = false)
   private Integer maxCapacity;
@@ -67,20 +71,26 @@ public class Space {
   @Column(nullable = false)
   private Integer reviewCount;
 
-  @ElementCollection
-  @CollectionTable(name = "space_images", joinColumns = @JoinColumn(name = "space_id"))
-  @Column
-  private List<String> imagePaths = new ArrayList<>();
-
   @Column
   private String representImage;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "realEstate_id")
   private RealEstate realEstate;
 
+  @ElementCollection(fetch = FetchType.LAZY)
+  @CollectionTable(name = "space_images", joinColumns = @JoinColumn(name = "space_id"))
+  @Column
+  @BatchSize(size = 10)
+  private List<String> imagePaths = new ArrayList<>();
+
   @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+  @BatchSize(size = 10)
   private List<SpaceOption> spaceOptions = new ArrayList<>();
+
+  @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+  @BatchSize(size = 10)
+  private List<Question> questions = new ArrayList<>();
 
   @ManyToMany
   @JoinTable(
@@ -88,6 +98,7 @@ public class Space {
     joinColumns = @JoinColumn(name = "space_id"),
     inverseJoinColumns = @JoinColumn(name = "sub_category_id")
   )
+  @BatchSize(size = 10)
   private List<SubCategory> subCategories = new ArrayList<>();
 
   @ManyToMany
@@ -96,20 +107,18 @@ public class Space {
     joinColumns = @JoinColumn(name = "space_id"),
     inverseJoinColumns = @JoinColumn(name = "hashtag_id")
   )
+  @BatchSize(size = 10)
   private List<Hashtag> hashtags = new ArrayList<>();
 
-  @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Question> questions = new ArrayList<>();
-
   public Space(String name, String description, String reservationNotes, LocalTime openingTime, LocalTime closingTime, Integer hourlyRate,
-    Integer spaceSize, Integer maxCapacity) {
+    Integer size, Integer maxCapacity) {
     this.name = name;
     this.description = description;
     this.reservationNotes = reservationNotes;
     this.openingTime = openingTime;
     this.closingTime = closingTime;
     this.hourlyRate = hourlyRate;
-    this.spaceSize = spaceSize;
+    this.size = size;
     this.maxCapacity = maxCapacity;
     this.likeCount = 0;
     this.viewCount = 0;
@@ -198,7 +207,7 @@ public class Space {
     this.openingTime = req.openingTime();
     this.closingTime = req.closingTime();
     this.hourlyRate = req.hourlyRate();
-    this.spaceSize = req.spaceSize();
+    this.size = req.spaceSize();
     this.maxCapacity = req.maxCapacity();
   }
 

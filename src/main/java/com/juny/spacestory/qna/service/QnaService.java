@@ -52,6 +52,7 @@ public class QnaService {
   private final String ANSWERED_QUESTION_NOT_EDITED = "Answered question can't be edited";
   private final String ANSWERED_ANSWER_NOT_EDITED = "Answered answer can't be edited";
 
+  @Transactional
   public ResQuestion createQuestion(Long spaceId, ReqQuestion req, UUID userId) {
 
     User user = userRepository.findById(userId).orElseThrow(
@@ -69,6 +70,7 @@ public class QnaService {
     return mapper.toResQuestion(question);
   }
 
+  @Transactional
   public ResAnswer createAnswer(Long questionId, ReqAnswer req, UUID userId) {
 
     Question question = questionRepository.findById(questionId).orElseThrow(
@@ -82,7 +84,7 @@ public class QnaService {
     answer.setQuestion(question);
 
     UUID hostId = question.getSpace().getRealEstate().getUser().getId();
-    if (req.parentId() == null && !hostId.equals(userId)) {
+    if (req.parentId() == null && (!hostId.equals(userId) || question.getAnswers().size() != 0)) {
 
       throw new BadRequestException(ErrorCode.BAD_REQUEST, String.format(FIRST_ANSWER_IS_NOT_HOST, hostId, userId));
     }
@@ -97,6 +99,10 @@ public class QnaService {
 
       if (!Objects.isNull(parent.getChild())) {
         throw new BadRequestException(ErrorCode.BAD_REQUEST, ALREADY_CREATED_ANSWER);
+      }
+
+      if (!userId.equals(question.getUser().getId()) && !userId.equals(hostId)) {
+        throw new BadRequestException(ErrorCode.BAD_REQUEST, INVALID_USER_ID);
       }
       answer.setParent(parent);
     }

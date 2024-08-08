@@ -9,5 +9,5 @@ public interface RealEstateRepository extends JpaRepository<RealEstate, Long> {
 
   Page<RealEstate> findAll(Pageable pageable);
 
-  Page<RealEstate> findByUserId(UUID userId, Pageable pageable);
+  Page<RealEstate> findByUserIdAndDeletedAtIsNull(UUID userId, Pageable pageable);
 }

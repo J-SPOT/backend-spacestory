@@ -2,6 +2,7 @@ package com.juny.spacestory.integration;
 
 import com.juny.spacestory.reservation.entity.Reservation;
 import com.juny.spacestory.space.domain.Space;
+import com.juny.spacestory.space.domain.category.ResOnlySubCategory;
 import com.juny.spacestory.space.domain.hashtag.Hashtag;
 import com.juny.spacestory.space.domain.hashtag.HashtagRepository;
 import com.juny.spacestory.space.domain.option.Option;
@@ -13,24 +14,20 @@ import com.juny.spacestory.space.domain.realestate.RealEstateRepository;
 import com.juny.spacestory.reservation.repository.ReservationRepository;
 import com.juny.spacestory.space.domain.category.SubCategory;
 import com.juny.spacestory.space.domain.category.ResMainCategory;
-import com.juny.spacestory.space.domain.category.ResSubCategory;
 import com.juny.spacestory.space.domain.category.MainCategoryRepository;
+import com.juny.spacestory.space.domain.realestate.RealEstateStatus;
 import com.juny.spacestory.space.repository.SpaceRepository;
 import com.juny.spacestory.space.domain.category.SubCategoryRepository;
 import com.juny.spacestory.space.domain.category.CategoryService;
 import com.juny.spacestory.user.domain.User;
 import com.juny.spacestory.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.Rollback;
 
 @SpringBootTest
 public class MakeDummyData {
@@ -59,7 +56,12 @@ public class MakeDummyData {
 
   private MainCategory getRandomMainCategory() {
     Random random = new Random();
-    List<ResMainCategory> mainCategories = categoryService.findMainCategories();
+    List<ResMainCategory> mainCategories = new ArrayList<>();
+    mainCategories.add(new ResMainCategory(1L, "모임"));
+    mainCategories.add(new ResMainCategory(2L, "연습"));
+    mainCategories.add(new ResMainCategory(3L, "행사"));
+    mainCategories.add(new ResMainCategory(4L, "촬영"));
+    mainCategories.add(new ResMainCategory(5L, "오피스"));
 
     Long mainCategoryId = mainCategories.get(random.nextInt(mainCategories.size())).id();
 
@@ -69,7 +71,7 @@ public class MakeDummyData {
 
   private SubCategory getRandomSubCategory(Long id) {
     Random random = new Random();
-    List<ResSubCategory> subCategories = categoryService.findSubCategoriesByMainCategoryId(id);
+    List<ResOnlySubCategory> subCategories = categoryService.findSubCategoriesByMainCategoryId(id);
 
     Long subCategoryId = subCategories.get(random.nextInt(subCategories.size())).id();
 
@@ -291,7 +293,7 @@ public class MakeDummyData {
       Address address = new Address("도로명주소" + i, "저번주소" + i, "서울특별시", selectedDistrict,
         selectedDong);
       RealEstate realEstate = new RealEstate(address, random.nextInt(20) + 1, random.nextBoolean(),
-        random.nextBoolean());
+        random.nextBoolean(), RealEstateStatus.승인);
 
       // RealEstate - Host
       realEstate.setHost(host);

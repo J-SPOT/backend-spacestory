@@ -4,7 +4,7 @@ import com.juny.spacestory.qna.domain.Answer;
 import com.juny.spacestory.qna.domain.Question;
 import com.juny.spacestory.qna.dto.ResAnswer;
 import com.juny.spacestory.qna.dto.ResQuestion;
-import com.juny.spacestory.space.mapper.SpaceMapper;
+import com.juny.spacestory.space.mapper.SpaceMapstruct;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -12,7 +12,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring", uses = SpaceMapper.class)
+@Mapper(componentModel = "spring", uses = SpaceMapstruct.class)
 public interface QnaMapper {
 
   @Mapping(source = "user.email", target = "email", qualifiedByName = "maskEmail")
