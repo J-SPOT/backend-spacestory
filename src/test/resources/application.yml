@@ -95,8 +95,8 @@ security:
 cloud:
   aws:
     credentials:
-      access-key: ${AWS_CREDENTIALS_ACCESS_KEY}
-      secret-key: ${AWS_CREDENTIALS_SECRET_KEY}
+      accessKey: ${AWS_CREDENTIALS_ACCESS_KEY}
+      secretKey: ${AWS_CREDENTIALS_SECRET_KEY}
     region:
       static: ${AWS_REGION_STATIC}
     s3:
