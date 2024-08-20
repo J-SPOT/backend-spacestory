@@ -8,7 +8,7 @@ import com.juny.spacestory.space.domain.Space;
 import com.juny.spacestory.space.domain.category.CategoryService;
 import com.juny.spacestory.space.domain.category.MainCategory;
 import com.juny.spacestory.space.domain.category.MainCategoryRepository;
-import com.juny.spacestory.space.domain.category.ResSubCategory;
+import com.juny.spacestory.space.domain.category.ResOnlySubCategory;
 import com.juny.spacestory.space.domain.category.SubCategory;
 import com.juny.spacestory.space.domain.category.SubCategoryRepository;
 import com.juny.spacestory.space.domain.hashtag.Hashtag;
@@ -20,7 +20,8 @@ import com.juny.spacestory.space.domain.realestate.RealEstateRepository;
 import com.juny.spacestory.space.domain.space_option.SpaceOption;
 import com.juny.spacestory.space.dto.ReqSpace;
 import com.juny.spacestory.space.dto.ResSpace;
-import com.juny.spacestory.space.mapper.SpaceMapper;
+import com.juny.spacestory.space.dto.ResSummarySpace;
+import com.juny.spacestory.space.mapper.SpaceMapstruct;
 import com.juny.spacestory.space.repository.SpaceRepository;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class SpaceService {
   private final MainCategoryRepository mainCategoryRepository;
   private final OptionRepository optionRepository;
   private final HashtagRepository hashtagRepository;
-  private final SpaceMapper mapper;
+  private final SpaceMapstruct mapstruct;
   private final CategoryService categoryService;
   private final AmazonS3 amazonS3;
 
@@ -61,13 +62,12 @@ public class SpaceService {
   private String bucketName;
 
   @Transactional
-  public Page<ResSpace> findAllSpaces(int page, int size) {
+  public Page<ResSummarySpace> findSortedSpacesForMainPage(int page, int size, String sort) {
 
-    Page<Space> spaces = spaceRepository.findAll(PageRequest.of(page, size));
-
-    return mapper.toResSpace(spaces);
+    return spaceRepository.findSortedSpacesForMainPage(page, size, sort);
   }
 
+  @Transactional
   public ResSpace findSpaceById(Long spaceId) {
 
     Space space = spaceRepository.findById(spaceId).orElseThrow(
@@ -75,15 +75,16 @@ public class SpaceService {
 
     space.increaseViewCount();
 
-    return mapper.toResSpace(space);
+    return mapstruct.toResSpace(space);
   }
 
+  @Transactional
   public Page<ResSpace> findSpacesByRealEstateId(Long realEstateId, int page, int size) {
 
     Page<Space> spaces = spaceRepository.findByRealEstateId(realEstateId,
       PageRequest.of(page, size));
 
-    return mapper.toResSpace(spaces);
+    return mapstruct.toResSpace(spaces);
   }
 
   @Transactional
@@ -103,7 +104,7 @@ public class SpaceService {
 
     setOption(req, savedSpace);
 
-    return mapper.toResSpace(savedSpace);
+    return mapstruct.toResSpace(savedSpace);
   }
 
   private void updateOptions(List<String> optionNames, Space space) {
@@ -157,7 +158,7 @@ public class SpaceService {
 
     List<String> subCategories = categoryService.findSubCategoriesByMainCategoryId(mainCategory.getId())
       .stream()
-      .map(ResSubCategory::name)
+      .map(ResOnlySubCategory::name)
       .toList();
 
     for (var e : req.subCategories()) {
@@ -195,7 +196,7 @@ public class SpaceService {
 
     updateOptions(req.options(), space);
 
-    return mapper.toResSpace(space);
+    return mapstruct.toResSpace(space);
   }
 
   public void deleteSpace(Long id) {
@@ -206,37 +207,11 @@ public class SpaceService {
     spaceRepository.delete(space);
   }
 
-  public Page<ResSpace> findAllSpacesByMostViews(int page, int size) {
-
-    Page<Space> spaces = spaceRepository.findAllByOrderByViewCountDesc(
-      PageRequest.of(page, size));
-
-    return mapper.toResSpace(spaces);
-  }
-
-  public Page<ResSpace> findAllSpacesByMostLikes(int page, int size) {
-
-    Page<Space> spaces = spaceRepository.findAllByOrderByLikeCountDesc(
-      PageRequest.of(page, size));
-
-    return mapper.toResSpace(spaces);
-  }
-
-  public Page<ResSpace> findAllRecentlyCreatedSpaces(int page, int size) {
-
-    Page<Space> spaces = spaceRepository.findAllByOrderByCreatedAtDesc(
-      PageRequest.of(page, size));
-
-    return mapper.toResSpace(spaces);
-  }
-
-  public Page<ResSpace> searchSpaces(String query, List<String> sigungu, Integer minCapacity,
+  public Page<ResSummarySpace> searchSpaces(String query, List<String> sigungu, Integer minCapacity,
     Integer minPrice, Integer maxPrice, List<String> options, String sort, int page, int size) {
 
-    Page<Space> spaces = spaceRepository.searchSpacesByFilter(query, sigungu, minCapacity, minPrice,
+    return spaceRepository.searchSpacesByFilter(query, sigungu, minCapacity, minPrice,
       maxPrice, options, sort, page, size);
-
-    return mapper.toResSpace(spaces);
   }
 
   @Transactional
@@ -266,7 +241,7 @@ public class SpaceService {
       space.getImagePaths().add(unique);
     }
 
-    return mapper.toResSpace(space);
+    return mapstruct.toResSpace(space);
   }
 
   @Transactional
@@ -303,6 +278,6 @@ public class SpaceService {
 
     space.setRepresentImage(imagePath);
 
-    return mapper.toResSpace(space);
+    return mapstruct.toResSpace(space);
   }
 }

@@ -95,9 +95,13 @@ security:
 cloud:
   aws:
     credentials:
-      access-key: ${AWS_CREDENTIALS_ACCESS_KEY}
-      secret-key: ${AWS_CREDENTIALS_SECRET_KEY}
+      accessKey: ${AWS_CREDENTIALS_ACCESS_KEY}
+      secretKey: ${AWS_CREDENTIALS_SECRET_KEY}
     region:
       static: ${AWS_REGION_STATIC}
     s3:
       bucket: ${AWS_S3_BUCKET}
+
+mybatis:
+  type-aliases-package: com.juny.spacestory
+  mapper-locations: classpath:mapper/*.xml

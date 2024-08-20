@@ -5,7 +5,6 @@ import com.juny.spacestory.global.exception.common.BadRequestException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +13,7 @@ public class CategoryService {
 
   private final MainCategoryRepository mainCategoryRepository;
   private final SubCategoryRepository subCategoryRepository;
-  private final CategoryMapper mapper;
+  private final CategoryMapstruct mapstruct;
 
   private final String MAIN_CATEGORY_NOT_FOUND_MSG = "Main category not found";
   private final String SUB_CATEGORY_NOT_FOUND_MSG = "Sub category not found";
@@ -25,29 +24,14 @@ public class CategoryService {
 
     List<MainCategory> allCategories = mainCategoryRepository.findAllCategories();
 
-    return mapper.toResCategories(allCategories);
-  }
-
-  public List<ResMainCategory> findMainCategories() {
-
-    List<MainCategory> mainCategories = mainCategoryRepository.findAll(
-      Sort.by(Sort.Order.asc("id")));
-
-    return mapper.toResMainCategories(mainCategories);
+    return mapstruct.toResCategories(allCategories);
   }
 
   public ResMainCategory createMainCategory(String name) {
 
     MainCategory savedCategory = mainCategoryRepository.save(new MainCategory(name));
 
-    return mapper.toResMainCategory(savedCategory);
-  }
-
-  public ResMainCategory findMainCategoryById(Long id) {
-
-    MainCategory mainCategory = getMainCategory(id);
-
-    return mapper.toResMainCategory(mainCategory);
+    return mapstruct.toResMainCategory(savedCategory);
   }
 
   @Transactional
@@ -57,7 +41,7 @@ public class CategoryService {
 
     mainCategory.changeCategoryName(newName);
 
-    return mapper.toResMainCategory(mainCategory);
+    return mapstruct.toResMainCategory(mainCategory);
   }
 
   public void deleteById(Long id) {
@@ -76,25 +60,16 @@ public class CategoryService {
 
     SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
 
-    return mapper.toResSubCategory(savedSubCategory);
+    return mapstruct.toResSubCategory(savedSubCategory);
   }
 
-  public List<ResSubCategory> findSubCategoriesByMainCategoryId(Long mainId) {
+  public List<ResOnlySubCategory> findSubCategoriesByMainCategoryId(Long mainId) {
 
     getMainCategory(mainId);
 
     List<SubCategory> subCategories = subCategoryRepository.findByMainCategory_Id(mainId);
-
-    return mapper.toResSubCategories(subCategories);
-  }
-
-  public ResSubCategory findSubCategoryById(Long id, Long subId) {
-
-    SubCategory subCategory = getSubCategory(subId);
-
-    checkCategoryHierarchy(id, subCategory);
-
-    return mapper.toResSubCategory(subCategory);
+    
+    return mapstruct.toResOnlySubCategories(subCategories);
   }
 
   @Transactional
@@ -106,7 +81,7 @@ public class CategoryService {
 
     subCategory.changeCategoryName(newName);
 
-    return mapper.toResSubCategory(subCategory);
+    return mapstruct.toResSubCategory(subCategory);
   }
 
   public void deleteSubCategory(Long id, Long subId) {

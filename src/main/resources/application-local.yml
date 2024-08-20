@@ -52,11 +52,11 @@ spring:
   jpa:
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
+        show_sql: false
+        format_sql: false
     hibernate:
       ddl-auto: validate
-    open-in-view: false
+    open-in-view: true
 
 server:
   port: 8080
