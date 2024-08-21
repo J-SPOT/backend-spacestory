@@ -32,19 +32,19 @@ public class Question {
   @JoinColumn(name = "space_id")
   private Space space;
 
-  @OneToMany(mappedBy = "question")
-  private List<Answer> answers = new ArrayList<>();
-
   @ManyToOne
   @JoinColumn(name = "user_id")
   private User user;
+
+  @OneToMany(mappedBy = "question")
+  private List<Answer> answers = new ArrayList<>();
 
   public Question(String content) {
     this.content = content;
     createdAt = LocalDateTime.now();
   }
 
-  // 연관관계 편의 메서드
+  // ManyToOne 연관관계 편의 메서드, 질문 - 유저 [양방향]
   public void setUser(User user) {
     if (this.user != null) {
       this.user.getQuestions().remove(this);
@@ -55,7 +55,7 @@ public class Question {
     }
   }
 
-  // 연관관계 편의 메서드
+  // ManyToOne 연관관계 편의 메서드, 질문 - 공간 [양방향]
   public void setSpace(Space space) {
     if (this.space != null) {
       this.space.getQuestions().remove(this);
@@ -66,7 +66,7 @@ public class Question {
     }
   }
 
-  // 연관관계 편의 메서드
+  // OneToMany 연관관계 편의 메서드, 질문 - 답변 [양방향]
   public void addAnswer(Answer answer) {
     this.answers.add(answer);
     if (answer.getQuestion() != this) {
@@ -74,7 +74,7 @@ public class Question {
     }
   }
 
-  // 연관관계 편의 메서드
+  // OneToMany 연관관계 편의 메서드, 질문 - 답변 [양방향]
   public void removeAnswer(Answer answer) {
     this.answers.remove(answer);
     if (answer.getQuestion() == this) {

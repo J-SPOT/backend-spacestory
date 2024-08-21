@@ -23,16 +23,16 @@ public class Answer {
   @Column
   private LocalDateTime createdAt;
 
-  @ManyToOne
-  @JoinColumn(name = "question_id")
-  private Question question;
-
   @OneToOne
   @JoinColumn(name = "parent_id")
   private Answer parent;
 
   @OneToOne(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
   private Answer child;
+
+  @ManyToOne
+  @JoinColumn(name = "question_id")
+  private Question question;
 
   @ManyToOne
   @JoinColumn(name = "user_id")
@@ -43,7 +43,7 @@ public class Answer {
     this.createdAt = LocalDateTime.now();
   }
 
-  // 연관관계 편의 메서드
+  // ManyToOne 연관관계 편의 메서드, 답변 - 유저 [양방향]
   public void setUser(User user) {
     if (this.user != null) {
       this.user.getAnswers().remove(this);
@@ -54,7 +54,7 @@ public class Answer {
     }
   }
 
-  // 연관관계 편의 메서드
+  // ManyToOne 연관관계 편의 메서드, 답변 - 질문 [양방향]
   public void setQuestion(Question question) {
     if (this.question != null) {
       this.question.getAnswers().remove(this);
@@ -65,7 +65,7 @@ public class Answer {
     }
   }
 
-  // 연관관계 편의 메서드
+  // OneToOne 연관관계 편의 메서드, 답변 - 답변 [양방향]
   public void setParent(Answer parent) {
     if (this.parent != null) {
       this.parent.child = null;

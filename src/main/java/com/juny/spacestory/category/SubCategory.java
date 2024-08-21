@@ -54,7 +54,7 @@ public class SubCategory {
     }
   }
 
-  // 연관관계 편의 메서드
+  // ManyToOne 연관관계 편의 메서드, 서브카테고리 - 메인카테고리 [양방향]
   public void setMainCategory(MainCategory mainCategory) {
     if (this.mainCategory != null) {
       this.mainCategory.getSubCategories().remove(this);
