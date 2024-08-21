@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "space_options")
+@Table(name = "detailed_space_options")
 @Getter
 @NoArgsConstructor
 public class SpaceOption {

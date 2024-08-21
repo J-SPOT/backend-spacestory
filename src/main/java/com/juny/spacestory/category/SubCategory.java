@@ -1,4 +1,4 @@
-package com.juny.spacestory.space.domain.category;
+package com.juny.spacestory.category;
 
 import com.juny.spacestory.space.domain.Space;
 import jakarta.persistence.Column;
@@ -39,7 +39,7 @@ public class SubCategory {
     this.name = name;
   }
 
-  // 연관관계 편의 메서드
+  // ManyToMany 연관관계 편의 메서드, 서브카테고리 - 공간 [양방향]
   public void addSpace(Space space) {
     if (!this.spaces.contains(space)) {
       this.spaces.add(space);
@@ -47,10 +47,9 @@ public class SubCategory {
     }
   }
 
-  // 연관관계 편의 메서드
+  // ManyToMany 연관관계 편의 메서드, 서브카테고리 - 공간 [양방향]
   public void removeSpace(Space space) {
-    if (this.spaces.contains(space)) {
-      this.spaces.remove(space);
+    if (this.spaces.remove(space)) {
       space.removeSubCategory(this);
     }
   }
