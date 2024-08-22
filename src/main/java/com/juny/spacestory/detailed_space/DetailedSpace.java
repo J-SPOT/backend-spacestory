@@ -1,7 +1,8 @@
 package com.juny.spacestory.detailed_space;
 
+import com.juny.spacestory.category.SubCategory;
+import com.juny.spacestory.reservation.entity.prices.ReservationInfo;
 import com.juny.spacestory.space.domain.Space;
-import com.juny.spacestory.space.domain.images.SpaceImagePath;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,18 +12,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Table(name = "detailed_spaces")
@@ -37,7 +38,7 @@ public class DetailedSpace {
 
   @Column
   @Enumerated(EnumType.STRING)
-  private RateType represestRateType;
+  private ReservationType represestReservationType;
 
   @Column
   private Integer representRate;
@@ -73,7 +74,18 @@ public class DetailedSpace {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   private List<DetailedSpaceImagePath> detailedSpaceImagePaths = new ArrayList<>();
 
-  // 연관관계 편의 메서드
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ReservationInfo> reservationInfos = new ArrayList<>();
+
+  @ManyToMany
+  @JoinTable(
+    name = "detailed_space_sub_categories",
+    joinColumns = @JoinColumn(name = "detailed_space_id"),
+    inverseJoinColumns = @JoinColumn(name = "sub_category_id")
+  )
+  private List<SubCategory> subCategories = new ArrayList<>();
+
+  // ManyToOne 연관관계 편의 메서드, 상세공간 - 공간 [양방향]
   public void setSpace(Space space) {
     if (this.space != null) {
       this.space.getDetailedSpaces().remove(this);
@@ -94,11 +106,42 @@ public class DetailedSpace {
     detailedSpaceImagePaths.remove(imagePath);
   }
 
-  public DetailedSpace(String name, RateType rateType, Integer rate, String representImage,
+  // OneToMany 연관관계 편의 메서드, 상세공간 - 예약정보 [양방향]
+  public void addReservationInfo(ReservationInfo reservationInfo) {
+    this.reservationInfos.add(reservationInfo);
+    if (reservationInfo.getDetailedSpace() != this) {
+      reservationInfo.setDetailedSpace(this);
+    }
+  }
+
+  // OneToMany 연관관계 편의 메서드, 상세공간 - 예약정보 [양방향]
+  public void removeReservationInfo(ReservationInfo reservationInfo) {
+    this.reservationInfos.remove(reservationInfo);
+    if (reservationInfo.getDetailedSpace() == this) {
+      reservationInfo.setDetailedSpace(null);
+    }
+  }
+
+  // ManyToMany[중간 테이블 X] 연관관계 편의 메서드, 상세공간 - 서브카테고리 [양방향]
+  public void addSubCategory(SubCategory subCategory) {
+    if (!this.subCategories.contains(subCategory)) {
+      this.subCategories.add(subCategory);
+      subCategory.addDetailedSpace(this);
+    }
+  }
+
+  // ManyToMany[중간 테이블 X] 연관관계 편의 메서드, 상세공간 - 서브카테고리 [양방향]
+  public void removeSubCategory(SubCategory subCategory) {
+    if (this.subCategories.remove(subCategory)) {
+      subCategory.removeDetailedSpace(this);
+    }
+  }
+
+  public DetailedSpace(String name, ReservationType reservationType, Integer rate, String representImage,
     String description, Integer size, Integer minimumCapacity, Integer maximumCapacity) {
 
     this.name = name;
-    this.represestRateType = rateType;
+    this.represestReservationType = reservationType;
     this.representRate = rate;
     this.representImage = representImage;
     this.description = description;
