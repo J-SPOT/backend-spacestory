@@ -33,7 +33,7 @@ public class Hashtag {
     this.name = name;
   }
 
-  // 연관관계 편의 메서드
+  // ManyToMany[중간 테이블 X] 연관관계 편의 메서드, 해시태그 - 공간 [양방향]
   public void addSpace(Space space) {
     if (!this.spaces.contains(space)) {
       this.spaces.add(space);
@@ -41,10 +41,9 @@ public class Hashtag {
     }
   }
 
-  // 연관관계 편의 메서드
+  // ManyToMany[중간 테이블 X] 연관관계 편의 메서드, 해시태그 - 공간 [양방향]
   public void removeSpace(Space space) {
-    if (this.spaces.contains(space)) {
-      this.spaces.remove(space);
+    if (this.spaces.remove(space)) {
       space.removeHashtag(this);
     }
   }

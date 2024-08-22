@@ -1,4 +1,4 @@
-package com.juny.spacestory.space.domain.realestate;
+package com.juny.spacestory.space.domain;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

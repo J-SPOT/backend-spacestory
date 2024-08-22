@@ -34,7 +34,7 @@ public class Review {
 
   @ElementCollection
   @CollectionTable(name = "review_images", joinColumns = @JoinColumn(name = "review_id"))
-  @Column
+  @Column(name = "image_path")
   private List<String> imagePaths = new ArrayList<>();
 
   @ManyToOne
@@ -51,7 +51,7 @@ public class Review {
     this.createdAt = LocalDateTime.now();
   }
 
-  // 연관관계 편의 메서드
+  // ManyToOne 연관관계 편의 메서드, 리뷰 - 유저 [양방향]
   public void setUser(User user) {
     if (this.user != null) {
       this.user.getReviews().remove(this);
@@ -62,9 +62,8 @@ public class Review {
     }
   }
 
-  // 연관관계 편의 메서드
+  // OneToOne 연관관계 편의 메서드, 리뷰 - 예약 [단방향]
   public void setReservation(Reservation reservation) {
-
     this.reservation = reservation;
   }
 

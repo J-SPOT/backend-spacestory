@@ -19,8 +19,12 @@ public class SpaceOptionId {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     SpaceOptionId that = (SpaceOptionId) o;
     return Objects.equals(spaceId, that.spaceId) &&
       Objects.equals(optionId, that.optionId);

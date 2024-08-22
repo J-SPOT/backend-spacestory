@@ -1,4 +1,4 @@
-package com.juny.spacestory.space.domain.category;
+package com.juny.spacestory.category;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,7 +28,7 @@ public class MainCategory {
   @OneToMany(mappedBy = "mainCategory")
   private List<SubCategory> subCategories = new ArrayList<>();
 
-  // 연관관계 편의 메서드
+  // OneToMany 연관관계 편의 메서드, 메인카테고리 - 서브카테고리 [양방향]
   public void addSubCategory(SubCategory subCategory) {
     this.subCategories.add(subCategory);
     if (subCategory.getMainCategory() != this) {
@@ -36,7 +36,7 @@ public class MainCategory {
     }
   }
 
-  // 연관관계 편의 메서드
+  // OneToMany 연관관계 편의 메서드, 메인카테고리 - 서브카테고리 [양방향]
   public void removeSubCategory(SubCategory subCategory) {
     subCategories.remove(subCategory);
     if (subCategory.getMainCategory() == this) {

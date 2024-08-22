@@ -1,6 +1,6 @@
 package com.juny.spacestory.reservation.entity;
 
-import com.juny.spacestory.space.domain.Space;
+import com.juny.spacestory.detailed_space.DetailedSpace;
 import com.juny.spacestory.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,17 +29,24 @@ public class Reservation {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
-  private LocalDate reservationDate;
+  @Column
+  @Enumerated(EnumType.STRING)
+  private ReservationStatus status;
 
   @Column(nullable = false)
-  private LocalTime startTime;
+  private LocalDateTime startTime;
 
   @Column(nullable = false)
-  private LocalTime endTime;
+  private LocalDateTime endTime;
 
   @Column(nullable = false)
-  private Long fee;
+  private Integer fee;
+
+  @Column
+  private Integer numberOfGuests;
+
+  @Column
+  private Long originReservationId;
 
   @Column(nullable = false)
   private LocalDateTime createdAt;
@@ -47,41 +54,43 @@ public class Reservation {
   @Column
   private LocalDateTime deletedAt;
 
-  @Column
-  @Enumerated(EnumType.STRING)
-  private ReservationStatus status;
-
-  @Column
-  private Long originReservationId;
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "space_id")
-  private Space space;
+  @JoinColumn(name = "detailed_space_id")
+  private DetailedSpace detailedSpace;
+
+//  @OneToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "reservation_type_id", nullable = false)
+//  private ReservationType reservationType;
 
   public Reservation(LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Long fee) {
-    this.reservationDate = reservationDate;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.fee = fee;
+//    this.reservationDate = reservationDate;
+//    this.startTime = startTime;
+//    this.endTime = endTime;
+//    this.fee = fee;
     this.createdAt = LocalDateTime.now();
     this.status = ReservationStatus.대기;
   }
 
   public Reservation(LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Long fee, Long originReservationId) {
-    this.reservationDate = reservationDate;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.fee = fee;
+//    this.reservationDate = reservationDate;
+//    this.startTime = startTime;
+//    this.endTime = endTime;
+//    this.fee = fee;
     this.createdAt = LocalDateTime.now();
     this.status = ReservationStatus.대기;
     this.originReservationId = originReservationId;
   }
 
-  // 연관관계 편의 메서드
+  // ManyToOne 연관관계 편의 메서드, 예약 - 상세공간 [단방향]
+  public void setDetailSpaces(DetailedSpace detailSpaces) {
+    this.detailedSpace = detailSpaces;
+  }
+
+  // ManyToOne 연관관계 편의 메서드, 예약 - 유저 [양방향]
   public void setUser(User user) {
     if (this.user != null) {
       this.user.getReservations().remove(this);
@@ -90,11 +99,6 @@ public class Reservation {
     if (user != null && !user.getReservations().contains(this)) {
       user.getReservations().add(this);
     }
-  }
-
-  // 연관관계 편의 메서드
-  public void setSpace(Space space) {
-    this.space = space;
   }
 
   public void approveReservation() {

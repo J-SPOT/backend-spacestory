@@ -35,22 +35,21 @@ public class Option {
     this.name = name;
   }
 
-  // 연관관계 편의 메서드
+  // ManyToMany[중간 테이블 O] 연관관계 편의 메서드, 옵션 - 공간 [양방향]
   public void addSpace(Space space) {
     SpaceOption spaceOption = new SpaceOption(space, this);
     spaceOptions.add(spaceOption);
     space.getSpaceOptions().add(spaceOption);
   }
 
-  // 연관관계 편의 메서드
+  // ManyToMany[중간 테이블 O] 연관관계 편의 메서드, 옵션 - 공간 [양방향]
   public void removeSpace(Space space) {
-    for (var spaceOption : new ArrayList<>(spaceOptions)) {
-      if (spaceOption.getSpace().equals(space) && spaceOption.getOption().equals(this)) {
-        spaceOptions.remove(spaceOption);
-        space.getSpaceOptions().remove(spaceOption);
-        spaceOption.setSpace(null);
-        spaceOption.setOption(null);
-      }
+    SpaceOption spaceOption = new SpaceOption(space, this);
+    
+    if (spaceOptions.remove(spaceOption)) {
+      space.getSpaceOptions().remove(spaceOption);
+      spaceOption.setSpace(null);
+      spaceOption.setOption(null);
     }
   }
 
