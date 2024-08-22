@@ -20,9 +20,12 @@ public class RegularDayOff {
   private Long id;
 
   @Column
-  private DayType dayType;
+  private DayOffType dayOffType;
 
-  public RegularDayOff(DayType dayType) {
-    this.dayType = dayType;
+  @Column
+  private DayOfWeekWithHoliday dayOfWeek;
+
+  public RegularDayOff(DayOfWeekWithHoliday dayOfWeek) {
+    this.dayOfWeek = dayOfWeek;
   }
 }
