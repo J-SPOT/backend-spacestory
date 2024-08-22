@@ -15,13 +15,11 @@ import com.juny.spacestory.user.domain.Host;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalTime;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Table(name = "spaces")
@@ -135,9 +133,19 @@ public class Space extends SoftDeleteBaseEntity {
     spaceImagePaths.add(spaceImagePath);
   }
 
+  // OneToMany 연관관계 편의 메서드, 공간 - 이미지 [단방향]
+  public void removeSpaceImagePath(SpaceImagePath spaceImagePath) {
+    spaceImagePaths.remove(spaceImagePath);
+  }
+
   // OneToMany 연관관계 편의 메서드, 공간 - 정기휴무일 [단방향]
   public void addRegularDayOff(RegularDayOff regularDayOff) {
     regularDayOffs.add(regularDayOff);
+  }
+
+  // OneToMany 연관관계 편의 메서드, 공간 - 정기휴무일 [단방향]
+  public void removeRegularDayOff(RegularDayOff regularDayOff) {
+    regularDayOffs.remove(regularDayOff);
   }
 
   // OneToMany 연관관계 편의 메서드, 공간 - 지정휴무일 [단방향]
@@ -145,9 +153,9 @@ public class Space extends SoftDeleteBaseEntity {
     designatedDayOffs.add(designatedDayOff);
   }
 
-  // OneToMany 연관관계 편의 메서드, 공간 - 이미지 [단방향]
-  public void removeSpaceImagePath(SpaceImagePath spaceImagePath) {
-    spaceImagePaths.remove(spaceImagePath);
+  // OneToMany 연관관계 편의 메서드, 공간 - 지정휴무일 [단방향]
+  public void removeDesignatedDayOff(DesignatedDayOff designatedDayOff) {
+    designatedDayOffs.remove(designatedDayOff);
   }
 
   // OneToMany 연관관계 편의 메서드, 공간 - 질문 [양방향]
